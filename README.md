@@ -1,255 +1,180 @@
 # Rooster AI Project Management 🐓
 
-A Jira-type application that allows AI agents to collaborate on software projects. Think of it as a project management workspace where AI agents with different roles and personalities work together to deliver the best code possible.
+A Jira-style project management application with **autonomous AI agents** that collaborate on software projects in real time. Features a **Kanban board web UI** (React + TypeScript) backed by an **Express API** with **Server-Sent Events (SSE)** for live agent activity.
 
 ## Features
 
-- **Project Management**: Create projects and clone repositories into a dedicated projects folder
-- **Task Board**: Kanban-style board with lanes (To Do, In Progress, Review, Done)
-- **AI Agent Team**: 7 specialized agents with unique personalities and skills:
-  - **Manager** (Marcus Thompson) - Strategic coordinator
-  - **Tech Lead** (Sarah Chen) - Technical architecture expert
-  - **Developer** (Alex Rivera) - Full-stack implementation specialist
-  - **Intern** (Jamie Park) - Enthusiastic learner
-  - **QA** (Taylor Johnson) - Quality assurance expert
-  - **Accessibility** (Morgan Davis) - Inclusive design advocate
-  - **Product Owner** (Jordan Lee) - User-focused prioritizer
-- **Collaborative Workflow**: Agents interact with each other based on their roles and personalities
-- **Task Notes & Communication**: Agents can leave notes and messages on tasks
+- **Kanban Board** — 7-lane web UI (Backlog → Analyze → Develop → Ready for Test → Testing → Ready for Acceptance → Accepted)
+- **Drag-and-Drop** — move tasks between lanes with HTML5 drag-and-drop
+- **Auto-Polling** — board refreshes every 3 seconds when external changes occur
+- **Sprint Selector** — filter the board by sprint
+- **Task Detail Modal** — view description, acceptance criteria, and agent comments
+- **Accessibility** — ARIA roles, keyboard navigation (Tab/Enter/Escape), focus trapping
+- **Autonomous AI Agents** — 7 server-side agents that react to task movements in real time:
+  - **Manager** (Marcus Thompson) — Strategic coordinator
+  - **Tech Lead** (Sarah Chen) — Technical architecture expert
+  - **Developer** (Alex Rivera) — Full-stack implementation specialist
+  - **Intern** (Jamie Park) — Enthusiastic learner
+  - **QA** (Taylor Johnson) — Quality assurance expert
+  - **Accessibility** (Morgan Davis) — Inclusive design advocate
+  - **Product Owner** (Jordan Lee) — User-focused prioritizer
+- **Live Agent Feed** — SSE pushes `agent:thinking`, `agent:comment`, and `agent:idle` events to the browser in real time
+
+---
+
+## Prerequisites
+
+- **Node.js 18+** and **npm**
+
+---
 
 ## Installation
 
-1. Clone this repository:
 ```bash
 git clone https://github.com/marts9182/Rooster-AI-Project-Management.git
 cd Rooster-AI-Project-Management
 ```
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Initialize the system:
-```bash
-./rooster init
-```
-
-## Quick Start
-
-### 1. Create a Project
+### 1. Install backend dependencies
 
 ```bash
-./rooster project create \
-  --name "My Awesome App" \
-  --description "Building a cool web application" \
-  --repo-url "https://github.com/user/repo.git"
+cd web.ui/backend
+npm install
 ```
 
-This will:
-- Create a new project
-- Clone the repository into the `projects/` folder
-- Return a project ID for future use
-
-### 2. Create a Task with Auto-Assignment
+### 2. Build the React frontend
 
 ```bash
-./rooster task create \
-  --project proj-12345678 \
-  --title "Implement user authentication" \
-  --description "Add login and registration features with secure password handling" \
-  --auto-assign
+cd web.ui/frontend-react
+npm install
+npm run build
 ```
 
-The `--auto-assign` flag will:
-- Automatically assign the task to the appropriate agent based on the description
-- Simulate agent collaboration showing how the team interacts
+This produces a production build in `web.ui/frontend-react/dist/` that Express serves automatically.
 
-### 3. View the Task Board
+---
+
+## Running
 
 ```bash
-./rooster task list
+cd web.ui/backend
+node server.js
 ```
 
-This shows a Kanban-style board with all tasks organized by status.
+Open **http://localhost:5000** in your browser. All 7 agents boot automatically and begin listening for task events.
 
-### 4. Move Tasks Through Lanes
+### Development mode (with hot-reload)
 
 ```bash
-./rooster task move task-12345678 IN_PROGRESS
-./rooster task move task-12345678 REVIEW
-./rooster task move task-12345678 DONE
+# Terminal 1 — Express API + Agent Runtime
+cd web.ui/backend
+node server.js
+
+# Terminal 2 — Vite dev server (proxies /api to Express)
+cd web.ui/frontend-react
+npm run dev
 ```
 
-### 5. View Agent Team
+Then open **http://localhost:3000** for the Vite dev server.
 
-```bash
-./rooster agent list
-```
-
-See all agents, their personalities, skills, and current tasks.
-
-## Command Reference
-
-### Projects
-
-```bash
-# Create a project
-./rooster project create --name "NAME" --description "DESC" [--repo-url URL]
-
-# List all projects
-./rooster project list
-
-# Show project details
-./rooster project show <project-id>
-```
-
-### Tasks
-
-```bash
-# Create a task
-./rooster task create --project <id> --title "TITLE" --description "DESC" [--auto-assign]
-
-# List tasks
-./rooster task list [--project <id>] [--status TODO|IN_PROGRESS|REVIEW|DONE]
-
-# Show task details
-./rooster task show <task-id>
-
-# Move task to different lane
-./rooster task move <task-id> TODO|IN_PROGRESS|REVIEW|DONE
-
-# Assign task to agent
-./rooster task assign <task-id> <agent-id>
-
-# Add a note to task
-./rooster task note <task-id> "Your note here"
-```
-
-### Agents
-
-```bash
-# List all agents
-./rooster agent list
-
-# Show agent details
-./rooster agent show <agent-id>
-```
-
-## Agent Personalities
-
-Each agent has a unique personality that influences how they approach work:
-
-- **Marcus Thompson (Manager)**: Strategic thinker who focuses on team coordination and ensuring projects stay on track
-- **Sarah Chen (Tech Lead)**: Detail-oriented technical expert passionate about architecture and code quality
-- **Alex Rivera (Developer)**: Creative problem-solver who loves tackling challenges with clean code
-- **Jamie Park (Intern)**: Enthusiastic learner bringing fresh perspectives and great documentation skills
-- **Taylor Johnson (QA)**: Meticulous tester with an eye for edge cases and quality metrics
-- **Morgan Davis (Accessibility)**: Empathetic advocate ensuring inclusive design for all users
-- **Jordan Lee (Product Owner)**: User-focused decision maker who prioritizes based on value
-
-## How Agents Collaborate
-
-When you create a task with `--auto-assign`, the system:
-
-1. **Product Owner** creates and clarifies requirements
-2. **Tech Lead** reviews technical approach and architecture
-3. **Developer/Intern** implements the feature (auto-assigned based on complexity)
-4. **QA** provides testing strategy and prepares test cases
-5. **Accessibility** reviews if the task involves UI/UX
-6. **Manager** oversees the process and provides support
-
-Each agent leaves messages from their unique perspective, creating a rich collaborative workflow.
+---
 
 ## Project Structure
 
 ```
 Rooster-AI-Project-Management/
-├── rooster                    # Main CLI entry point
-├── rooster_ai/
-│   ├── models/               # Data models (Project, Task, Agent, Message)
-│   ├── agents/               # Agent definitions and personalities
-│   ├── core/                 # Core functionality
-│   │   ├── storage.py       # Data persistence
-│   │   ├── project_manager.py # Project and task management
-│   │   └── workflow.py       # Agent collaboration logic
-│   └── cli/                  # Command-line interface
-├── projects/                 # Cloned repositories (auto-created)
-├── data/                     # Storage files (auto-created)
-└── requirements.txt          # Python dependencies
+├── web.ui/
+│   ├── backend/
+│   │   ├── server.js                # Express API + SSE + static file server
+│   │   └── agents/
+│   │       ├── index.js             # Barrel export (runtime, bus, validateTransition)
+│   │       ├── EventBus.js          # Node.js EventEmitter with .fire() helper
+│   │       ├── BaseAgent.js         # Abstract agent with boot/engage/respond lifecycle
+│   │       ├── AgentRuntime.js      # Boots all agents, wires persistence, SSE broadcast
+│   │       ├── workflowRules.js     # Stage → role mapping (which agents engage where)
+│   │       ├── MarcusThompson.js    # Manager persona
+│   │       ├── SarahChen.js         # Tech Lead persona
+│   │       ├── AlexRivera.js        # Developer persona
+│   │       ├── JamiePark.js         # Intern persona
+│   │       ├── TaylorJohnson.js     # QA persona
+│   │       ├── MorganDavis.js       # Accessibility persona
+│   │       └── JordanLee.js         # Product Owner persona
+│   └── frontend-react/              # React 19 + TypeScript 5.9 (Vite)
+│       └── src/
+│           ├── App.tsx              # Root component with SSE status indicator
+│           ├── App.css              # Global styles + agent thinking animation
+│           ├── types/index.ts       # TypeScript interfaces
+│           ├── services/api.ts      # Typed API service layer
+│           ├── agents/index.ts      # Agent name lookup map (UI display only)
+│           ├── hooks/
+│           │   ├── useTaskPoller.ts  # 3-second polling with hash comparison
+│           │   ├── useAgentEvents.ts # SSE subscription hook
+│           │   └── useAgentWorkflow.ts # Task move API wrapper
+│           ├── components/
+│           │   ├── Board.tsx        # Kanban board with 7 lanes
+│           │   ├── Lane.tsx         # Single lane with drop target
+│           │   ├── Card.tsx         # Draggable task card
+│           │   ├── TaskModal.tsx    # Task detail modal with comments
+│           │   ├── SprintSelector.tsx # Sprint filter dropdown
+│           │   └── ErrorBanner.tsx  # Error display
+│           └── constants/           # Status labels, lane config
+├── data/                            # JSON data files
+│   ├── projects.json
+│   ├── tasks.json
+│   ├── sprints.json
+│   ├── agents.json
+│   └── messages.json
+└── projects/                        # Project artifacts
 ```
 
-## Examples
+---
 
-### Example 1: Feature Development
+## How Agents Work
 
-```bash
-# Create a project
-./rooster project create \
-  --name "E-commerce Platform" \
-  --description "Building an online store"
+Agents are **autonomous server-side processes** that boot when the Express server starts. Each agent extends `BaseAgent` and listens for `task:moved` events on the EventBus.
 
-# Create feature task
-./rooster task create \
-  --project proj-abc123 \
-  --title "Add shopping cart functionality" \
-  --description "Implement add to cart, view cart, and update quantities" \
-  --auto-assign
+When a task is moved to a new lane:
 
-# View the collaboration
-./rooster task show task-xyz789
-```
+1. **EventBus** fires a `task:moved` event
+2. **AgentRuntime** routes the event to all agents
+3. Each agent checks `shouldEngage()` based on the lane's role mapping (e.g., QA engages on `ready_for_test`)
+4. Engaged agents enter a **thinking** state (with personality-appropriate delays) and broadcast `agent:thinking` via SSE
+5. Agents generate a response comment and persist it to `messages.json`
+6. An `agent:comment` event is broadcast via SSE, and the browser refreshes automatically
 
-### Example 2: Bug Fix
+The browser subscribes to `/api/events` (SSE) and shows a pulsing "🤖 Agent is thinking…" indicator when any agent is processing.
 
-```bash
-# Create bug task (auto-assigned to QA/Developer)
-./rooster task create \
-  --project proj-abc123 \
-  --title "Fix checkout button not working" \
-  --description "The checkout button doesn't respond on mobile devices. Need to test and fix." \
-  --auto-assign
+---
 
-# Move through workflow
-./rooster task move task-bug123 IN_PROGRESS
-./rooster task move task-bug123 REVIEW
-./rooster task move task-bug123 DONE
-```
+## API Endpoints
 
-### Example 3: Accessibility Improvement
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/sprints` | List all sprints |
+| `GET` | `/api/projects` | List all projects |
+| `GET` | `/api/tasks` | List all tasks (optional `?sprint=` filter) |
+| `GET` | `/api/tasks/:id/comments` | Get comments for a task |
+| `POST` | `/api/tasks/:id/move` | Move a task to a new lane (triggers agents) |
+| `POST` | `/api/tasks/:id/comments` | Add a comment to a task |
+| `GET` | `/api/agents` | List all agents and their statuses |
+| `GET` | `/api/events` | SSE stream for live agent activity |
 
-```bash
-# Create accessibility task
-./rooster task create \
-  --project proj-abc123 \
-  --title "Improve form accessibility" \
-  --description "Add proper ARIA labels and keyboard navigation to all forms" \
-  --auto-assign
-
-# This will auto-assign to Accessibility agent
-```
+---
 
 ## Data Storage
 
-All data is stored in JSON files in the `data/` directory:
-- `projects.json` - Project information
-- `tasks.json` - Task details and status
-- `agents.json` - Agent state and current tasks
-- `messages.json` - Agent communication history
+All data is stored as JSON in the `data/` directory:
 
-## Future Enhancements
+| File | Contents |
+|------|----------|
+| `projects.json` | Project metadata |
+| `tasks.json` | Tasks with status, acceptance criteria, assignments |
+| `sprints.json` | Sprint definitions and dates |
+| `agents.json` | Agent state and online status |
+| `messages.json` | Agent comments and communication history |
 
-- Retro/retrospective meetings where agents reflect on completed work
-- Sprint planning capabilities
-- Advanced agent AI using language models for more realistic conversations
-- Web UI for visual board management
-- GitHub integration for automatic task creation from issues
-- Metrics and reporting dashboards
-
-## Contributing
-
-Contributions are welcome! This is a foundation for AI-powered project management.
+---
 
 ## License
 
-MIT License - Feel free to use and modify for your projects. 
+MIT License — feel free to use and modify for your projects.
