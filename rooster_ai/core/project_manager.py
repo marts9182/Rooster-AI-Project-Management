@@ -122,7 +122,8 @@ class TaskManager:
         """Add a note to a task."""
         task = self.get_task(task_id)
         if task:
-            task.notes.append(f"[{task.updated_at.isoformat()}] {note}")
+            timestamp = datetime.now().isoformat()
+            task.notes.append(f"[{timestamp}] {note}")
             self.storage.save_task(task)
             return task
         return None

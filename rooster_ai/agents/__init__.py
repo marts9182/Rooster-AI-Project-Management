@@ -60,19 +60,3 @@ DEFAULT_AGENTS = [
 def get_default_agents():
     """Return the list of default agents."""
     return DEFAULT_AGENTS
-
-
-def get_agent_by_role(role: AgentRole):
-    """Get an agent by their role."""
-    for agent in DEFAULT_AGENTS:
-        if agent.role == role:
-            return agent
-    return None
-
-
-def get_agent_by_id(agent_id: str):
-    """Get an agent by their ID."""
-    for agent in DEFAULT_AGENTS:
-        if agent.id == agent_id:
-            return agent
-    return None

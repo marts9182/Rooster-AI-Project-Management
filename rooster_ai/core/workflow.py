@@ -6,7 +6,20 @@ from datetime import datetime
 
 from rooster_ai.models import Agent, Task, Message, TaskStatus, AgentRole
 from rooster_ai.core.storage import Storage
-from rooster_ai.agents import get_agent_by_id, get_agent_by_role
+
+
+def get_agent_by_role(storage: Storage, role: AgentRole) -> Optional[Agent]:
+    """Get an agent by their role from storage."""
+    agents = storage.get_agents()
+    for agent in agents:
+        if agent.role == role:
+            return agent
+    return None
+
+
+def get_agent_by_id(storage: Storage, agent_id: str) -> Optional[Agent]:
+    """Get an agent by their ID from storage."""
+    return storage.get_agent(agent_id)
 
 
 class AgentWorkflow:
@@ -22,20 +35,20 @@ class AgentWorkflow:
         
         # Determine appropriate role
         if any(word in description_lower for word in ['feature', 'implement', 'develop', 'code']):
-            agent = get_agent_by_role(AgentRole.DEVELOPER)
+            agent = get_agent_by_role(self.storage, AgentRole.DEVELOPER)
         elif any(word in description_lower for word in ['test', 'qa', 'quality', 'bug']):
-            agent = get_agent_by_role(AgentRole.QA)
+            agent = get_agent_by_role(self.storage, AgentRole.QA)
         elif any(word in description_lower for word in ['accessibility', 'a11y', 'wcag', 'screen reader']):
-            agent = get_agent_by_role(AgentRole.ACCESSIBILITY)
+            agent = get_agent_by_role(self.storage, AgentRole.ACCESSIBILITY)
         elif any(word in description_lower for word in ['architecture', 'design', 'technical lead']):
-            agent = get_agent_by_role(AgentRole.TECH_LEAD)
+            agent = get_agent_by_role(self.storage, AgentRole.TECH_LEAD)
         elif any(word in description_lower for word in ['requirement', 'story', 'user', 'product']):
-            agent = get_agent_by_role(AgentRole.PRODUCT_OWNER)
+            agent = get_agent_by_role(self.storage, AgentRole.PRODUCT_OWNER)
         elif any(word in description_lower for word in ['simple', 'documentation', 'docs', 'readme']):
-            agent = get_agent_by_role(AgentRole.INTERN)
+            agent = get_agent_by_role(self.storage, AgentRole.INTERN)
         else:
             # Default to developer
-            agent = get_agent_by_role(AgentRole.DEVELOPER)
+            agent = get_agent_by_role(self.storage, AgentRole.DEVELOPER)
         
         if agent:
             task.assignee = agent.id
@@ -86,7 +99,7 @@ class AgentWorkflow:
         messages = []
         
         # 1. Product Owner creates and clarifies requirements
-        po = get_agent_by_role(AgentRole.PRODUCT_OWNER)
+        po = get_agent_by_role(self.storage, AgentRole.PRODUCT_OWNER)
         if po:
             msg = self.send_message(
                 po.id,
@@ -96,7 +109,7 @@ class AgentWorkflow:
             messages.append(msg)
         
         # 2. Tech Lead reviews technical approach
-        tech_lead = get_agent_by_role(AgentRole.TECH_LEAD)
+        tech_lead = get_agent_by_role(self.storage, AgentRole.TECH_LEAD)
         if tech_lead:
             msg = self.send_message(
                 tech_lead.id,
@@ -108,7 +121,7 @@ class AgentWorkflow:
         # 3. Developer or Intern takes the task
         assignee_id = task.assignee
         if assignee_id:
-            agent = get_agent_by_id(assignee_id)
+            agent = get_agent_by_id(self.storage, assignee_id)
             if agent:
                 msg = self.send_message(
                     agent.id,
@@ -118,7 +131,7 @@ class AgentWorkflow:
                 messages.append(msg)
         
         # 4. QA provides input on testing
-        qa = get_agent_by_role(AgentRole.QA)
+        qa = get_agent_by_role(self.storage, AgentRole.QA)
         if qa:
             msg = self.send_message(
                 qa.id,
@@ -128,7 +141,7 @@ class AgentWorkflow:
             messages.append(msg)
         
         # 5. Accessibility reviews if relevant
-        accessibility = get_agent_by_role(AgentRole.ACCESSIBILITY)
+        accessibility = get_agent_by_role(self.storage, AgentRole.ACCESSIBILITY)
         if accessibility and any(word in task.description.lower() for word in ['ui', 'interface', 'user', 'form', 'button', 'page']):
             msg = self.send_message(
                 accessibility.id,
@@ -138,7 +151,7 @@ class AgentWorkflow:
             messages.append(msg)
         
         # 6. Manager oversees
-        manager = get_agent_by_role(AgentRole.MANAGER)
+        manager = get_agent_by_role(self.storage, AgentRole.MANAGER)
         if manager:
             msg = self.send_message(
                 manager.id,

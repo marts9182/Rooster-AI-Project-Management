@@ -8,9 +8,9 @@ A Jira-type application for AI agents to collaborate on projects.
 import click
 from colorama import init, Fore, Style
 
-from rooster_ai.core import Storage, ProjectManager, TaskManager, AgentWorkflow
+from rooster_ai.core import Storage, ProjectManager, TaskManager, AgentWorkflow, get_agent_by_id
 from rooster_ai.models import TaskStatus
-from rooster_ai.agents import get_default_agents, get_agent_by_id
+from rooster_ai.agents import get_default_agents
 
 # Initialize colorama for cross-platform colored output
 init()
@@ -119,7 +119,7 @@ def create_task(project_id, title, description, auto_assign):
             click.echo(f"\n{Fore.YELLOW}Simulating agent collaboration...{Style.RESET_ALL}")
             messages = workflow.simulate_workflow(t)
             for msg in messages:
-                agent = get_agent_by_id(msg.from_agent)
+                agent = get_agent_by_id(storage, msg.from_agent)
                 if agent:
                     click.echo(f"\n{Fore.CYAN}{agent.name} ({agent.role.value}):{Style.RESET_ALL}")
                     click.echo(f"  {msg.content}")
@@ -154,7 +154,7 @@ def list_tasks(project_id, status):
         for t in status_tasks:
             assignee_name = "Unassigned"
             if t.assignee:
-                agent = get_agent_by_id(t.assignee)
+                agent = get_agent_by_id(storage, t.assignee)
                 if agent:
                     assignee_name = f"{agent.name} ({agent.role.value})"
             
@@ -179,7 +179,7 @@ def show_task(task_id):
     click.echo(f"Description: {t.description}")
     
     if t.assignee:
-        agent = get_agent_by_id(t.assignee)
+        agent = get_agent_by_id(storage, t.assignee)
         if agent:
             click.echo(f"Assigned to: {agent.name} ({agent.role.value})")
     
@@ -196,7 +196,7 @@ def show_task(task_id):
     if messages:
         click.echo(f"\n{Fore.CYAN}Agent Collaboration ({len(messages)} messages):{Style.RESET_ALL}")
         for msg in reversed(messages):  # Show oldest first
-            agent = get_agent_by_id(msg.from_agent)
+            agent = get_agent_by_id(storage, msg.from_agent)
             if agent:
                 click.echo(f"\n{Fore.YELLOW}{agent.name} ({agent.role.value}):{Style.RESET_ALL}")
                 click.echo(f"  {msg.content}")
@@ -224,7 +224,7 @@ def assign_task(task_id, agent_id):
     t = task_manager.assign_task(task_id, agent_id)
     
     if t:
-        agent = get_agent_by_id(agent_id)
+        agent = get_agent_by_id(storage, agent_id)
         if agent:
             click.echo(f"{Fore.GREEN}✓ Assigned task '{t.title}' to {agent.name}{Style.RESET_ALL}")
     else:
