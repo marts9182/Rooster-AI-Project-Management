@@ -4,6 +4,7 @@ import os
 import uuid
 from pathlib import Path
 from typing import Optional
+from datetime import datetime
 import git
 
 from rooster_ai.models import Project, Task, TaskStatus
