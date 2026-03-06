@@ -59,6 +59,11 @@ const persistence = {
     writeJson('messages.json', messages);
   },
 
+  getTaskComments(taskId) {
+    const messages = readJson('messages.json');
+    return messages.filter((m) => String(m.task_id) === String(taskId));
+  },
+
   updateAgentStatus(agentId, status) {
     const agents = readJson('agents.json');
     const agent = agents.find((a) => a.id === agentId);

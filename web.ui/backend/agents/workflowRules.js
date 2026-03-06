@@ -15,7 +15,7 @@ export const WORKFLOW_RULES = {
   },
   analyze: {
     requiredRoles: ['Tech Lead', 'Product Owner'],
-    conditionalRoles: [],
+    conditionalRoles: ['Intern'],
   },
   develop: {
     requiredRoles: ['Developer', 'Tech Lead'],
@@ -23,11 +23,11 @@ export const WORKFLOW_RULES = {
   },
   ready_for_test: {
     requiredRoles: ['QA', 'Developer', 'Tech Lead'],
-    conditionalRoles: [],
+    conditionalRoles: ['Intern'],
   },
   testing: {
     requiredRoles: ['QA'],
-    conditionalRoles: ['Accessibility'],
+    conditionalRoles: ['Accessibility', 'Intern'],
   },
   ready_for_acceptance: {
     requiredRoles: ['Product Owner', 'Manager'],
@@ -54,7 +54,11 @@ export function isUiTask(task) {
   return false;
 }
 
-const INTERN_KEYWORDS = ['documentation', 'docs', 'readme', 'simple', 'small'];
+const INTERN_KEYWORDS = [
+  'documentation', 'docs', 'readme', 'simple', 'small',
+  'agent', 'test', 'review', 'update', 'add', 'fix', 'implement',
+  'feature', 'task', 'system', 'component', 'module',
+];
 
 export function isInternTask(task) {
   const text = `${task.title} ${task.description ?? ''}`.toLowerCase();

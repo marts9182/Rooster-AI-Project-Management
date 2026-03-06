@@ -7,7 +7,7 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { runtime, bus, validateTransition } from './agents/index.js';
+import { runtime, bus, validateTransition, marcus } from './agents/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,6 +68,7 @@ function broadcast(event, data) {
 bus.on('agent:thinking', (data) => broadcast('agent:thinking', data));
 bus.on('agent:comment', (data) => broadcast('agent:comment', data));
 bus.on('agent:idle', (data) => broadcast('agent:idle', data));
+bus.on('agent:rejection', (data) => broadcast('agent:rejection', data));
 
 // ── API routes ───────────────────────────────────────────────────────────
 
@@ -91,6 +92,20 @@ app.get('/api/tasks/:id/comments', (req, res) => {
   const messages = readJson('messages.json');
   const taskComments = messages.filter((m) => String(m.task_id) === String(req.params.id));
   res.json(taskComments);
+});
+
+app.get('/api/tasks/:id/approvals', (req, res) => {
+  const messages = readJson('messages.json');
+  const taskComments = messages.filter((m) => String(m.task_id) === String(req.params.id) && m.approval);
+  const approvals = taskComments.map((m) => ({
+    agent_id: m.from_agent,
+    agent_name: runtime.resolveAgentName(m.from_agent),
+    approved: m.approval.approved,
+    reason: m.approval.reason,
+    timestamp: m.timestamp,
+  }));
+  const hasRejection = approvals.some((a) => !a.approved);
+  res.json({ taskId: req.params.id, approvals, allApproved: !hasRejection });
 });
 
 app.post('/api/tasks/:id/move', (req, res) => {
@@ -120,6 +135,43 @@ app.post('/api/tasks/:id/move', (req, res) => {
   broadcast('task:moved', { taskId: task.id, fromStage, toStage: status });
 
   res.json({ success: true });
+});
+
+// ── Sprint Retrospective ─────────────────────────────────────────────────
+
+app.post('/api/sprints/:id/retro', (req, res) => {
+  const sprints = readJson('sprints.json');
+  const sprint = sprints.find(s => s.id === req.params.id);
+  if (!sprint) return res.status(404).json({ error: 'Sprint not found' });
+
+  const tasks = readJson('tasks.json').filter(t => t.sprint_id === sprint.id);
+  const allMessages = readJson('messages.json');
+  const taskIds = new Set(tasks.map(t => t.id));
+  const sprintMessages = allMessages.filter(m => taskIds.has(m.task_id));
+
+  const { content, analytics } = marcus.generateRetro(sprint, tasks, sprintMessages);
+
+  // Update sprint retrospective field
+  sprint.retrospective = content;
+  writeJson('sprints.json', sprints);
+
+  // Store as an audit message
+  const retroMessage = {
+    id: `msg-retro-${sprint.id}`,
+    from_agent: marcus.id,
+    to_agent: null,
+    content,
+    task_id: null,
+    sprint_id: sprint.id,
+    timestamp: new Date().toISOString(),
+    type: 'retrospective',
+  };
+  allMessages.push(retroMessage);
+  writeJson('messages.json', allMessages);
+
+  broadcast('sprint:retro', { sprintId: sprint.id, analytics });
+
+  res.json({ success: true, analytics, content });
 });
 
 // Save agent-generated comments (bulk) — kept for manual use / backwards compat

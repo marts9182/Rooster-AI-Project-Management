@@ -8,6 +8,8 @@
 
 import crypto from 'crypto';
 import bus from './EventBus.js';
+import { analyzeTask } from './TaskAnalyzer.js';
+import { defaultAdapter } from './LLMAdapter.js';
 
 export class BaseAgent {
   /** @abstract */ id;
@@ -27,6 +29,9 @@ export class BaseAgent {
 
   /** Reference to the shared data persistence layer (injected by runtime). */
   _persistence = null;
+
+  /** LLM adapter — swap for OpenAI/Anthropic by calling setLLMAdapter(). */
+  _llmAdapter = defaultAdapter;
 
   // ── lifecycle ───────────────────────────────────────────────────────────
 
@@ -57,18 +62,29 @@ export class BaseAgent {
     const delay = min + Math.random() * (max - min);
     await new Promise((r) => setTimeout(r, delay));
 
-    // 3. Generate the response
+    // 3. Load conversation history for this task
+    const conversationHistory = this._persistence
+      ? this._persistence.getTaskComments(taskId)
+      : [];
+
+    // 4. Generate the response (may include approval decision)
     this.status = 'responding';
     const action = this.stageActions[toStage];
-    const content = this.generateResponse(task, action);
+    const result = this.generateResponse(task, action, conversationHistory);
+
+    // Normalize: generateResponse can return a string or { content, approved, reason, toAgent }
+    const { content, approved, reason, toAgent } = typeof result === 'string'
+      ? { content: result, approved: true, reason: null, toAgent: null }
+      : result;
 
     const comment = {
       id: `msg-${crypto.randomUUID().slice(0, 8)}`,
       from_agent: this.id,
-      to_agent: null,
+      to_agent: toAgent || null,
       content,
       task_id: taskId,
       timestamp: new Date().toISOString(),
+      approval: { approved, reason: reason || null },
     };
 
     // 4. Persist the comment
@@ -76,14 +92,27 @@ export class BaseAgent {
       this._persistence.saveComment(comment);
     }
 
-    // 5. Broadcast that we commented
+    // 5. Broadcast that we commented (include approval info)
     bus.fire('agent:comment', {
       agentId: this.id,
       agentName: this.name,
       role: this.role,
       taskId,
       comment,
+      approved,
+      reason,
     });
+
+    // 5b. If agent rejected, fire a specific event
+    if (!approved) {
+      bus.fire('agent:rejection', {
+        agentId: this.id,
+        agentName: this.name,
+        role: this.role,
+        taskId,
+        reason,
+      });
+    }
 
     // 6. Done
     this.status = 'idle';
@@ -96,29 +125,26 @@ export class BaseAgent {
     return stage in (this.stageActions || {});
   }
 
-  /** Build a response from the template. Override for LLM. */
-  generateResponse(task, action) {
-    const parts = [];
+  /** Set a custom LLM adapter (e.g., OpenAI, Anthropic). */
+  setLLMAdapter(adapter) {
+    this._llmAdapter = adapter;
+  }
 
-    if (action.outputTemplate) {
-      parts.push(this._fillTemplate(action.outputTemplate, task));
-    }
+  /**
+   * Generate a context-aware response using TaskAnalyzer + LLM adapter.
+   * Override this method or swap the adapter for full LLM integration.
+   */
+  generateResponse(task, action, conversationHistory = []) {
+    const analysis = analyzeTask(task);
 
-    if (action.reviewCriteria?.length > 0) {
-      parts.push('\n**Review checklist:**');
-      for (const criterion of action.reviewCriteria) {
-        parts.push(`  - ${criterion}`);
-      }
-    }
-
-    if (this.guardrails?.length > 0) {
-      parts.push('\n**Standing rules applied:**');
-      for (const rule of this.guardrails) {
-        parts.push(`  - ${rule}`);
-      }
-    }
-
-    return parts.join('\n');
+    return this._llmAdapter.generate({
+      systemPrompt: this.systemPrompt,
+      task,
+      action,
+      analysis,
+      conversationHistory,
+      agent: this,
+    });
   }
 
   _fillTemplate(template, task) {
