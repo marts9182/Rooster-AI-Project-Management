@@ -1,0 +1,220 @@
+# GitHub Actions Workflow: Build iOS app and deploy to TestFlight
+# This workflow builds Hero Rooster on a macOS runner, signs it, 
+# and uploads to TestFlight — no local Mac required.
+#
+# Trigger: Push to main branch, or manual dispatch
+# Runner: macos-14 (Apple Silicon M1, Xcode 15+ preinstalled)
+
+name: iOS TestFlight Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/heroRooster/**'
+      - '.github/workflows/ios-testflight.yml'
+  workflow_dispatch:
+    inputs:
+      build_note:
+        description: 'TestFlight build notes'
+        required: false
+        default: 'Automated CI build'
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20'
+  RUBY_VERSION: '3.2'
+  WORKING_DIR: 'projects/heroRooster'
+
+jobs:
+  build-and-deploy:
+    name: Build & Upload to TestFlight
+    runs-on: macos-14
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIR }}
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Setup Node.js ─────────────────────────────────────────
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIR }}/package-lock.json
+
+      # ── Setup Ruby (for Fastlane & CocoaPods) ─────────────────
+      - name: Setup Ruby ${{ env.RUBY_VERSION }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+          bundler-cache: true
+          working-directory: ${{ env.WORKING_DIR }}/fastlane
+
+      # ── Install npm dependencies ──────────────────────────────
+      - name: Install npm dependencies
+        run: npm ci
+
+      # ── Build web assets ──────────────────────────────────────
+      - name: Build web assets to dist/
+        run: npm run build
+
+      # ── Sync Capacitor iOS ────────────────────────────────────
+      - name: Sync Capacitor iOS platform
+        run: npx cap sync ios
+
+      # ── Install CocoaPods ─────────────────────────────────────
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios/App
+          pod install
+
+      # ── Select Xcode version ──────────────────────────────────
+      - name: Select Xcode 15
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+
+      # ── Decode & install Apple signing certificate ────────────
+      - name: Install Apple certificate
+        env:
+          DISTRIBUTION_CERTIFICATE_BASE64: ${{ secrets.DISTRIBUTION_CERTIFICATE_BASE64 }}
+          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Decode the certificate from base64
+          echo -n "$DISTRIBUTION_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create a temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$DISTRIBUTION_CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: \
+            -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+      # ── Install provisioning profile ──────────────────────────
+      - name: Install provisioning profile
+        env:
+          PROVISIONING_PROFILE_BASE64: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+
+          # Decode provisioning profile
+          echo -n "$PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+          # Install provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      # ── Build the iOS app ─────────────────────────────────────
+      - name: Build iOS app (.ipa)
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/HeroRooster.xcarchive \
+            archive \
+            DEVELOPMENT_TEAM=$APPLE_TEAM_ID \
+            CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE_SPECIFIER="Hero Rooster AppStore" \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            -allowProvisioningUpdates
+
+      # ── Export the archive to .ipa ────────────────────────────
+      - name: Export .ipa from archive
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # Generate ExportOptions.plist with actual team ID
+          cat > $RUNNER_TEMP/ExportOptions.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>destination</key>
+            <string>upload</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.herorooster.app</key>
+              <string>Hero Rooster AppStore</string>
+            </dict>
+            <key>teamID</key>
+            <string>$APPLE_TEAM_ID</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>uploadBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath $RUNNER_TEMP/HeroRooster.xcarchive \
+            -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
+            -exportPath $RUNNER_TEMP/export \
+            -allowProvisioningUpdates
+
+      # ── Upload to TestFlight ──────────────────────────────────
+      - name: Upload to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+        run: |
+          # Create the API key .p8 file
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo -n "$APP_STORE_CONNECT_API_KEY" | base64 --decode \
+            > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
+
+          # Upload using xcrun altool or notarytool
+          xcrun notarytool submit $RUNNER_TEMP/export/App.ipa \
+            --key ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8 \
+            --key-id $APP_STORE_CONNECT_API_KEY_ID \
+            --issuer $APP_STORE_CONNECT_API_ISSUER_ID \
+            --wait 2>/dev/null || true
+
+          # Use altool as primary upload method
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$RUNNER_TEMP/export/App.ipa" \
+            --apiKey $APP_STORE_CONNECT_API_KEY_ID \
+            --apiIssuer $APP_STORE_CONNECT_API_ISSUER_ID
+
+      # ── Upload .ipa as artifact (backup) ──────────────────────
+      - name: Upload .ipa artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: HeroRooster-iOS
+          path: ${{ runner.temp }}/export/*.ipa
+          retention-days: 30
+
+      # ── Cleanup keychain ──────────────────────────────────────
+      - name: Cleanup keychain
+        if: always()
+        run: |
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || true
