@@ -128,6 +128,21 @@ app.post('/api/tasks/:id/move', (req, res) => {
   task.updated_at = new Date().toISOString();
   writeJson('tasks.json', tasks);
 
+  // Auto-complete sprint when last task is accepted
+  if (status === 'accepted' && task.sprint_id) {
+    const sprintTasks = tasks.filter(t => t.sprint_id === task.sprint_id);
+    const allAccepted = sprintTasks.every(t => t.status === 'accepted');
+    if (allAccepted) {
+      const sprints = readJson('sprints.json');
+      const sprint = sprints.find(s => s.id === task.sprint_id);
+      if (sprint && sprint.status !== 'completed') {
+        sprint.status = 'completed';
+        writeJson('sprints.json', sprints);
+        broadcast('sprint:completed', { sprintId: sprint.id });
+      }
+    }
+  }
+
   // 🔥 Fire the event — agents will pick it up asynchronously
   runtime.onTaskMoved(task.id, fromStage, status, task);
 
@@ -149,10 +164,14 @@ app.post('/api/sprints/:id/retro', (req, res) => {
   const taskIds = new Set(tasks.map(t => t.id));
   const sprintMessages = allMessages.filter(m => taskIds.has(m.task_id));
 
-  const { content, analytics } = marcus.generateRetro(sprint, tasks, sprintMessages);
+  const { content, analytics, review } = marcus.generateRetro(sprint, tasks, sprintMessages);
 
   // Update sprint retrospective field
   sprint.retrospective = content;
+  // Auto-generate review if not manually written
+  if (!sprint.review || sprint.review.trim() === '') {
+    sprint.review = review || '';
+  }
   writeJson('sprints.json', sprints);
 
   // Store as an audit message

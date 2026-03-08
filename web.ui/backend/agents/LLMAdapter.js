@@ -205,15 +205,37 @@ export class SmartTemplateAdapter extends BaseLLMAdapter {
         if (!task.description || task.description.trim().length < 10) {
           return { approved: false, reason: 'Task has no meaningful description. Cannot assess technical approach.' };
         }
+        // Flag high-complexity tasks heading to develop without risk mitigation
+        if (task.status === 'develop' && analysis.complexityScore >= 8) {
+          const desc = (task.description || '').toLowerCase();
+          const hasRiskMitigation = /risk|mitigation|incremental|phased|rollback|fallback|safeguard/.test(desc);
+          if (!hasRiskMitigation) {
+            return { approved: false, reason: `High-complexity task (${analysis.complexityScore}/10) entering develop without risk mitigation strategy. Add a risk mitigation approach to the description before proceeding.` };
+          }
+        }
         return { approved: true, reason: null };
       },
       'QA': () => {
         if (!analysis.hasAcceptanceCriteria) {
           return { approved: false, reason: 'Cannot create test plan — no acceptance criteria defined.' };
         }
+        // Flag tasks entering testing with fewer than 3 acceptance criteria
+        if (task.status === 'testing' && analysis.criteriaCount < 3) {
+          return { approved: false, reason: `Only ${analysis.criteriaCount} acceptance criteria defined — need at least 3 testable criteria to build a thorough test plan.` };
+        }
         return { approved: true, reason: null };
       },
-      // Manager, Developer, Accessibility, Intern default to approve
+      'Developer': () => {
+        // Flag tasks entering develop without technical approach
+        if (task.status === 'develop') {
+          const desc = (task.description || '').toLowerCase();
+          const hasTechApproach = /implement|refactor|add|update|fix|create|build|rewrite|endpoint|function|method|class|module|component|api|database|query/.test(desc);
+          if (!hasTechApproach) {
+            return { approved: false, reason: 'Task description lacks technical approach indicators. Add implementation details (what to build, modify, or fix) before development begins.' };
+          }
+        }
+        return { approved: true, reason: null };
+      },
     };
 
     const check = checks[agent.role];

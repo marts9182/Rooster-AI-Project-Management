@@ -92,6 +92,10 @@ export class MarcusThompson extends BaseAgent {
       ? (cycleTimes.reduce((a, b) => a + b, 0) / cycleTimes.length).toFixed(1)
       : 'N/A';
 
+    // Cycle time variance
+    const minCycle = cycleTimes.length > 0 ? Math.min(...cycleTimes).toFixed(1) : 'N/A';
+    const maxCycle = cycleTimes.length > 0 ? Math.max(...cycleTimes).toFixed(1) : 'N/A';
+
     // --- Agent engagement counts ---
     const agentCounts = {};
     for (const m of messages) {
@@ -103,6 +107,19 @@ export class MarcusThompson extends BaseAgent {
     const topAgent = Object.entries(agentCounts)
       .sort(([, a], [, b]) => b - a)[0];
 
+    // Bottom contributor
+    const bottomAgent = Object.entries(agentCounts)
+      .sort(([, a], [, b]) => a - b)[0];
+
+    // Workload distribution analysis
+    const agentCommentCounts = Object.values(agentCounts);
+    const avgComments = agentCommentCounts.length > 0
+      ? agentCommentCounts.reduce((a, b) => a + b, 0) / agentCommentCounts.length
+      : 0;
+    const workloadSkew = topAgent && bottomAgent
+      ? (topAgent[1] / Math.max(bottomAgent[1], 1)).toFixed(1)
+      : 'N/A';
+
     // --- Bottleneck detection: tasks stuck in non-terminal stages ---
     const stuckTasks = tasks.filter(t =>
       t.status !== 'accepted' && t.status !== 'backlog'
@@ -110,6 +127,22 @@ export class MarcusThompson extends BaseAgent {
 
     // --- Rejection analysis ---
     const rejections = messages.filter(m => m.approval && !m.approval.approved);
+
+    // --- Comment depth analysis (short vs substantive) ---
+    const shortComments = messages.filter(m => m.content && m.content.length < 100).length;
+    const substantiveComments = messages.filter(m => m.content && m.content.length >= 100).length;
+
+    // --- Fastest and slowest tasks ---
+    const tasksWithCycleTime = completedTasks
+      .filter(t => t.created_at && t.updated_at)
+      .map(t => ({
+        title: t.title,
+        hours: ((new Date(t.updated_at).getTime() - new Date(t.created_at).getTime()) / (1000 * 60 * 60)).toFixed(1),
+      }))
+      .sort((a, b) => parseFloat(a.hours) - parseFloat(b.hours));
+
+    const fastestTask = tasksWithCycleTime[0] || null;
+    const slowestTask = tasksWithCycleTime.length > 1 ? tasksWithCycleTime[tasksWithCycleTime.length - 1] : null;
 
     // --- Build retro content ---
     const lines = [
@@ -120,6 +153,7 @@ export class MarcusThompson extends BaseAgent {
       `  - **Completed (accepted):** ${completedTasks.length}`,
       `  - **Tasks by status:** ${Object.entries(statusCounts).map(([k, v]) => `${k}: ${v}`).join(', ')}`,
       `  - **Average cycle time:** ${avgCycleTimeHours} hours`,
+      `  - **Cycle time range:** ${minCycle}h – ${maxCycle}h`,
       `  - **Total agent comments:** ${messages.length}`,
       `  - **Agent rejections:** ${rejections.length}`,
       '',
@@ -132,20 +166,30 @@ export class MarcusThompson extends BaseAgent {
       '',
     ];
 
-    // What went well
+    // What went well — data-driven
     lines.push(`## ✅ What Went Well`);
     if (completedTasks.length > 0) {
-      lines.push(`  - ${completedTasks.length} task(s) delivered and accepted.`);
+      const pct = ((completedTasks.length / tasks.length) * 100).toFixed(0);
+      lines.push(`  - ${completedTasks.length}/${tasks.length} tasks delivered (${pct}% completion rate).`);
     }
     if (messages.length > 20) {
       lines.push(`  - Strong team collaboration — ${messages.length} agent interactions recorded.`);
     }
     if (rejections.length > 0) {
-      lines.push(`  - Gate-keeping working: ${rejections.length} quality rejection(s) caught issues early.`);
+      lines.push(`  - Gate-keeping active: ${rejections.length} quality rejection(s) caught issues early.`);
+    }
+    if (substantiveComments > shortComments) {
+      lines.push(`  - Comment quality was strong — ${substantiveComments} substantive comments vs ${shortComments} brief ones.`);
+    }
+    if (fastestTask) {
+      lines.push(`  - Fastest delivery: "${fastestTask.title}" completed in ${fastestTask.hours}h.`);
+    }
+    if (Object.keys(agentCounts).length >= 5) {
+      lines.push(`  - Broad participation: ${Object.keys(agentCounts).length} agents engaged across the sprint.`);
     }
     lines.push('');
 
-    // What needs improvement
+    // What needs improvement — proactive insights even when successful
     lines.push(`## 🔧 What Needs Improvement`);
     if (stuckTasks.length > 0) {
       lines.push(`  - ${stuckTasks.length} task(s) not yet accepted: ${stuckTasks.map(t => `"${t.title}" (${t.status})`).join(', ')}`);
@@ -156,30 +200,84 @@ export class MarcusThompson extends BaseAgent {
     if (Object.keys(agentCounts).length < 5) {
       lines.push(`  - Only ${Object.keys(agentCounts).length} agents engaged — aim for broader participation.`);
     }
+    // Proactive: workload imbalance
+    if (workloadSkew !== 'N/A' && parseFloat(workloadSkew) > 2.0) {
+      lines.push(`  - Workload imbalance detected: ${topAgent[0]} contributed ${topAgent[1]} comments vs ${bottomAgent[0]} with ${bottomAgent[1]} (${workloadSkew}x ratio). Consider redistributing review responsibilities.`);
+    }
+    // Proactive: zero rejections
+    if (rejections.length === 0 && tasks.length > 0) {
+      lines.push(`  - Zero rejections across ${tasks.length} tasks — gate-keeping may be too lenient. Review approval thresholds to ensure quality checks are meaningful.`);
+    }
+    // Proactive: cycle time variance
+    if (slowestTask && fastestTask && parseFloat(slowestTask.hours) > parseFloat(fastestTask.hours) * 3) {
+      lines.push(`  - High cycle time variance: fastest task took ${fastestTask.hours}h, slowest took ${slowestTask.hours}h ("${slowestTask.title}"). Investigate what caused delays.`);
+    }
+    // Proactive: comment quality
+    if (shortComments > substantiveComments) {
+      lines.push(`  - ${shortComments} of ${messages.length} comments were brief (< 100 chars) — encourage more detailed feedback from agents.`);
+    }
     lines.push('');
 
-    // Action items
+    // Action items — data-driven, sprint-specific
     lines.push(`## 📋 Action Items`);
-    lines.push(`  1. Review any stuck tasks and unblock them.`);
+    let actionNum = 1;
     if (stuckTasks.length > 0) {
-      lines.push(`  2. Follow up on: ${stuckTasks.map(t => t.title).join(', ')}`);
+      lines.push(`  ${actionNum++}. Unblock stuck tasks: ${stuckTasks.map(t => `"${t.title}"`).join(', ')}.`);
     }
-    lines.push(`  ${stuckTasks.length > 0 ? '3' : '2'}. Carry forward learnings into the next sprint planning.`);
+    if (rejections.length === 0 && tasks.length > 0) {
+      lines.push(`  ${actionNum++}. Review gate-keeping thresholds — zero rejections across ${tasks.length} tasks suggests criteria may need tightening.`);
+    }
+    if (workloadSkew !== 'N/A' && parseFloat(workloadSkew) > 2.0) {
+      lines.push(`  ${actionNum++}. Address workload imbalance — ${bottomAgent[0]} had significantly fewer interactions. Consider adjusting stage assignments.`);
+    }
+    if (slowestTask && fastestTask && parseFloat(slowestTask.hours) > parseFloat(fastestTask.hours) * 3) {
+      lines.push(`  ${actionNum++}. Investigate cycle time outlier: "${slowestTask.title}" (${slowestTask.hours}h) — was it blocked, under-specified, or over-scoped?`);
+    }
+    if (shortComments > substantiveComments) {
+      lines.push(`  ${actionNum++}. Improve comment quality — shift from brief acknowledgments to actionable feedback.`);
+    }
+    if (completedTasks.length === tasks.length && tasks.length > 0) {
+      lines.push(`  ${actionNum++}. All tasks delivered — carry velocity into next sprint. Consider increasing scope slightly.`);
+    }
+    if (actionNum === 1) {
+      // Fallback if nothing specific emerged
+      lines.push(`  1. Sprint ran smoothly. Focus on continuous improvement and stretch goals next sprint.`);
+    }
 
     const content = lines.join('\n');
+
+    // --- Auto-generate review summary ---
+    const reviewParts = [];
+    reviewParts.push(`${completedTasks.length}/${tasks.length} tasks delivered.`);
+    if (avgCycleTimeHours !== 'N/A') {
+      reviewParts.push(`Average cycle time: ${avgCycleTimeHours}h.`);
+    }
+    if (rejections.length > 0) {
+      reviewParts.push(`${rejections.length} quality gate rejection(s).`);
+    } else if (tasks.length > 0) {
+      reviewParts.push(`Zero rejections — review gate-keeping thresholds.`);
+    }
+    if (topAgent) {
+      reviewParts.push(`Top contributor: ${topAgent[0]} (${topAgent[1]} comments).`);
+    }
+    const review = reviewParts.join(' ');
+
     const analytics = {
       totalTasks: tasks.length,
       completedTasks: completedTasks.length,
       statusCounts,
       avgCycleTimeHours,
+      cycleTimeRange: { min: minCycle, max: maxCycle },
       totalComments: messages.length,
       rejections: rejections.length,
       agentEngagement: agentCounts,
       topContributor: topAgent ? { agent: topAgent[0], comments: topAgent[1] } : null,
       stuckTasks: stuckTasks.map(t => ({ id: t.id, title: t.title, status: t.status })),
+      workloadSkew,
+      commentDepth: { short: shortComments, substantive: substantiveComments },
     };
 
-    return { content, analytics };
+    return { content, analytics, review };
   }
 }
 
