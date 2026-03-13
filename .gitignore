@@ -22,6 +22,20 @@ build/
 .DS_Store
 Thumbs.db
 
+# Screenshots & Playwright artifacts
+.playwright-mcp/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.bmp
+
+# Temp files
+api_out.txt
+last_task.txt
+task_status.txt
+
 # Project-specific
 projects/
 data/
