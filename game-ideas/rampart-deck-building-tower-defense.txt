@@ -1,0 +1,232 @@
+================================================================================
+  RAMPART — Deck-Building Tower Defense
+  Design Document
+================================================================================
+
+HIGH CONCEPT
+A roguelike tower defense where your towers, spells, and traps are cards. Build
+your deck between waves, play cards on a hex grid during combat. Enemies adapt
+and develop resistances. Branching campaign map with boss encounters, shops,
+and events.
+
+GENRE & PLATFORM
+- Genre:    Deck-builder / tower defense / roguelike
+- Platform: PC, mobile (ideal for touch), web
+- Engine:   HTML5 Canvas / Phaser 3
+- Art:      Clean vector-style pixel art. Bold colors for card types.
+            Readable at mobile scale.
+
+================================================================================
+CORE LOOP
+================================================================================
+
+  +-------------+     +---------------+     +---------------+
+  |  MAP NODE   |---->|  COMBAT WAVE  |---->|   REWARDS     |
+  |  Selection  |     |  Play Cards   |     |  New Cards /  |
+  |             |     |  on Hex Grid  |     |  Gold / Relic |
+  +-------------+     +---------------+     +-------+-------+
+                                                     |
+                                             +-------v-------+
+                                             | BETWEEN WAVES  |
+                                             | Shop / Event   |
+                                             | Deck Mgmt      |
+                                             +---------------+
+
+================================================================================
+COMBAT SYSTEM
+================================================================================
+
+THE GRID:
+- Hex-based map (approx 8x12 hexes)
+- Enemies enter from spawn points, path toward your Core crystal
+- You place cards on hexes during a planning phase before each wave
+
+CARD TYPES:
+
+   Type         Color     Examples
+   ---------    ------    ------------------------------------------
+   Tower        Blue      Arrow Tower, Frost Spire, Cannon, Lightning Rod
+   Trap         Red       Spike Pit, Tar Slick, Explosive Mine, Snare
+   Spell        Purple    Fireball (AOE), Heal Tower, Haste, Teleport Enemy
+   Terrain      Green     Wall (blocks path), Bridge, High Ground, Moat
+   Modifier     Gold      +Damage Enchant, Chain Lightning, Vampiric
+
+CARD ECONOMY DURING COMBAT:
+- Start each wave with a hand of 5 cards drawn from your deck
+- Gain 1 Mana per turn + bonus mana from kills
+- Cards cost Mana to play
+- Unplayed cards carry over (hand limit: 8)
+- Some cards are Exhaust (single use per run) — powerful but limited
+
+PLACEMENT RULES:
+- Towers persist between waves (can be destroyed by enemies)
+- Traps trigger once, then discard back to deck
+- Spells are instant effects, discard after use
+- Terrain is permanent for the run
+- Modifier cards attach to existing towers (upgrade them)
+
+================================================================================
+CARD DESIGN (Examples)
+================================================================================
+
+  +-------------------+  +-------------------+  +-------------------+
+  | ** ARROW TOWER    |  | *** FIREBALL      |  | *  SPIKE PIT      |
+  | [Tower]     2 Mana|  | [Spell]     3 Mana|  | [Trap]      1 Mana|
+  |                   |  |                   |  |                   |
+  | Shoots nearest    |  | Deal 8 damage     |  | First enemy to    |
+  | enemy for 3 DMG   |  | in 2-hex radius   |  | cross takes 5 DMG |
+  | every 2 sec       |  |                   |  | and is Slowed     |
+  | Range: 3 hexes    |  | Exhaust           |  |                   |
+  |                   |  |                   |  |                   |
+  | Common            |  | Rare              |  | Common            |
+  +-------------------+  +-------------------+  +-------------------+
+
+================================================================================
+ENEMY SYSTEM
+================================================================================
+
+BASE TYPES:
+
+   Enemy           HP          Speed     Special
+   -------------   ---------   -------   ----------------------------------
+   Grunt           Low         Normal    None
+   Runner          Very Low    Fast      Hard to trap
+   Tank            Very High   Slow      Armor (reduces damage)
+   Flyer           Medium      Normal    Ignores terrain/traps, straight path
+   Healer          Low         Normal    Heals nearby enemies
+   Sapper          Medium      Normal    Destroys towers it reaches
+   Splitter        Medium      Normal    Splits into 2 smaller on death
+   Shield Bearer   Medium      Normal    Projectile shield for those behind
+
+ADAPTATION MECHANIC (Key Differentiator):
+- After every 3 waves, enemies gain a resistance to your most-used damage type
+- If you spam Arrow Towers -> enemies gain Physical Resist
+- Forces deck diversity and strategic pivots
+- Boss enemies have unique resistances and mechanics
+
+================================================================================
+DECK BUILDING (Between Waves)
+================================================================================
+
+CARD REWARDS:
+After each wave, choose 1 of 3 random cards to add to deck.
+
+SHOP (appears on map):
+- Buy specific cards
+- Remove cards from deck (crucial — keep deck lean)
+- Buy Relics (passive bonuses for the entire run)
+
+RELIC EXAMPLES:
+
+   Relic                Effect
+   -------------------  ------------------------------------------
+   Whetstone            All towers +1 damage
+   Crystal Lens         Tower range +1 hex
+   Trap Recycler        Traps return to hand instead of discard (50%)
+   Mana Spring          +1 starting mana per wave
+   Scout's Map          See enemy types 1 wave ahead
+   Architect's Compass  Terrain cards cost 0 mana
+
+================================================================================
+CAMPAIGN MAP (Roguelike Structure)
+================================================================================
+
+            [START]
+             / | \
+           W   S   E        <- Row 1 (choose a path)
+           |   |   |
+           W   E   W        <- Row 2
+            \  |  /
+            [BOSS1]          <- Mini-Boss
+             / | \
+           W   S   W        <- Row 3
+           |   |   |
+           E   W   S        <- Row 4
+            \  |  /
+            [BOSS2]          <- BOSS
+
+   Legend: W = Combat Wave   S = Shop   E = Random Event
+
+- 3 Acts with increasing difficulty, each ending in a boss
+- Events: Gamble cards, find relics, make choices
+  (sacrifice HP for rare card, etc.)
+- Multiple starting decks (archetypes)
+
+================================================================================
+STARTER ARCHETYPES
+================================================================================
+
+   Archetype      Theme               Playstyle
+   ------------   -----------------   ----------------------------------------
+   Frost          Slow + shatter      Control-heavy, freeze enemies, shatter
+   Fire           Burn + AOE          Aggressive, DOT effects, chain explosions
+   Mechanical     Towers + synergy    Tower-heavy, modifier stacking, turrets
+   Nature         Terrain + growth    Maze-building, living walls, towers grow
+
+================================================================================
+UI LAYOUT (Mobile-Optimized)
+================================================================================
+
+   +--------------------------------------+
+   |  Wave 5/8    Mana: 4    Core: ###    |
+   +--------------------------------------+
+   |                                      |
+   |        [Hex Grid Battlefield]        |
+   |         Towers placed, enemies       |
+   |         pathing, projectiles         |
+   |                                      |
+   +--------------------------------------+
+   |  [Card1] [Card2] [Card3] [Card4]    |  <- Drag to place
+   |              [End Turn]              |
+   +--------------------------------------+
+
+- Drag card to hex to play it (touch-friendly)
+- Tap tower to see range/stats
+- Pinch to zoom on mobile
+- Fast-forward button during enemy movement phase
+
+================================================================================
+TECHNICAL ARCHITECTURE
+================================================================================
+
+   /src
+     /engine      — Game loop, hex renderer, input (mouse + touch)
+     /grid        — Hex grid, pathfinding (A*), tile types
+     /cards       — Card base class, card database, deck manager
+     /combat      — Wave spawner, enemy AI, projectile system, damage calc
+     /enemies     — Enemy types, adaptation system, boss AI
+     /towers      — Tower placement, targeting, modifier stacking
+     /campaign    — Map generator, node types, act progression
+     /shop        — Shop inventory, card removal, relic system
+     /ui          — Hand display, grid overlay, health bars, animations
+     /save        — Run state, meta-progression (unlocked cards/archetypes)
+     /data        — JSON: cards.json, enemies.json, relics.json, events.json
+     /audio       — Combat music, card play SFX, ambient
+
+================================================================================
+ESTIMATED SCOPE
+================================================================================
+
+   Milestone    Content                                         Notes
+   ----------   -------------------------------------------     ----------------
+   MVP          1 archetype, 20 cards, 5 enemies, 5 waves      Prove hybrid works
+   Alpha        2 archetypes, 40 cards, bosses, shop, relics    Full run playable
+   Beta         4 archetypes, 80+ cards, 3 acts, adaptation     Full campaign
+   Polish       Animations, SFX, balance, daily challenges      Ship-ready
+
+================================================================================
+COMPARISON WITH OTHER DESIGNS
+================================================================================
+
+   Aspect               Last Haven (Colony)    Eighth Bell (Loop)    Rampart (This)
+   -------------------  --------------------   -------------------   ---------------
+   Complexity           High                   Very High             Medium
+   Replayability        High (proc-gen)        Medium (fixed story)  Very High
+   Mobile Fit           Good                   Decent                Excellent
+   Narrative Depth      Light                  Deep                  Light
+   Multiplayer          Co-op possible         Solo only             Daily challenges
+   Monetization         Cosmetics, DLC         DLC story expansions  Card packs
+   Risk                 Balancing colony sim   NPC schedule work     Card balance
+   Unique Hook          Prosperity=danger      Knowledge-as-prog     Enemy adaptation
+
+================================================================================

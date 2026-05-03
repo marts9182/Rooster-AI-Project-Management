@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"name": "Rooster AI Project Management",
+			"path": "."
+		},
+		{
+			"name": "heroRooster",
+			"path": "projects/heroRooster"
+		},
+		{
+			"name": "bitcraftOnlineDiscordBot",
+			"path": "projects/bitcraftOnlineDiscordBot"
+		},
+		{
+			"name": "RoosterCGMApp",
+			"path": "projects/RoosterCGMApp"
+		},
+		{
+			"name": "kdp-puzzle-press",
+			"path": "projects/kdp-puzzle-press"
+		}
+	],
+	"settings": {}
+}

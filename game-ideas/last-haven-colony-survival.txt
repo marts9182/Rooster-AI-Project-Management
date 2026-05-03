@@ -1,0 +1,150 @@
+================================================================================
+  LAST HAVEN — Colony Survival Roguelike
+  Design Document
+================================================================================
+
+HIGH CONCEPT
+A top-down roguelike colony survival game where you lead a band of shipwreck
+survivors on a procedurally generated island. Build, assign roles, manage morale,
+and defend against escalating nightly threats. Each colony wipe unlocks
+persistent meta-progression.
+
+GENRE & PLATFORM
+- Genre:    Top-down survival / colony sim / roguelike
+- Platform: PC (Steam), mobile (iOS/Android via Capacitor), web
+- Engine:   HTML5 Canvas or Phaser 3
+- Art:      Pixel art, 16x16 or 32x32 tiles, muted earthy palette with vibrant UI
+
+================================================================================
+CORE LOOP
+================================================================================
+
+  Morning Phase          Day Phase              Night Phase
+  +--------------+    +------------------+    +------------------+
+  | Assign Roles |---->| Gather / Build / |---->| Defend Colony    |
+  | Plan the Day |    | Explore / Craft  |    | Survive the Raid |
+  +--------------+    +------------------+    +--------+---------+
+                                                       |
+                                               Colony Survives?
+                                               Yes -> Next Day (escalate difficulty)
+                                               No  -> Permadeath -> Meta Unlock Screen
+
+================================================================================
+KEY SYSTEMS
+================================================================================
+
+1. SURVIVOR MANAGEMENT
+   - Each survivor has: Name, HP, Hunger, Morale, 3 Skills
+     (Farming, Combat, Crafting, Scouting, Medicine — each 1-10)
+   - Survivors gain XP in the role you assign them
+   - Low morale -> desertion, fights, refusal to work
+   - Survivors can die permanently; you recruit new ones from random events
+
+2. ROLE ASSIGNMENT (Morning Phase)
+
+   Role       Action                    Output
+   -------    ----------------------    --------------------------
+   Farmer     Tends crops               Food per skill level
+   Scout      Explores fog of war       Map reveals, event triggers
+   Builder    Constructs/repairs         Building progress
+   Crafter    Creates tools/weapons      Items
+   Guard      Patrols perimeter          Early raid warnings, traps armed
+   Medic      Heals injured survivors    HP restoration
+
+3. BASE BUILDING
+   - Grid-based placement on the island
+   - Structures: Shelter (morale), Walls (defense), Farm Plots, Workshop,
+     Watchtower, Medical Tent, Storage
+   - Structures degrade nightly from raids; must be repaired
+   - Unlock tiers: Thatch -> Wood -> Stone -> Reinforced
+
+4. NIGHTLY RAIDS
+   - Auto-battler style: you set positions and gear, survivors fight automatically
+   - Enemy types escalate:
+       Wolves (Day 1-5)
+       Bandits (6-15)
+       Mutants (16-30)
+       Eldritch Horrors (31+)
+   - Raid intensity scales with colony "prosperity score" (more stuff = bigger raids)
+   - Terrain matters: walls funnel enemies, watchtowers give range, traps deal AOE
+
+5. EXPLORATION
+   - Island is fog-of-war, revealed tile by tile
+   - Biomes: Beach, Forest, Swamp, Mountains, Ruins, Caves
+   - Points of Interest: Shipwrecks (loot), Shrines (buffs), Caves (dungeons),
+     NPC camps (trade/recruit)
+   - Each run generates a new island (seed-based)
+
+6. META PROGRESSION (Persistent)
+   - "Legacy Points" earned based on: days survived, buildings built, enemies
+     killed, events completed
+   - Unlock: Starting bonuses (extra survivor, bonus tools), new building
+     blueprints, cosmetic island themes
+   - Lore entries unlock as you discover things — builds overarching mystery
+     of why the island exists
+
+================================================================================
+RESOURCE ECONOMY
+================================================================================
+
+   Resource    Source                 Used For
+   ---------   -------------------    ----------------------------------
+   Wood        Forest tiles           Buildings, tools, fuel
+   Stone       Mountain tiles         Advanced buildings, weapons
+   Food        Farms, foraging        Daily consumption (1/survivor/day)
+   Herbs       Swamp/forest           Medicine, morale potions
+   Scrap       Ruins, shipwrecks      Advanced crafting, traps
+   Crystal     Deep caves             Endgame tech, shrine activation
+
+================================================================================
+WIN / LOSS CONDITIONS
+================================================================================
+
+- Loss: All survivors dead or all desert (morale 0)
+- "Win": Survive 30 days and activate the island's central shrine (requires
+  full exploration + rare resources). Reveals story ending. Multiple endings
+  based on choices.
+- Endless Mode: No shrine goal, pure survival for leaderboard score
+
+================================================================================
+UI WIREFRAME (Mobile-First)
+================================================================================
+
+   +----------------------------------+
+   |  Day 7   Morning      Food: 12   |  <- Status Bar
+   +----------------------------------+
+   |                                   |
+   |       [Island Grid View]         |  <- Scrollable/Pannable
+   |       Survivors shown as         |
+   |       sprites on tiles            |
+   |                                   |
+   +----------------------------------+
+   | [Assign] [Build] [Craft] [Map]   |  <- Bottom Action Bar
+   +----------------------------------+
+
+================================================================================
+TECHNICAL ARCHITECTURE
+================================================================================
+
+   /src
+     /engine      — Game loop, renderer, input handler
+     /world       — Island generation, tile system, fog of war
+     /entities    — Survivor class, enemy class, NPC class
+     /systems     — Role system, combat system, building system, crafting
+     /ui          — HUD, menus, modals, mobile touch controls
+     /meta        — Save/load, legacy progression, achievements
+     /data        — JSON configs: items, buildings, enemies, events
+     /audio       — Sound manager, ambient tracks
+
+================================================================================
+ESTIMATED SCOPE
+================================================================================
+
+   Milestone    Content                                            Effort
+   ----------   -----------------------------------------------    --------
+   MVP          1 biome, 5 buildings, 3 enemy types, basic cycle   Core
+   Alpha        All biomes, full crafting, exploration, 10 events  Medium
+   Beta         Meta progression, balancing, 3 endings, endless    Large
+   Polish       Sound, music, particles, mobile opt, leaderboards  Medium
+
+================================================================================

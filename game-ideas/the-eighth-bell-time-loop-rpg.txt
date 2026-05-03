@@ -1,0 +1,209 @@
+================================================================================
+  THE EIGHTH BELL — Time-Loop Detective RPG
+  Design Document
+================================================================================
+
+HIGH CONCEPT
+You're a detective trapped in a 24-hour time loop in a sprawling fantasy city.
+Every loop resets the world but you keep your knowledge. NPCs live full
+schedules. Crimes unfold whether you witness them or not. Solving the central
+mystery requires weaving together clues from dozens of loops, making allies,
+and breaking the cycle.
+
+GENRE & PLATFORM
+- Genre:    Narrative RPG / mystery / time-loop puzzle
+- Platform: PC (Steam), potential mobile port
+- Engine:   Phaser 3 or custom HTML5 (top-down 2D)
+- Art:      Detailed pixel art, 32x32 characters, painterly backgrounds.
+            Noir-fantasy aesthetic — gas lamps, cobblestone, magic runes.
+
+================================================================================
+CORE LOOP
+================================================================================
+
+  Loop Starts (6:00 AM)
+  |
+  +-- Explore the city, talk to NPCs
+  +-- Follow leads, gather clues
+  +-- Use abilities to access new areas/info
+  +-- Witness or intervene in events
+  |
+  +-- KEY EVENTS happen at fixed times regardless of player
+  |   (Murder at 2PM, Heist at 8PM, Ritual at 11PM, etc.)
+  |
+  +-- Midnight -> Loop Resets
+      +-- You keep: Knowledge, clue journal, unlocked abilities
+      +-- World resets: NPCs, items, events, relationships (partial)
+
+================================================================================
+THE CITY: BELLHAVEN
+================================================================================
+
+Districts (6):
+
+   District        Flavor                 Key Locations
+   ------------    -------------------    ------------------------------------
+   Old Quarter     Medieval, cramped      Tavern, Thieves' Guild, Black Market
+   Temple Row      Religious, ornate      Cathedral, Monastery, Oracle's Chamber
+   The Docks       Rough, industrial      Warehouses, Smugglers' Cove, Fish Mkt
+   Highwall        Wealthy, guarded       Manor Houses, Council Hall, Gardens
+   Academy         Scholarly, magical     Library, Alchemy Lab, Clocktower
+   Undercity       Hidden, dangerous      Catacombs, Sewer Network, Shrine
+
+================================================================================
+TIME SYSTEM
+================================================================================
+
+- 24-hour day divided into 18 "time units" (each ~80 minutes in-world)
+- Moving between districts costs 1-2 time units
+- Conversations cost 0-1 time units depending on depth
+- Key events are scripted to specific times — you can't be everywhere at once
+- Player must choose: "Do I follow the suspect to the docks at 2PM, or
+  eavesdrop on the council meeting at 2PM?" -> requires multiple loops
+
+================================================================================
+NPC SCHEDULE SYSTEM
+================================================================================
+
+Every named NPC (30-40 total) has a full daily schedule:
+
+   Example — Captain Maren Holt:
+     06:00  Wakes at barracks
+     07:00  Morning patrol (Old Quarter)
+     09:00  Reports to Council Hall
+     11:00  Lunch at Highwall cafe (meets contact)
+     13:00  Investigates warehouse (IMPORTANT: finds evidence)
+     15:00  Confrontation at docks <- CAN DIE HERE
+     17:00  Returns to barracks OR dead
+     20:00  Drinks at tavern (if alive, reveals info when drunk)
+
+- Schedules branch based on whether the player intervened in prior events
+- NPCs remember nothing between loops, but their behavior can be ALTERED
+  within a loop by player actions
+
+================================================================================
+KNOWLEDGE & CLUE SYSTEM
+================================================================================
+
+THE JOURNAL (Persistent Across Loops):
+- Clues auto-record when discovered
+- Categories: People, Places, Events, Objects, Secrets
+- Connections form automatically when related clues are found
+  (conspiracy board style)
+- Some clues unlock dialogue options in future loops
+  ("I know you were at the warehouse at 1PM")
+- "Knowledge gates": certain NPCs only reveal info if you demonstrate
+  existing knowledge
+
+EXAMPLE CLUE CHAIN:
+  Loop 1: Overhear mention of "the eighth bell" at tavern
+  Loop 2: Find a book about Bellhaven's missing 8th clocktower bell in library
+  Loop 3: Ask the clockmaker about the bell -> he panics, runs to Temple Row
+  Loop 4: Follow the clockmaker -> he meets a hooded figure at the Cathedral
+  Loop 5: Identify the hooded figure using info from the thieves' guild
+  Loop 6: Confront the figure with enough evidence -> major revelation
+
+================================================================================
+ABILITY SYSTEM
+================================================================================
+
+Instead of combat stats, abilities unlock new investigative tools:
+
+   Ability          Unlock Condition           Effect
+   -------------    -----------------------    ---------------------------------
+   Eavesdrop        Start                      Listen to nearby conversations
+   Persuade         5 clues about a person     New dialogue branches
+   Lockpick         Find thieves' guild        Access locked doors/chests
+   Arcane Sight     Library research chain     See magical residue/hidden runes
+   Disguise         Befriend theater troupe    Enter restricted areas
+   Time Echo        Major story milestone      "See" what happened 1 hour ago
+   Loop Anchor      Endgame                    Carry ONE physical item across loops
+
+================================================================================
+DIALOGUE SYSTEM
+================================================================================
+
+- Keyword-based with skill checks
+- Dialogue options are gated by: clues known, abilities unlocked, relationship
+- Some NPCs have trust meters (reset each loop, but you know faster routes)
+- Confrontation mechanic: Present evidence to NPCs -> they react based on
+  how much proof you have. Wrong accusations waste time; right ones unlock
+  new paths.
+
+================================================================================
+THE CENTRAL MYSTERY (Spoiler-Free Structure)
+================================================================================
+
+  Layer 1: A murder happens every loop at 2PM. Who did it?
+           (Solvable in ~5 loops)
+
+  Layer 2: The murder is connected to a larger conspiracy. Who's behind it?
+           (~15 loops)
+
+  Layer 3: The conspiracy is trying to prevent/cause something at midnight.
+           What? (~25 loops)
+
+  Layer 4: Why does the time loop exist? Who created it? What's "the eighth
+           bell"? (~35 loops)
+
+  Layer 5: Breaking the loop requires a specific sequence of actions.
+           Multiple endings. (~40+ loops)
+
+================================================================================
+UI DESIGN
+================================================================================
+
+   +-------------------------------------------+
+   |  Loop #14     2:00 PM     The Docks       |
+   +-------------------------------------------+
+   |                                            |
+   |          [City View / Interior]            |
+   |          NPCs walking schedules            |
+   |          Interactive hotspots marked        |
+   |                                            |
+   +-------------------------------------------+
+   |  [Journal]    [Map]    [Abilities]         |
+   +-------------------------------------------+
+
+   Journal View (Conspiracy Board):
+   +-------------------------------------------+
+   |  CONSPIRACY BOARD                          |
+   |                                            |
+   |  [Maren]--knows--[Warehouse]              |
+   |     |                   |                  |
+   |   patrols           contains               |
+   |     |                   |                  |
+   |  [Old Quarter]    [Stolen Relic]--?--[Cathedral]
+   |                                            |
+   |  Clues: 23/??    Connections: 8            |
+   +-------------------------------------------+
+
+================================================================================
+TECHNICAL ARCHITECTURE
+================================================================================
+
+   /src
+     /engine      — Game loop, renderer, scene manager
+     /time        — Clock system, event scheduler, loop manager
+     /world       — City map, districts, location interiors
+     /npcs        — NPC class, schedule system, AI behavior trees
+     /dialogue    — Dialogue tree engine, keyword system, skill checks
+     /journal     — Clue database, connection graph, knowledge gates
+     /abilities   — Ability unlock system, effects
+     /narrative   — Event scripts, story flags, ending conditions
+     /ui          — HUD, journal UI, map overlay, dialogue boxes
+     /save        — Loop state persistence, meta-save
+     /audio       — Ambient per-district, music, SFX
+
+================================================================================
+ESTIMATED SCOPE
+================================================================================
+
+   Milestone    Content                                          Notes
+   ----------   --------------------------------------------     ----------------
+   MVP          1 district, 5 NPCs, 1 mystery layer, journal    Prove the loop
+   Alpha        3 districts, 15 NPCs, layers 1-2, 3 abilities   Core mystery
+   Beta         All 6 districts, 30+ NPCs, full story, all      Complete
+   Polish       Multiple endings, achievements, music, VFX       Ship-ready
+
+================================================================================
