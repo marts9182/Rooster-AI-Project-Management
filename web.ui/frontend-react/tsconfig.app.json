@@ -22,7 +22,10 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Allow .mjs source-of-truth imports from ../shared */
+    "allowJs": true
   },
-  "include": ["src"]
+  "include": ["src", "../shared/**/*.d.mts"]
 }

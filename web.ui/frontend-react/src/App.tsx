@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Project, Sprint, Task } from './types';
 import { fetchProjects, fetchSprints } from './services/api';
 import { useTaskPoller } from './hooks/useTaskPoller';
@@ -9,22 +9,38 @@ import Board from './components/Board';
 import SprintSelector from './components/SprintSelector';
 import TaskModal from './components/TaskModal';
 import ErrorBanner from './components/ErrorBanner';
+import SprintRetroModal from './components/SprintRetroModal';
 import './App.css';
+
+interface AppError {
+  message: string;
+  severity: 'info' | 'error';
+}
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [sprints, setSprints] = useState<Sprint[]>([]);
   const [currentSprintId, setCurrentSprintId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
+  const [retroSprintId, setRetroSprintId] = useState<string | null>(null);
 
-  const showError = useCallback((msg: string) => {
-    setError(msg);
+  const showError = useCallback((message: string, severity: 'info' | 'error' = 'error') => {
+    setError({ message, severity });
   }, []);
 
-  const { tasks, refresh } = useTaskPoller(showError);
+  const dismissError = useCallback(() => setError(null), []);
+
+  // Break the cyclic dependency between SSE-driven refresh and poller's
+  // `connected`-aware interval by routing the refresh callback through a ref.
+  const refreshRef = useRef<() => void>(() => {});
+  const { thinkingAgents, connected } = useAgentEvents(() => refreshRef.current());
+  const { tasks, refresh } = useTaskPoller((m) => showError(m, 'error'), connected);
   const { handleTaskMove } = useAgentWorkflow(showError);
-  const { thinkingAgents, connected } = useAgentEvents(refresh);
+
+  useEffect(() => {
+    refreshRef.current = refresh;
+  }, [refresh]);
 
   // Bootstrap: load projects + sprints once
   useEffect(() => {
@@ -49,7 +65,11 @@ export default function App() {
       await handleTaskMove(task, newStatus);
       await refresh();
     } catch (err) {
-      showError('Move failed: ' + (err instanceof Error ? err.message : String(err)));
+      // useAgentWorkflow already calls onError with rich blocker detail.
+      // We just need to ensure the board reflects the rejected move by refreshing.
+      await refresh();
+      // Don't double-report — useAgentWorkflow already surfaced it.
+      void err;
     }
   };
 
@@ -57,7 +77,11 @@ export default function App() {
 
   return (
     <>
-      <ErrorBanner message={error} />
+      <ErrorBanner
+        message={error?.message ?? null}
+        severity={error?.severity ?? 'error'}
+        onDismiss={dismissError}
+      />
 
       <header className="jira-header" role="banner">
         <div className="jira-logo" aria-label="Rooster AI">🐓 Rooster AI</div>
@@ -65,6 +89,7 @@ export default function App() {
           sprints={sprints}
           currentSprintId={currentSprintId}
           onSelect={setCurrentSprintId}
+          onGenerateRetro={(id) => setRetroSprintId(id)}
         />
         {thinkingAgents.size > 0 && (
           <div className="agent-activity" aria-live="polite">
@@ -103,6 +128,14 @@ export default function App() {
         projects={projects}
         onClose={() => setSelectedTask(null)}
       />
+
+      {retroSprintId && (
+        <SprintRetroModal
+          sprintId={retroSprintId}
+          sprints={sprints}
+          onClose={() => setRetroSprintId(null)}
+        />
+      )}
     </>
   );
 }

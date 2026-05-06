@@ -6,4 +6,3 @@ export * from './workflowRules.js';
 export { analyzeTask } from './TaskAnalyzer.js';
 export { BaseLLMAdapter, SmartTemplateAdapter, defaultAdapter } from './LLMAdapter.js';
 export { default as marcus } from './MarcusThompson.js';
-

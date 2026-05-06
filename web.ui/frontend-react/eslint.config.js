@@ -19,5 +19,11 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Polling & reset-on-prop-change inside useEffect are legitimate
+      // patterns. The new react-hooks/set-state-in-effect rule is overly
+      // aggressive and forbids common imperative flows.
+      'react-hooks/set-state-in-effect': 'off',
+    },
   },
 ])

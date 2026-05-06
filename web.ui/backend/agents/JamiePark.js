@@ -1,9 +1,10 @@
 import { BaseAgent } from './BaseAgent.js';
+import { AGENT_IDS, AGENT_ROLES } from '../../shared/agentIds.mjs';
 
 export class JamiePark extends BaseAgent {
-  id = 'agent-intern-001';
+  id = AGENT_IDS.INTERN;
   name = 'Jamie Park';
-  role = 'Intern';
+  role = AGENT_ROLES.INTERN;
   personality =
     'Enthusiastic and eager to learn. Jamie brings fresh perspectives and ' +
     "isn't afraid to ask questions. Quick learner who's great at " +
@@ -50,6 +51,24 @@ export class JamiePark extends BaseAgent {
         'Here are my observations and any issues I found.',
     },
   };
+
+  // ── role hooks ──────────────────────────────────────────────────────────
+
+  buildContextNotes(_task, analysis) {
+    const lines = ['\n**Learning Notes:**'];
+    lines.push(`  - This is a ${analysis.complexityLabel}-complexity task in the ${analysis.primaryDomain} domain.`);
+    if (analysis.domains.length > 0) {
+      lines.push(`  - Technologies I'll learn about: ${analysis.domains.map((d) => d.domain).join(', ')}`);
+    }
+    if (analysis.complexityLabel === 'high') {
+      lines.push('  - 📝 Complex task — I\'ll focus on documentation and supporting the senior devs.');
+    } else {
+      lines.push('  - I can contribute to implementation with guidance from the tech lead.');
+    }
+    return lines.join('\n');
+  }
+
+  // Intern doesn't initiate dialogue or block transitions.
 }
 
 export default new JamiePark();

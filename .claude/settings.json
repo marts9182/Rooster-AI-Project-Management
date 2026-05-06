@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk '{print $6, $7, $8, $9}')",
+      "Bash(nvidia-smi)",
+      "Bash(wmic path *)",
+      "Bash(mkdir -p assets/hero)",
+      "Bash(touch assets/hero/.gitkeep)",
+      "Read(//c/Users/marts/.cache/**)",
+      "Bash(rm -f scripts/generate_hero_art.py)",
+      "Bash(.venv/Scripts/python.exe -m pip list)"
+    ]
+  }
+}

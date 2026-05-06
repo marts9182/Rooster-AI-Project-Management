@@ -1,9 +1,10 @@
 import { BaseAgent } from './BaseAgent.js';
+import { AGENT_IDS, AGENT_ROLES } from '../../shared/agentIds.mjs';
 
 export class JordanLee extends BaseAgent {
-  id = 'agent-po-001';
+  id = AGENT_IDS.PRODUCT_OWNER;
   name = 'Jordan Lee';
-  role = 'Product Owner';
+  role = AGENT_ROLES.PRODUCT_OWNER;
   personality =
     'User-focused and decisive. Jordan represents the customer voice and ' +
     'prioritizes features based on value. Great at breaking down complex ' +
@@ -66,6 +67,50 @@ export class JordanLee extends BaseAgent {
         'I will verify each criterion is satisfied before approving the task for the Accepted lane.',
     },
   };
+
+  // ── role hooks ──────────────────────────────────────────────────────────
+
+  evaluateApproval(task, analysis) {
+    if (!analysis.hasAcceptanceCriteria) {
+      return {
+        approved: false,
+        reason: 'Task has no acceptance criteria. Cannot proceed without testable AC.',
+      };
+    }
+    if (!task.description || task.description.trim().length < 20) {
+      return {
+        approved: false,
+        reason: 'Task description is too vague (< 20 chars). Needs more detail.',
+      };
+    }
+    return { approved: true, reason: null };
+  }
+
+  buildContextNotes(_task, analysis) {
+    const lines = ['\n**Product Assessment:**'];
+    lines.push(`  - Scope complexity: ${analysis.complexityLabel}`);
+    lines.push(`  - Acceptance criteria: ${analysis.hasAcceptanceCriteria ? `${analysis.criteriaCount} defined` : '⚠️ MISSING — must be added'}`);
+
+    if (analysis.domains.length > 1) {
+      lines.push(`  - This task spans multiple domains (${analysis.domains.map((d) => d.domain).join(', ')}) — consider splitting if scope grows.`);
+    }
+
+    if (analysis.isHighRisk) {
+      lines.push('  - High-risk task — recommend stakeholder visibility and incremental delivery.');
+    }
+
+    return lines.join('\n');
+  }
+
+  generateDirectedQuestion(task, analysis, _history) {
+    if (task.status === 'analyze' && analysis.isHighRisk) {
+      return {
+        text: '\n**@Tech Lead** — Given the risk profile, is the current scope achievable in this sprint? Should we consider descoping any acceptance criteria?',
+        toAgent: AGENT_IDS.TECH_LEAD,
+      };
+    }
+    return null;
+  }
 }
 
 export default new JordanLee();

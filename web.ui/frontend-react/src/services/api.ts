@@ -1,13 +1,23 @@
 /** Typed API service — all fetch calls with error handling. */
 
-import type { Task, Project, Sprint, Comment } from '../types';
+import type { Task, Project, Sprint, Comment, RetroAnalytics } from '../types';
 
-class ApiError extends Error {
+export interface MoveBlocker {
+  agent_id: string;
+  agent_name: string;
+  reason: string;
+}
+
+export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  blockers?: MoveBlocker[];
+  canForce?: boolean;
+  constructor(status: number, message: string, extras: { blockers?: MoveBlocker[]; canForce?: boolean } = {}) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
+    this.blockers = extras.blockers;
+    this.canForce = extras.canForce;
   }
 }
 
@@ -36,15 +46,22 @@ export async function fetchComments(taskId: string): Promise<Comment[]> {
   return get<Comment[]>(`/api/tasks/${taskId}/comments`);
 }
 
-export async function moveTask(taskId: string, newStatus: string): Promise<void> {
+export async function moveTask(
+  taskId: string,
+  newStatus: string,
+  opts: { force?: boolean } = {},
+): Promise<void> {
   const res = await fetch(`/api/tasks/${taskId}/move`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status: newStatus }),
+    body: JSON.stringify({ status: newStatus, force: opts.force ?? false }),
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-    throw new ApiError(res.status, body.error ?? `Move failed`);
+    throw new ApiError(res.status, body.error ?? `Move failed`, {
+      blockers: body.blockers,
+      canForce: body.canForce,
+    });
   }
 }
 
@@ -59,4 +76,23 @@ export async function saveComments(taskId: string, comments: Comment[]): Promise
     const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
     throw new ApiError(res.status, body.error ?? `Failed to save comments`);
   }
+}
+
+export interface RetroResponse {
+  success: boolean;
+  analytics: RetroAnalytics;
+  content: string;
+  review: string;
+}
+
+export async function generateRetro(sprintId: string): Promise<RetroResponse> {
+  const res = await fetch(`/api/sprints/${sprintId}/retro`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new ApiError(res.status, body.error ?? `Retro generation failed`);
+  }
+  return res.json() as Promise<RetroResponse>;
 }

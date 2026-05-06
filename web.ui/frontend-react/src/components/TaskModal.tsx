@@ -42,8 +42,10 @@ export default function TaskModal({ task, projects, onClose }: Props) {
 
   const project = projects.find((p) => p.id === task.project_id);
 
+  // Handle both real newlines and the legacy escaped "\n" sequences that
+  // some seed data still contains, so multi-line criteria render properly.
   const acLines = task.acceptance_criteria
-    ? task.acceptance_criteria.split('\\n').filter((l) => l.trim())
+    ? task.acceptance_criteria.split(/\r?\n|\\n/).filter((l) => l.trim())
     : [];
 
   return (
@@ -103,7 +105,7 @@ export default function TaskModal({ task, projects, onClose }: Props) {
           {comments.length > 0
             ? comments.map((c, i) => (
                 <div className="comment" key={i}>
-                  <b>{resolveAgentName(c.from_agent || '')}:</b> {c.content || c.text || ''}
+                  <b>{resolveAgentName(c.from_agent || '')}:</b> {c.content || ''}
                 </div>
               ))
             : <em>No comments</em>

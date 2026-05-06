@@ -46,14 +46,30 @@ export default function Lane({
       onDrop={handleDrop}
     >
       <div className="lane-title">{lane.label}</div>
-      {tasks.map((task) => (
-        <Card
-          key={task.id}
-          task={task}
-          project={projects.find((p) => p.id === task.project_id)}
-          onClick={onCardClick}
-        />
-      ))}
+      {tasks.length === 0 ? (
+        <div
+          className="lane-empty"
+          aria-label={`No tasks in ${lane.label}`}
+          style={{
+            color: '#888',
+            fontStyle: 'italic',
+            textAlign: 'center',
+            padding: '12px 8px',
+            fontSize: '0.85em',
+          }}
+        >
+          No tasks
+        </div>
+      ) : (
+        tasks.map((task) => (
+          <Card
+            key={task.id}
+            task={task}
+            project={projects.find((p) => p.id === task.project_id)}
+            onClick={onCardClick}
+          />
+        ))
+      )}
     </div>
   );
 }

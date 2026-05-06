@@ -2,8 +2,14 @@
  * BaseAgent — live autonomous agent that subscribes to task events,
  * decides whether to engage, and posts comments asynchronously.
  *
- * Each subclass defines its identity, stage actions, and personality.
- * Override generateResponse() to plug in an LLM.
+ * Each subclass defines its identity, stage actions, personality, and
+ * may override the per-role hooks:
+ *   - evaluateApproval(task, analysis)        — synchronous gate-keeping
+ *   - buildContextNotes(task, analysis)       — role-specific bullet list
+ *   - generateDirectedQuestion(task, analysis, history) — @mentions
+ *
+ * To plug in a real LLM, either swap the adapter (setLLMAdapter) or
+ * override generateResponse().
  */
 
 import crypto from 'crypto';
@@ -57,66 +63,77 @@ export class BaseAgent {
       taskId,
     });
 
-    // 2. Simulate thinking time (personality-appropriate delay)
-    const [min, max] = this.thinkingDelayRange;
-    const delay = min + Math.random() * (max - min);
-    await new Promise((r) => setTimeout(r, delay));
+    try {
+      // 2. Simulate thinking time (personality-appropriate delay)
+      const [min, max] = this.thinkingDelayRange;
+      const delay = min + Math.random() * (max - min);
+      await new Promise((r) => setTimeout(r, delay));
 
-    // 3. Load conversation history for this task
-    const conversationHistory = this._persistence
-      ? this._persistence.getTaskComments(taskId)
-      : [];
+      // 3. Load conversation history for this task
+      const conversationHistory = this._persistence
+        ? await this._persistence.getTaskComments(taskId)
+        : [];
 
-    // 4. Generate the response (may include approval decision)
-    this.status = 'responding';
-    const action = this.stageActions[toStage];
-    const result = this.generateResponse(task, action, conversationHistory);
+      // 4. Generate the response (may include approval decision)
+      this.status = 'responding';
+      const action = this.stageActions[toStage];
+      const result = await this.generateResponse(task, action, conversationHistory);
 
-    // Normalize: generateResponse can return a string or { content, approved, reason, toAgent }
-    const { content, approved, reason, toAgent } = typeof result === 'string'
-      ? { content: result, approved: true, reason: null, toAgent: null }
-      : result;
+      // Normalize: generateResponse can return a string or a structured object
+      const { content, approved, reason, toAgent } = typeof result === 'string'
+        ? { content: result, approved: true, reason: null, toAgent: null }
+        : result;
 
-    const comment = {
-      id: `msg-${crypto.randomUUID().slice(0, 8)}`,
-      from_agent: this.id,
-      to_agent: toAgent || null,
-      content,
-      task_id: taskId,
-      timestamp: new Date().toISOString(),
-      approval: { approved, reason: reason || null },
-    };
+      const comment = {
+        id: `msg-${crypto.randomUUID().slice(0, 8)}`,
+        from_agent: this.id,
+        to_agent: toAgent || null,
+        content,
+        task_id: taskId,
+        timestamp: new Date().toISOString(),
+        approval: { approved, reason: reason || null },
+      };
 
-    // 4. Persist the comment
-    if (this._persistence) {
-      this._persistence.saveComment(comment);
-    }
+      // 5. Persist the comment
+      if (this._persistence) {
+        await this._persistence.saveComment(comment);
+      }
 
-    // 5. Broadcast that we commented (include approval info)
-    bus.fire('agent:comment', {
-      agentId: this.id,
-      agentName: this.name,
-      role: this.role,
-      taskId,
-      comment,
-      approved,
-      reason,
-    });
-
-    // 5b. If agent rejected, fire a specific event
-    if (!approved) {
-      bus.fire('agent:rejection', {
+      // 6. Broadcast that we commented (include approval info)
+      bus.fire('agent:comment', {
         agentId: this.id,
         agentName: this.name,
         role: this.role,
         taskId,
+        comment,
+        approved,
         reason,
       });
-    }
 
-    // 6. Done
-    this.status = 'idle';
-    bus.fire('agent:idle', { agentId: this.id });
+      if (!approved) {
+        bus.fire('agent:rejection', {
+          agentId: this.id,
+          agentName: this.name,
+          role: this.role,
+          taskId,
+          reason,
+        });
+      }
+    } catch (err) {
+      // Never let an agent silently disappear. Surface and keep the bus alive.
+      console.error(`[${this.name}] generateResponse failed:`, err);
+      bus.fire('agent:error', {
+        agentId: this.id,
+        agentName: this.name,
+        role: this.role,
+        taskId,
+        message: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      // 7. Done — always emit idle so the UI's thinking indicator clears.
+      this.status = 'idle';
+      bus.fire('agent:idle', { agentId: this.id });
+    }
   }
 
   // ── agent logic ─────────────────────────────────────────────────────────
@@ -134,7 +151,7 @@ export class BaseAgent {
    * Generate a context-aware response using TaskAnalyzer + LLM adapter.
    * Override this method or swap the adapter for full LLM integration.
    */
-  generateResponse(task, action, conversationHistory = []) {
+  async generateResponse(task, action, conversationHistory = []) {
     const analysis = analyzeTask(task);
 
     return this._llmAdapter.generate({
@@ -145,6 +162,35 @@ export class BaseAgent {
       conversationHistory,
       agent: this,
     });
+  }
+
+  // ── role hooks (override in subclasses) ─────────────────────────────────
+
+  /**
+   * Synchronous gate-keeping decision. Default: always approve.
+   * Subclasses override to block obviously broken transitions BEFORE the
+   * task status is mutated server-side.
+   *
+   * Returns `{approved: boolean, reason: string|null}`.
+   */
+  evaluateApproval(/* task, analysis */) {
+    return { approved: true, reason: null };
+  }
+
+  /**
+   * Role-specific context bullets the templated adapter prepends to a comment.
+   * Default: nothing.
+   */
+  buildContextNotes(/* task, analysis */) {
+    return null;
+  }
+
+  /**
+   * Optional @mention dialogue with another agent.
+   * Returns null if nothing to ask, else `{text, toAgent}`.
+   */
+  generateDirectedQuestion(/* task, analysis, history */) {
+    return null;
   }
 
   _fillTemplate(template, task) {

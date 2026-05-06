@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem \"C:\\\\Sandbox\" -Directory | Select-Object Name; Get-ChildItem \"C:\\\\\" -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'kdp|puzzle' } | Select-Object FullName)"
+    ]
+  }
+}

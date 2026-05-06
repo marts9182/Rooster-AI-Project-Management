@@ -1,9 +1,10 @@
 import { BaseAgent } from './BaseAgent.js';
+import { AGENT_IDS, AGENT_ROLES } from '../../shared/agentIds.mjs';
 
 export class MarcusThompson extends BaseAgent {
-  id = 'agent-manager-001';
+  id = AGENT_IDS.MANAGER;
   name = 'Marcus Thompson';
-  role = 'Manager';
+  role = AGENT_ROLES.MANAGER;
   personality =
     'Strategic and supportive. Marcus focuses on team coordination, resource ' +
     "allocation, and ensuring projects stay on track. He's great at seeing " +
@@ -63,12 +64,37 @@ export class MarcusThompson extends BaseAgent {
     },
   };
 
+  // ── role hooks ──────────────────────────────────────────────────────────
+
+  buildContextNotes(_task, analysis) {
+    const lines = ['\n**Resource & Planning Assessment:**'];
+    lines.push(`  - Task complexity: ${analysis.complexityLabel} (score ${analysis.complexityScore}/10)`);
+    lines.push(`  - Domains touched: ${analysis.domains.map((d) => d.domain).join(', ') || 'general'}`);
+    if (analysis.isHighRisk) {
+      lines.push('  - 🔴 High-risk — scheduling buffer and adding checkpoint reviews.');
+    }
+    if (analysis.domains.length > 2) {
+      lines.push('  - Multi-domain task — may need collaboration across multiple team members.');
+    }
+    return lines.join('\n');
+  }
+
+  generateDirectedQuestion(task, _analysis, _history) {
+    if (task.status === 'ready_for_acceptance') {
+      return {
+        text: '\n**@Product Owner** — All stages completed. Please confirm you\'ve reviewed the deliverables against the acceptance criteria before I mark this as accepted.',
+        toAgent: AGENT_IDS.PRODUCT_OWNER,
+      };
+    }
+    return null;
+  }
+
   /**
    * Generate a sprint retrospective with analytics.
    * @param {object} sprint - The sprint object
    * @param {object[]} tasks - All tasks in this sprint
    * @param {object[]} messages - All messages for this sprint's tasks
-   * @returns {{ content: string, analytics: object }}
+   * @returns {{ content: string, analytics: object, review: string }}
    */
   generateRetro(sprint, tasks, messages) {
     // --- Task analytics ---
@@ -77,12 +103,12 @@ export class MarcusThompson extends BaseAgent {
       statusCounts[t.status] = (statusCounts[t.status] || 0) + 1;
     }
 
-    const completedTasks = tasks.filter(t => t.status === 'accepted');
+    const completedTasks = tasks.filter((t) => t.status === 'accepted');
 
     // Cycle time: created_at → updated_at (rough proxy)
     const cycleTimes = completedTasks
-      .filter(t => t.created_at && t.updated_at)
-      .map(t => {
+      .filter((t) => t.created_at && t.updated_at)
+      .map((t) => {
         const start = new Date(t.created_at).getTime();
         const end = new Date(t.updated_at).getTime();
         return (end - start) / (1000 * 60 * 60); // hours
@@ -92,7 +118,6 @@ export class MarcusThompson extends BaseAgent {
       ? (cycleTimes.reduce((a, b) => a + b, 0) / cycleTimes.length).toFixed(1)
       : 'N/A';
 
-    // Cycle time variance
     const minCycle = cycleTimes.length > 0 ? Math.min(...cycleTimes).toFixed(1) : 'N/A';
     const maxCycle = cycleTimes.length > 0 ? Math.max(...cycleTimes).toFixed(1) : 'N/A';
 
@@ -103,39 +128,22 @@ export class MarcusThompson extends BaseAgent {
       agentCounts[agent] = (agentCounts[agent] || 0) + 1;
     }
 
-    // Top contributor
-    const topAgent = Object.entries(agentCounts)
-      .sort(([, a], [, b]) => b - a)[0];
+    const topAgent = Object.entries(agentCounts).sort(([, a], [, b]) => b - a)[0];
+    const bottomAgent = Object.entries(agentCounts).sort(([, a], [, b]) => a - b)[0];
 
-    // Bottom contributor
-    const bottomAgent = Object.entries(agentCounts)
-      .sort(([, a], [, b]) => a - b)[0];
-
-    // Workload distribution analysis
-    const agentCommentCounts = Object.values(agentCounts);
-    const avgComments = agentCommentCounts.length > 0
-      ? agentCommentCounts.reduce((a, b) => a + b, 0) / agentCommentCounts.length
-      : 0;
     const workloadSkew = topAgent && bottomAgent
       ? (topAgent[1] / Math.max(bottomAgent[1], 1)).toFixed(1)
       : 'N/A';
 
-    // --- Bottleneck detection: tasks stuck in non-terminal stages ---
-    const stuckTasks = tasks.filter(t =>
-      t.status !== 'accepted' && t.status !== 'backlog'
-    );
+    const stuckTasks = tasks.filter((t) => t.status !== 'accepted' && t.status !== 'backlog');
+    const rejections = messages.filter((m) => m.approval && !m.approval.approved);
 
-    // --- Rejection analysis ---
-    const rejections = messages.filter(m => m.approval && !m.approval.approved);
+    const shortComments = messages.filter((m) => m.content && m.content.length < 100).length;
+    const substantiveComments = messages.filter((m) => m.content && m.content.length >= 100).length;
 
-    // --- Comment depth analysis (short vs substantive) ---
-    const shortComments = messages.filter(m => m.content && m.content.length < 100).length;
-    const substantiveComments = messages.filter(m => m.content && m.content.length >= 100).length;
-
-    // --- Fastest and slowest tasks ---
     const tasksWithCycleTime = completedTasks
-      .filter(t => t.created_at && t.updated_at)
-      .map(t => ({
+      .filter((t) => t.created_at && t.updated_at)
+      .map((t) => ({
         title: t.title,
         hours: ((new Date(t.updated_at).getTime() - new Date(t.created_at).getTime()) / (1000 * 60 * 60)).toFixed(1),
       }))
@@ -144,7 +152,6 @@ export class MarcusThompson extends BaseAgent {
     const fastestTask = tasksWithCycleTime[0] || null;
     const slowestTask = tasksWithCycleTime.length > 1 ? tasksWithCycleTime[tasksWithCycleTime.length - 1] : null;
 
-    // --- Build retro content ---
     const lines = [
       `**[Manager — Sprint Retrospective]**`,
       `Sprint: *${sprint.name}*\n`,
@@ -166,7 +173,6 @@ export class MarcusThompson extends BaseAgent {
       '',
     ];
 
-    // What went well — data-driven
     lines.push(`## ✅ What Went Well`);
     if (completedTasks.length > 0) {
       const pct = ((completedTasks.length / tasks.length) * 100).toFixed(0);
@@ -189,10 +195,9 @@ export class MarcusThompson extends BaseAgent {
     }
     lines.push('');
 
-    // What needs improvement — proactive insights even when successful
     lines.push(`## 🔧 What Needs Improvement`);
     if (stuckTasks.length > 0) {
-      lines.push(`  - ${stuckTasks.length} task(s) not yet accepted: ${stuckTasks.map(t => `"${t.title}" (${t.status})`).join(', ')}`);
+      lines.push(`  - ${stuckTasks.length} task(s) not yet accepted: ${stuckTasks.map((t) => `"${t.title}" (${t.status})`).join(', ')}`);
     }
     if (avgCycleTimeHours !== 'N/A' && parseFloat(avgCycleTimeHours) > 48) {
       lines.push(`  - Average cycle time (${avgCycleTimeHours}h) is high — consider breaking tasks into smaller pieces.`);
@@ -200,29 +205,24 @@ export class MarcusThompson extends BaseAgent {
     if (Object.keys(agentCounts).length < 5) {
       lines.push(`  - Only ${Object.keys(agentCounts).length} agents engaged — aim for broader participation.`);
     }
-    // Proactive: workload imbalance
     if (workloadSkew !== 'N/A' && parseFloat(workloadSkew) > 2.0) {
       lines.push(`  - Workload imbalance detected: ${topAgent[0]} contributed ${topAgent[1]} comments vs ${bottomAgent[0]} with ${bottomAgent[1]} (${workloadSkew}x ratio). Consider redistributing review responsibilities.`);
     }
-    // Proactive: zero rejections
     if (rejections.length === 0 && tasks.length > 0) {
       lines.push(`  - Zero rejections across ${tasks.length} tasks — gate-keeping may be too lenient. Review approval thresholds to ensure quality checks are meaningful.`);
     }
-    // Proactive: cycle time variance
     if (slowestTask && fastestTask && parseFloat(slowestTask.hours) > parseFloat(fastestTask.hours) * 3) {
       lines.push(`  - High cycle time variance: fastest task took ${fastestTask.hours}h, slowest took ${slowestTask.hours}h ("${slowestTask.title}"). Investigate what caused delays.`);
     }
-    // Proactive: comment quality
     if (shortComments > substantiveComments) {
       lines.push(`  - ${shortComments} of ${messages.length} comments were brief (< 100 chars) — encourage more detailed feedback from agents.`);
     }
     lines.push('');
 
-    // Action items — data-driven, sprint-specific
     lines.push(`## 📋 Action Items`);
     let actionNum = 1;
     if (stuckTasks.length > 0) {
-      lines.push(`  ${actionNum++}. Unblock stuck tasks: ${stuckTasks.map(t => `"${t.title}"`).join(', ')}.`);
+      lines.push(`  ${actionNum++}. Unblock stuck tasks: ${stuckTasks.map((t) => `"${t.title}"`).join(', ')}.`);
     }
     if (rejections.length === 0 && tasks.length > 0) {
       lines.push(`  ${actionNum++}. Review gate-keeping thresholds — zero rejections across ${tasks.length} tasks suggests criteria may need tightening.`);
@@ -240,13 +240,11 @@ export class MarcusThompson extends BaseAgent {
       lines.push(`  ${actionNum++}. All tasks delivered — carry velocity into next sprint. Consider increasing scope slightly.`);
     }
     if (actionNum === 1) {
-      // Fallback if nothing specific emerged
       lines.push(`  1. Sprint ran smoothly. Focus on continuous improvement and stretch goals next sprint.`);
     }
 
     const content = lines.join('\n');
 
-    // --- Auto-generate review summary ---
     const reviewParts = [];
     reviewParts.push(`${completedTasks.length}/${tasks.length} tasks delivered.`);
     if (avgCycleTimeHours !== 'N/A') {
@@ -272,7 +270,7 @@ export class MarcusThompson extends BaseAgent {
       rejections: rejections.length,
       agentEngagement: agentCounts,
       topContributor: topAgent ? { agent: topAgent[0], comments: topAgent[1] } : null,
-      stuckTasks: stuckTasks.map(t => ({ id: t.id, title: t.title, status: t.status })),
+      stuckTasks: stuckTasks.map((t) => ({ id: t.id, title: t.title, status: t.status })),
       workloadSkew,
       commentDepth: { short: shortComments, substantive: substantiveComments },
     };

@@ -1,9 +1,10 @@
 import { BaseAgent } from './BaseAgent.js';
+import { AGENT_IDS, AGENT_ROLES } from '../../shared/agentIds.mjs';
 
 export class MorganDavis extends BaseAgent {
-  id = 'agent-accessibility-001';
+  id = AGENT_IDS.ACCESSIBILITY;
   name = 'Morgan Davis';
-  role = 'Accessibility';
+  role = AGENT_ROLES.ACCESSIBILITY;
   personality =
     'Empathetic advocate for inclusive design. Morgan ensures everyone can ' +
     'use the product regardless of ability. Passionate about WCAG standards ' +
@@ -56,6 +57,32 @@ export class MorganDavis extends BaseAgent {
         'testing have been addressed. No a11y blockers remain.',
     },
   };
+
+  // ── role hooks ──────────────────────────────────────────────────────────
+
+  buildContextNotes(_task, analysis) {
+    const lines = ['\n**Accessibility Scope:**'];
+
+    if (analysis.isUiRelated) {
+      lines.push('  - UI changes detected — full a11y review required.');
+      const a11yDomain = analysis.domains.find((d) => d.domain === 'accessibility');
+      if (a11yDomain) {
+        lines.push(`  - A11y keywords found: ${a11yDomain.keywords.join(', ')}`);
+      }
+    } else {
+      lines.push('  - Non-UI task — verifying no indirect accessibility impact.');
+    }
+
+    if (analysis.criteriaItems.some((c) => /aria|keyboard|screen reader|focus|wcag|a11y/i.test(c))) {
+      lines.push('  - ✅ Acceptance criteria include explicit a11y requirements.');
+    } else if (analysis.isUiRelated) {
+      lines.push('  - ⚠️ UI task but no a11y acceptance criteria — recommending additions.');
+    }
+
+    return lines.join('\n');
+  }
+
+  // No directed dialogue, no blocking gate.
 }
 
 export default new MorganDavis();

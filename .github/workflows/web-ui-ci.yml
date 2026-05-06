@@ -1,0 +1,54 @@
+name: web.ui CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web.ui/**'
+      - 'scripts/**'
+      - '.github/workflows/web-ui-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web.ui/**'
+      - 'scripts/**'
+      - '.github/workflows/web-ui-ci.yml'
+
+jobs:
+  backend:
+    name: Backend (Node)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web.ui/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Type-check
+        run: npm run typecheck
+      - name: Test
+        run: npm test
+
+  frontend:
+    name: Frontend (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web.ui/frontend-react
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build

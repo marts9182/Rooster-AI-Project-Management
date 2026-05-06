@@ -9,6 +9,10 @@ export default defineConfig({
     proxy: {
       '/api': 'http://localhost:5000',
     },
+    // Allow importing from ../shared (workflow + agent IDs SSOT)
+    fs: {
+      allow: ['..'],
+    },
   },
   build: {
     outDir: 'dist',

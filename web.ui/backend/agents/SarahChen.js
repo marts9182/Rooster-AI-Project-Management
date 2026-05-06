@@ -1,9 +1,10 @@
 import { BaseAgent } from './BaseAgent.js';
+import { AGENT_IDS, AGENT_ROLES } from '../../shared/agentIds.mjs';
 
 export class SarahChen extends BaseAgent {
-  id = 'agent-techlead-001';
+  id = AGENT_IDS.TECH_LEAD;
   name = 'Sarah Chen';
-  role = 'Tech Lead';
+  role = AGENT_ROLES.TECH_LEAD;
   personality =
     'Analytical and detail-oriented. Sarah excels at technical architecture ' +
     "and code quality. She's passionate about best practices and loves " +
@@ -66,6 +67,71 @@ export class SarahChen extends BaseAgent {
         'Confirming the implementation is clean and test-ready.',
     },
   };
+
+  // ── role hooks ──────────────────────────────────────────────────────────
+
+  evaluateApproval(task, analysis) {
+    if (!task.description || task.description.trim().length < 10) {
+      return {
+        approved: false,
+        reason: 'Task has no meaningful description. Cannot assess technical approach.',
+      };
+    }
+    if (task.status === 'develop' && analysis.complexityScore >= 8) {
+      const desc = (task.description || '').toLowerCase();
+      const hasRiskMitigation = /risk|mitigation|incremental|phased|rollback|fallback|safeguard/.test(desc);
+      if (!hasRiskMitigation) {
+        return {
+          approved: false,
+          reason: `High-complexity task (${analysis.complexityScore}/10) entering develop without risk mitigation strategy. Add a risk mitigation approach to the description before proceeding.`,
+        };
+      }
+    }
+    return { approved: true, reason: null };
+  }
+
+  buildContextNotes(_task, analysis) {
+    const lines = ['\n**Technical Assessment:**'];
+    lines.push(`  - Complexity: **${analysis.complexityLabel}** (score ${analysis.complexityScore}/10)`);
+    lines.push(`  - Primary domain: ${analysis.primaryDomain}`);
+
+    if (analysis.domains.length > 1) {
+      lines.push(`  - Cross-cutting concerns: ${analysis.domains.map((d) => d.domain).join(', ')}`);
+    }
+
+    if (analysis.risks.length > 0) {
+      lines.push('  - **Risks identified:**');
+      for (const risk of analysis.risks) {
+        lines.push(`    - ${risk.risk} (signals: ${risk.signals.join(', ')})`);
+      }
+    }
+
+    if (analysis.isHighRisk) {
+      lines.push('  - ⚠️ This is a high-risk task — recommend incremental implementation and extra review.');
+    }
+
+    if (!analysis.hasAcceptanceCriteria) {
+      lines.push('  - ⚠️ **No acceptance criteria defined** — this needs to be fixed before development.');
+    }
+
+    return lines.join('\n');
+  }
+
+  generateDirectedQuestion(task, analysis, _history) {
+    if (task.status === 'analyze' && analysis.complexityLabel === 'high') {
+      return {
+        text: '\n**@Product Owner** — This is a high-complexity task. Can you confirm the priority of each acceptance criterion? I want to suggest a phased approach and need to know which criteria are must-haves vs nice-to-haves.',
+        toAgent: AGENT_IDS.PRODUCT_OWNER,
+      };
+    }
+    if (task.status === 'develop' && analysis.risks.length > 0) {
+      return {
+        text: `\n**@Developer** — I've flagged ${analysis.risks.length} risk area(s): ${analysis.risks.map((r) => r.risk).join(', ')}. Please outline your mitigation strategy before proceeding with implementation.`,
+        toAgent: AGENT_IDS.DEVELOPER,
+      };
+    }
+    return null;
+  }
 }
 
 export default new SarahChen();

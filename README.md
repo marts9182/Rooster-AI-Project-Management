@@ -25,6 +25,7 @@ A Jira-style project management application with **autonomous AI agents** that c
 ## Prerequisites
 
 - **Node.js 18+** and **npm**
+- (Optional) An **Anthropic API key** if you want the agents to be powered by real Claude calls. Without it the agents fall back to a built-in template adapter and the app still works end-to-end.
 
 ---
 
@@ -42,7 +43,19 @@ cd web.ui/backend
 npm install
 ```
 
-### 2. Build the React frontend
+### 2. Configure the LLM provider (optional)
+
+```bash
+cp .env.example .env
+# then edit .env:
+#   LLM_PROVIDER=anthropic
+#   ANTHROPIC_API_KEY=sk-ant-...
+#   ANTHROPIC_MODEL=claude-haiku-4-5      # default; cheap and fast
+```
+
+If `LLM_PROVIDER` is unset or `template`, the agents use the built-in `SmartTemplateAdapter` and never call any external API.
+
+### 3. Build the React frontend
 
 ```bash
 cd web.ui/frontend-react
@@ -51,6 +64,16 @@ npm run build
 ```
 
 This produces a production build in `web.ui/frontend-react/dist/` that Express serves automatically.
+
+### 4. (Optional) Repair encoding in seed data
+
+If `data/tasks.json` has visible mojibake from a prior import:
+
+```bash
+node scripts/fix-encoding.mjs
+```
+
+It backs up originals to `data/.backup-<timestamp>/` before writing.
 
 ---
 
@@ -62,6 +85,18 @@ node server.js
 ```
 
 Open **http://localhost:5000** in your browser. All 7 agents boot automatically and begin listening for task events.
+
+The startup banner tells you which provider is active:
+
+```
+🧠 LLM provider: Anthropic (claude-haiku-4-5) — all 7 agents wired
+```
+
+or
+
+```
+🧠 LLM provider: template (set LLM_PROVIDER=anthropic to use Claude)
+```
 
 ### Development mode (with hot-reload)
 
@@ -135,14 +170,23 @@ Agents are **autonomous server-side processes** that boot when the Express serve
 
 When a task is moved to a new lane:
 
-1. **EventBus** fires a `task:moved` event
-2. **AgentRuntime** routes the event to all agents
-3. Each agent checks `shouldEngage()` based on the lane's role mapping (e.g., QA engages on `ready_for_test`)
-4. Engaged agents enter a **thinking** state (with personality-appropriate delays) and broadcast `agent:thinking` via SSE
-5. Agents generate a response comment and persist it to `messages.json`
-6. An `agent:comment` event is broadcast via SSE, and the browser refreshes automatically
+1. **Synchronous gate pass** — required agents for the destination stage are asked `evaluateApproval(task, analysis)`. If any return `approved: false`, the move is blocked with a `409` and a list of blocker reasons; the task does not move.
+2. If the gate pass passes, the server writes the new status and **EventBus** fires `task:moved`.
+3. **AgentRuntime** routes the event to all agents.
+4. Each agent checks `shouldEngage()` based on the lane's role mapping (e.g., QA engages on `ready_for_test`).
+5. Engaged agents enter a **thinking** state (with personality-appropriate delays) and broadcast `agent:thinking` via SSE.
+6. Agents generate a response comment via the configured LLM adapter (Claude or template) and persist it to `messages.json`.
+7. An `agent:comment` event is broadcast via SSE, and the browser refreshes automatically.
 
-The browser subscribes to `/api/events` (SSE) and shows a pulsing "🤖 Agent is thinking…" indicator when any agent is processing.
+The browser subscribes to `/api/events` (SSE) and shows a pulsing "🤖 Agent is thinking…" indicator when any agent is processing. SSE includes a 20-second heartbeat to prevent silent proxy disconnections; if the stream drops, the UI falls back to a 3-second poll until it reconnects.
+
+### Force-overriding a blocked move
+
+The `/api/tasks/:id/move` endpoint accepts `{ status, force: true }` to bypass the synchronous gate pass — useful for product owners who want to override an automated rejection. Without `force`, blocked moves return `409 Conflict` with a list of `blockers`.
+
+### Plugging in a different LLM
+
+The agent system uses a pluggable adapter pattern (`web.ui/backend/agents/LLMAdapter.js`). To use OpenAI, create a subclass of `BaseLLMAdapter` that returns `{content, approved, reason, toAgent}` from `generate(params)` and wire it in `AgentRuntime._wireLLMAdapter`. The provided `AnthropicAdapter` uses prompt caching and forces structured output via tool use — copy that pattern.
 
 ---
 
@@ -152,12 +196,33 @@ The browser subscribes to `/api/events` (SSE) and shows a pulsing "🤖 Agent is
 |--------|----------|-------------|
 | `GET` | `/api/sprints` | List all sprints |
 | `GET` | `/api/projects` | List all projects |
-| `GET` | `/api/tasks` | List all tasks (optional `?sprint=` filter) |
+| `GET` | `/api/tasks` | List all tasks |
 | `GET` | `/api/tasks/:id/comments` | Get comments for a task |
-| `POST` | `/api/tasks/:id/move` | Move a task to a new lane (triggers agents) |
-| `POST` | `/api/tasks/:id/comments` | Add a comment to a task |
+| `GET` | `/api/tasks/:id/approvals` | Per-agent approval state for a task |
+| `POST` | `/api/tasks/:id/move` | Move a task to a new lane (gate pass + triggers agents). Body: `{status, force?: boolean}`. Returns `409` with `{blockers: [...]}` on rejection. |
+| `POST` | `/api/tasks/:id/comments` | Add comments to a task (bulk) |
+| `POST` | `/api/sprints/:id/retro` | Generate sprint retrospective (Marcus) |
 | `GET` | `/api/agents` | List all agents and their statuses |
-| `GET` | `/api/events` | SSE stream for live agent activity |
+| `GET` | `/api/events` | SSE stream for live agent activity (`agent:thinking`, `agent:comment`, `agent:idle`, `agent:rejection`, `agent:error`, `task:moved`, `sprint:completed`, `sprint:retro`) |
+
+---
+
+## Development scripts
+
+```bash
+# Backend
+cd web.ui/backend
+npm run lint       # ESLint
+npm run typecheck  # tsc --noEmit -p jsconfig.json (JSDoc-driven)
+npm test           # Vitest
+
+# Frontend
+cd web.ui/frontend-react
+npm run lint
+npm run build      # tsc -b && vite build
+```
+
+CI runs all of the above on every push / PR to `main` (`.github/workflows/web-ui-ci.yml`).
 
 ---
 

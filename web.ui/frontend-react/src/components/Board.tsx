@@ -2,7 +2,7 @@ import type { Task, Project, Lane as LaneType } from '../types';
 import Lane from './Lane';
 
 interface Props {
-  lanes: LaneType[];
+  lanes: readonly LaneType[];
   tasks: Task[];
   projects: Project[];
   sprintId: string | null;

@@ -1,9 +1,10 @@
 import { BaseAgent } from './BaseAgent.js';
+import { AGENT_IDS, AGENT_ROLES } from '../../shared/agentIds.mjs';
 
 export class AlexRivera extends BaseAgent {
-  id = 'agent-developer-001';
+  id = AGENT_IDS.DEVELOPER;
   name = 'Alex Rivera';
-  role = 'Developer';
+  role = AGENT_ROLES.DEVELOPER;
   personality =
     'Creative problem-solver with a pragmatic approach. Alex enjoys tackling ' +
     'challenging features and writing clean, maintainable code. Always ready ' +
@@ -54,6 +55,59 @@ export class AlexRivera extends BaseAgent {
         '• See acceptance criteria: {acceptanceCriteria}',
     },
   };
+
+  // ── role hooks ──────────────────────────────────────────────────────────
+
+  evaluateApproval(task, _analysis) {
+    if (task.status === 'develop') {
+      const desc = (task.description || '').toLowerCase();
+      const hasTechApproach = /implement|refactor|add|update|fix|create|build|rewrite|endpoint|function|method|class|module|component|api|database|query/.test(desc);
+      if (!hasTechApproach) {
+        return {
+          approved: false,
+          reason: 'Task description lacks technical approach indicators. Add implementation details (what to build, modify, or fix) before development begins.',
+        };
+      }
+    }
+    return { approved: true, reason: null };
+  }
+
+  buildContextNotes(_task, analysis) {
+    const lines = ['\n**Implementation Notes:**'];
+
+    if (analysis.actionVerbs.length > 0) {
+      lines.push(`  - Key actions: ${analysis.actionVerbs.join(', ')}`);
+    }
+
+    lines.push(`  - Estimated scope: ${analysis.criteriaCount} acceptance criteria to satisfy`);
+
+    if (analysis.domains.length > 0) {
+      const techAreas = analysis.domains.filter((d) => d.keywords.length > 0);
+      if (techAreas.length > 0) {
+        lines.push(`  - Tech stack involved: ${techAreas.map((d) => `${d.domain} (${d.keywords.slice(0, 3).join(', ')})`).join('; ')}`);
+      }
+    }
+
+    if (analysis.risks.some((r) => r.risk === 'breaking change')) {
+      lines.push('  - ⚠️ Potential breaking changes detected — will add migration notes and backward compat.');
+    }
+
+    if (analysis.complexityLabel === 'high') {
+      lines.push('  - Recommending a phased approach given high complexity.');
+    }
+
+    return lines.join('\n');
+  }
+
+  generateDirectedQuestion(task, analysis, _history) {
+    if (task.status === 'develop' && analysis.criteriaCount > 3) {
+      return {
+        text: '\n**@Intern** — This task has several moving parts. Can you start drafting documentation for the changes as I implement them? Focus on the API changes and any new patterns introduced.',
+        toAgent: AGENT_IDS.INTERN,
+      };
+    }
+    return null;
+  }
 }
 
 export default new AlexRivera();
