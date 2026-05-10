@@ -13,8 +13,9 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": false,
+    "maxNodeModuleJsDepth": 0,
     "types": ["node"]
   },
   "include": ["**/*.js", "**/*.mjs", "types.d.ts"],
-  "exclude": ["node_modules", "**/__tests__/**", "**/*.test.js"]
+  "exclude": ["node_modules", "**/node_modules/**", "**/__tests__/**", "**/*.test.js"]
 }

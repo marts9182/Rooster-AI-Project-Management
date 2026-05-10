@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Get-ChildItem \"C:\\\\Sandbox\" -Directory | Select-Object Name; Get-ChildItem \"C:\\\\\" -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'kdp|puzzle' } | Select-Object FullName)"
+      "PowerShell(Get-ChildItem \"C:\\\\Sandbox\" -Directory | Select-Object Name; Get-ChildItem \"C:\\\\\" -Directory -ErrorAction SilentlyContinue | Where-Object { $_.Name -match 'kdp|puzzle' } | Select-Object FullName)",
+      "PowerShell(\"---wrap---\")",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_real_grid_hero.py\" travel-sudoku-v2 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_real_grid_hero.py\" gardeners-word-search-v2 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_real_grid_hero.py\" kjv-proverbs-cryptograms 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\preview_cover.py\" travel-sudoku-v2 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_all_playful_covers.py\" 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_all_playful_covers.py\" --only garden-companion 2>&1)",
+      "PowerShell(\"---contact sheet for all---\")",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_real_grid_hero.py\" christmas-word-search-seniors 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\preview_cover.py\" christmas-word-search-seniors 2>&1)",
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\preview_cover.py\" garden-companion 2>&1)"
     ]
   }
 }

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Task, Project, Comment } from '../types';
-import { fetchComments } from '../services/api';
+import { fetchComments, saveComments, type GenerateImageResponse } from '../services/api';
 import { resolveAgentName } from '../agents';
+import ImageGenPanel from './ImageGenPanel';
 
 interface Props {
   task: Task | null;
@@ -105,13 +106,65 @@ export default function TaskModal({ task, projects, onClose }: Props) {
           {comments.length > 0
             ? comments.map((c, i) => (
                 <div className="comment" key={i}>
-                  <b>{resolveAgentName(c.from_agent || '')}:</b> {c.content || ''}
+                  <b>{resolveAgentName(c.from_agent || '')}:</b>{' '}
+                  <CommentBody content={c.content || ''} />
                 </div>
               ))
             : <em>No comments</em>
           }
         </div>
+
+        <hr />
+
+        <ImageGenPanel
+          taskId={task.id}
+          onGenerated={async (img: GenerateImageResponse) => {
+            // Persist the image as a comment so it shows up next time the
+            // modal opens. The "user" agent isn't a real persona; resolveAgentName
+            // gracefully falls through to the raw id, which renders fine here.
+            const comment: Comment = {
+              id: `msg-img-${task.id}-${Date.now()}`,
+              from_agent: 'user',
+              content: `🎨 Generated image\n\n![${img.filename}](${img.url})`,
+              task_id: task.id,
+              timestamp: new Date().toISOString(),
+              type: 'image',
+            };
+            try {
+              await saveComments(task.id, [comment]);
+              setComments((prev) => [...prev, comment]);
+            } catch {
+              // Persistence failure is non-fatal — the image is still on disk
+              // at img.url; the user just won't see it after a refresh.
+              setComments((prev) => [...prev, comment]);
+            }
+          }}
+        />
       </div>
     </div>
+  );
+}
+
+/**
+ * Render comment text with inline markdown image support so generated images
+ * show up directly in the comment stream. Anything that isn't a recognized
+ * image link renders as plain text — no full markdown engine needed for now.
+ */
+function CommentBody({ content }: { content: string }) {
+  const parts = content.split(/(!\[[^\]]*\]\([^)]+\))/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        const m = part.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
+        if (m) {
+          return (
+            <div key={i} className="comment-image">
+              <img src={m[2]} alt={m[1] || 'generated image'} />
+            </div>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
   );
 }

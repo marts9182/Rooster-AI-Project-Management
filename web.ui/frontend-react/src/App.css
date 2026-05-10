@@ -149,3 +149,94 @@ body {
   opacity: 0.7;
   margin-left: 12px;
 }
+
+/* Image generation panel inside the task modal */
+.image-gen-panel {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f7f9fc;
+  border: 1px solid #dfe1e6;
+  border-radius: 6px;
+}
+.image-gen-prompt {
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px 8px;
+  font-family: inherit;
+  font-size: 0.95em;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.image-gen-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 0.9em;
+}
+.image-gen-controls select {
+  padding: 3px 6px;
+  border: 1px solid #dfe1e6;
+  border-radius: 4px;
+  font-size: 0.95em;
+}
+.image-gen-controls button {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: #0747a6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+.image-gen-controls button:disabled {
+  background: #97a0af;
+  cursor: not-allowed;
+}
+.image-gen-file {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.image-gen-file input[type="file"] {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+}
+.image-gen-file > span {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #0747a6;
+}
+.image-gen-hint { color: #5e6c84; font-style: italic; }
+.image-gen-error {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: #ffebe6;
+  color: #bf2600;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+.image-gen-result { margin-top: 10px; }
+.image-gen-result img {
+  max-width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.image-gen-meta {
+  margin-top: 6px;
+  font-size: 0.8em;
+  color: #5e6c84;
+  word-break: break-all;
+}
+.comment-image { margin-top: 6px; }
+.comment-image img {
+  max-width: 100%;
+  border-radius: 4px;
+  display: block;
+}

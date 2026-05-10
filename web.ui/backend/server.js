@@ -3,14 +3,16 @@
  * boots the AgentRuntime, and pushes live agent events via SSE.
  */
 
-// Load .env first so AgentRuntime can read ANTHROPIC_API_KEY at boot.
-import 'dotenv/config';
+// Side-effect first: populates process.env from .env / .env.local before any
+// downstream import reads ANTHROPIC_API_KEY or GEMINI_API_KEY at module load.
+import './loadEnv.js';
 
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { runtime, bus, marcus, analyzeTask } from './agents/index.js';
+import { ImageGenerationService } from './agents/ImageGenerationService.js';
 import {
   validateTransition,
   ALLOWED_STATUSES,
@@ -21,11 +23,39 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const DIST_DIR = path.resolve(__dirname, '../frontend-react/dist');
+const IMAGES_DIR = path.resolve(__dirname, 'generated-images');
 const PORT = Number(process.env.PORT) || 5000;
 const SSE_HEARTBEAT_MS = 20_000;
 
 const app = express();
-app.use(express.json());
+// 25 MB ceiling supports edit mode where the client posts a base64-encoded
+// source image alongside the prompt. The default 100 KB rejects every edit.
+app.use(express.json({ limit: '25mb' }));
+
+// ── Image generation service (Nano Banana Pro) ───────────────────────────
+// Lazy-init: only build the service if GEMINI_API_KEY is set, so dev
+// environments without a key still boot cleanly. The endpoint below
+// returns 503 when the service is absent.
+let imageService = null;
+if (process.env.GEMINI_API_KEY) {
+  try {
+    imageService = new ImageGenerationService({
+      apiKey: process.env.GEMINI_API_KEY,
+      model: process.env.IMAGE_MODEL,
+      outputDir: IMAGES_DIR,
+    });
+    console.log(
+      `🎨 Image generation enabled (${process.env.IMAGE_MODEL || 'gemini-3-pro-image-preview'})`,
+    );
+  } catch (err) {
+    console.warn('Image service init failed:', err.message);
+  }
+} else {
+  console.log('🎨 Image generation disabled (set GEMINI_API_KEY to enable)');
+}
+
+// Serve generated PNGs at /images/* for direct <img src> use in the browser.
+app.use('/images', express.static(IMAGES_DIR));
 
 // ── SSE — live agent event stream ────────────────────────────────────────
 
@@ -224,6 +254,42 @@ app.post('/api/sprints/:id/retro', async (req, res) => {
   broadcast('sprint:retro', { sprintId: sprint.id, analytics });
 
   res.json({ success: true, analytics, content, review });
+});
+
+// ── Image generation (Nano Banana Pro / Gemini 3 Pro Image) ──────────────
+// Body: {prompt, taskId?, aspectRatio?, resolution?, inputImage?}
+//   inputImage = {data: base64-string, mimeType: string}  (edit mode)
+// Returns: {url, filename, bytes, model, mimeType}
+app.post('/api/generate-image', async (req, res) => {
+  if (!imageService) {
+    return res.status(503).json({
+      error: 'Image generation is not configured. Set GEMINI_API_KEY in .env and restart.',
+    });
+  }
+  const { prompt, taskId, aspectRatio, resolution, inputImage } = req.body || {};
+  if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+    return res.status(400).json({ error: 'prompt is required' });
+  }
+  try {
+    const result = await imageService.generate({
+      prompt,
+      taskId,
+      aspectRatio,
+      resolution,
+      inputImage,
+    });
+    res.json(result);
+  } catch (err) {
+    // Validation errors (invalid aspect ratio, bad inputImage shape) come
+    // back as plain Error — surface as 400 so the UI can show the message.
+    // Anything else is treated as upstream failure (502).
+    const msg = err?.message || 'Image generation failed';
+    const isValidation =
+      msg.startsWith('Invalid ') ||
+      msg.startsWith('prompt is required') ||
+      msg.startsWith('inputImage must be');
+    res.status(isValidation ? 400 : 502).json({ error: msg });
+  }
 });
 
 // Save agent-generated comments (bulk) — kept for manual use / backwards compat

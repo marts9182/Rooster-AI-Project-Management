@@ -96,3 +96,38 @@ export async function generateRetro(sprintId: string): Promise<RetroResponse> {
   }
   return res.json() as Promise<RetroResponse>;
 }
+
+// ── Image generation (Nano Banana Pro) ──────────────────────────────────
+
+export type ImageAspectRatio = '1:1' | '16:9' | '9:16' | '4:3' | '3:4';
+export type ImageResolution = '1K' | '2K' | '4K';
+
+export interface GenerateImageRequest {
+  prompt: string;
+  taskId?: string;
+  aspectRatio?: ImageAspectRatio;
+  resolution?: ImageResolution;
+  /** Edit mode: pass an existing image to remix. data is base64 (no data: prefix). */
+  inputImage?: { data: string; mimeType: string };
+}
+
+export interface GenerateImageResponse {
+  url: string;
+  filename: string;
+  bytes: number;
+  model: string;
+  mimeType: string;
+}
+
+export async function generateImage(req: GenerateImageRequest): Promise<GenerateImageResponse> {
+  const res = await fetch('/api/generate-image', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(req),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
+    throw new ApiError(res.status, body.error ?? `Image generation failed`);
+  }
+  return res.json() as Promise<GenerateImageResponse>;
+}

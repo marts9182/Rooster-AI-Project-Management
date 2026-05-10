@@ -55,6 +55,17 @@ cp .env.example .env
 
 If `LLM_PROVIDER` is unset or `template`, the agents use the built-in `SmartTemplateAdapter` and never call any external API.
 
+#### Image generation (Nano Banana Pro)
+
+Optional. Add to `web.ui/backend/.env` to enable the **🎨 Generate image** panel in the task modal:
+
+```bash
+GEMINI_API_KEY=AIza...                       # https://aistudio.google.com/apikey
+IMAGE_MODEL=gemini-3-pro-image-preview       # or gemini-2.5-flash-image-preview (cheaper)
+```
+
+Without `GEMINI_API_KEY` the server boots normally and the endpoint returns `503` — nothing else changes.
+
 ### 3. Build the React frontend
 
 ```bash
@@ -204,6 +215,8 @@ The agent system uses a pluggable adapter pattern (`web.ui/backend/agents/LLMAda
 | `POST` | `/api/sprints/:id/retro` | Generate sprint retrospective (Marcus) |
 | `GET` | `/api/agents` | List all agents and their statuses |
 | `GET` | `/api/events` | SSE stream for live agent activity (`agent:thinking`, `agent:comment`, `agent:idle`, `agent:rejection`, `agent:error`, `task:moved`, `sprint:completed`, `sprint:retro`) |
+| `POST` | `/api/generate-image` | Generate or edit an image with Nano Banana Pro. Body: `{prompt, taskId?, aspectRatio?, resolution?, inputImage?}`. Returns `{url, filename, bytes, model, mimeType}`. `inputImage = {data: base64, mimeType}` triggers edit mode. Returns `503` if `GEMINI_API_KEY` is unset. |
+| `GET` | `/images/:filename` | Static route serving generated PNGs from `web.ui/backend/generated-images/`. |
 
 ---
 
