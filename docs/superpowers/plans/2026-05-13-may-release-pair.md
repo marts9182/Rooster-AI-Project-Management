@@ -2565,7 +2565,8 @@ This is not engineering work. The plan's job ends with the QA-passed tag; the hu
 ## Spike Results (filled in during Phase 0)
 
 ```
-S1 outcome: TBD (write during execution)
+S1 outcome: (C) — No section-page rendering exists at all; _draw_text_page is used inline in build_sudoku_book for difficulty intros but there is no _draw_section_header, _draw_section_divider, or any public/private method for section divider pages.
+Decision: scope expands to full impl — Task 1.5 builds render_section_divider from scratch (estimated <1 day).
 S2 outcome: TBD (write during execution)
 S3 outcome: TBD (write during execution)
 ```
