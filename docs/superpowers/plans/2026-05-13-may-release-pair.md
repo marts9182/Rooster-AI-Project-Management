@@ -11,10 +11,39 @@
 **Spec:** [docs/superpowers/specs/2026-05-13-may-release-pair-design.md](docs/superpowers/specs/2026-05-13-may-release-pair-design.md)
 
 **Conventions:**
-- All paths under `projects/kdp-puzzle-press/` unless noted otherwise. Working directory for commands is the repo root.
+- All paths under `projects/kdp-puzzle-press/` unless noted otherwise.
 - Tests use pytest with plain assertions (matching `tests/test_sudoku.py` style).
 - Commit after every passing task. Use Conventional Commits prefix (`feat:`, `test:`, `fix:`, `chore:`).
 - All commit messages end with the Co-Authored-By line per repo convention.
+
+---
+
+## ⚠️ Plan Corrections (verified post-Phase-0 reading of actual code)
+
+The plan body below was drafted from a prior Explore agent's notes that turned out to contain material errors. **These corrections override anything in the task bodies that conflicts.**
+
+**Repo layout** — nested-repos setup:
+- **Outer repo** (`c:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management`) holds `docs/superpowers/plans/...` and `docs/superpowers/specs/...`. Plan/spec/spike-result commits land here.
+- **Inner repo** (`projects/kdp-puzzle-press/`) is its own git repo (excluded from outer via `.gitignore`). All Python source, tests, metadata, output, and cover scripts commit here. You must `cd projects/kdp-puzzle-press` before any `git add`/`git commit` of book/code work.
+
+**Imports:**
+- `TEMPLATE_85X11_LARGEPRINT`, `TEMPLATE_6X9_POCKET`, and the `PageTemplate` class come from `pocket_rooster_press.layout.templates` — **not** from `config`.
+- `OUTPUT_DIR`, the `PALETTE_*` constants (19 already shipped: `PALETTE_KAKURO`, `PALETTE_GRANDPARENT_GIFT`, etc.), `IMPRINT_TAGLINE`, font paths, and the `ColorPalette` dataclass come from `pocket_rooster_press.config`.
+
+**`PDFBuilder` constructor — actual signature:**
+```python
+PDFBuilder(template: PageTemplate, output_path: Path, *, imprint_tagline: str | None = None)
+```
+**No palette argument.** Palettes are exclusively a `CoverBuilder` concern. Every place in the plan that says `PDFBuilder(template, palette, path)` is wrong — drop the palette argument. Interior PDF styling is driven by the fonts registered in `pdf_builder.py` and the per-method drawing code.
+
+**`BookAssembler` and palettes:** `BookConfig` does not need `metadata={"palette": PALETTE_X}` — drop that pattern from Book A and Book B modules. The palette is passed only to `CoverBuilder` at the cover-build step.
+
+**Consequence for Tasks 1.4–1.7:** new `build_futoshiki_book`, `_draw_section_header`, `assemble_futoshiki_book`, and `assemble_mixed_puzzle_book` methods do **not** thread a palette through. They use existing interior styling. If a future variety book wants a different interior tint, that's a separate refactor — out of scope here.
+
+**Phase 0 results so far:**
+- **S1 outcome:** **(C)** — no section-page rendering exists at all (`_draw_section_header` absent; no `section`/`divider`/`header` methods in `pdf_builder.py`; `build_sudoku_book` uses `_draw_text_page` inline for difficulty intros). Task 1.5 builds it from scratch as planned.
+- **S2 outcome:** TBD (Task 0.2 next)
+- **S3 outcome:** TBD (Task 0.3 next)
 
 ---
 
