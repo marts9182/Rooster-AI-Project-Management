@@ -42,3 +42,4 @@ data/
 *.db
 *.sqlite
 *.sqlite3
+.superpowers/
