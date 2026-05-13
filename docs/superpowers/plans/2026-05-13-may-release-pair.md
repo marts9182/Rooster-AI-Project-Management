@@ -43,7 +43,8 @@ PDFBuilder(template: PageTemplate, output_path: Path, *, imprint_tagline: str | 
 **Phase 0 results so far:**
 - **S1 outcome:** **(C)** — no section-page rendering exists at all (`_draw_section_header` absent; no `section`/`divider`/`header` methods in `pdf_builder.py`; `build_sudoku_book` uses `_draw_text_page` inline for difficulty intros). Task 1.5 builds it from scratch as planned.
 - **S2 outcome:** **(B)** — no Futoshiki rendering exists in `pdf_builder.py` (none of `build_futoshiki_book`, `_draw_futoshiki_puzzle`, `_draw_futoshiki_page`, `_draw_futoshiki_solution`, `_draw_futoshiki_answer_key` present; `[m for m in dir(builder) if "futoshiki" in m]` returns `[]`). Generator output shape confirmed as planned: `FutoshikiPuzzle(size=6, givens={} (count=0), inequalities=[Inequality(r1, c1, r2, c2), ...] (count=60 for full-ineq bank puzzle), solution=list[list[int]] 6×6)`. `puzzle.difficulty` is `Difficulty.EASY`; `puzzle.metadata` includes `size`, `seed`, `base_id`, `symmetry_op`, `ineq_count`, `givens_count`. Task 1.4 proceeds as planned. Note: `data/futoshiki_bank.json` does not exist yet — spike used an inline temp bank (same pattern as `test_futoshiki.py`); `scripts/build_futoshiki_bank.py` must be run before Task 1.4 integration tests.
-- **S3 outcome:** TBD (Task 0.3 next)
+- **S3 outcome:** **(A)** — four-grid collage reads clearly at 200×300px thumbnail; all four quadrants have 15–21% non-background pixel density, palette coverage 12.2%, brass label zone has 119 pixels. Composition is distinguishable at thumbnail scale. Task 2.2 proceeds with four-grid layout as planned.
+Decision: proceed with four-grid as planned
 
 ---
 
@@ -2597,7 +2598,8 @@ This is not engineering work. The plan's job ends with the QA-passed tag; the hu
 S1 outcome: (C) — No section-page rendering exists at all; _draw_text_page is used inline in build_sudoku_book for difficulty intros but there is no _draw_section_header, _draw_section_divider, or any public/private method for section divider pages.
 Decision: scope expands to full impl — Task 1.5 builds render_section_divider from scratch (estimated <1 day).
 S2 outcome: TBD (write during execution)
-S3 outcome: TBD (write during execution)
+S3 outcome: (A) — four tiles distinguishable, palette pops, labels render in brass (quad non-bg ratios 15–21%, palette coverage 12.2%, 119 brass label pixels)
+Decision: proceed with four-grid as planned
 ```
 
 ---
