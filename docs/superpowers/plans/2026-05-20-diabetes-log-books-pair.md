@@ -939,7 +939,231 @@ EOF
 
 ---
 
-## Task 7: SKU A — `large_print_diabetes_log_v1.py` book module
+## Task 7: Add `TextBlockPage` template
+
+A page that renders a block of prose with a bold title bar, optional subtitle, word-wrapped body paragraphs separated by blank lines, and an optional bullet list. Used by SKU C for the CGM primer, AGP-reader explainer, glossary, and sample-filled-in DVP. Single-page only — paginates by splitting long text across multiple `TextBlockPage` instances at the caller (book module) level.
+
+**Files:**
+- Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`
+- Modify: `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`
+
+- [ ] **Step 1: Extend the imports + write the failing test**
+
+In `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`, change the import block to:
+
+```python
+from pocket_rooster_press.layout.journal_templates import (
+    CarbReferencePage,
+    DiabetesWeeklySpread,
+    MonthlyA1CTrend,
+    QuarterlyDoctorVisitPrep,
+    TextBlockPage,
+)
+```
+
+Then append these tests to the bottom of the file:
+
+```python
+@pytest.mark.parametrize("template", [TEMPLATE_85X11_LARGEPRINT, TEMPLATE_6X9_POCKET])
+def test_text_block_page_renders(template) -> None:
+    c, buf = _new_canvas(template)
+    TextBlockPage(
+        title="How CGM data works",
+        body=(
+            "Your CGM gives you four numbers that matter most: TIR, average, "
+            "lowest, and highest.\n\n"
+            "Time-in-Range is the share of the day your glucose was inside "
+            "your target band. Average tells you the centre of the picture. "
+            "Lowest flags hypoglycemia risk; highest flags hyperglycemia."
+        ),
+    ).draw(c, template, page_num=1)
+    c.showPage()
+    c.save()
+    assert _page_count(buf) == 1
+
+
+def test_text_block_page_with_bullets() -> None:
+    c, buf = _new_canvas(TEMPLATE_6X9_POCKET)
+    TextBlockPage(
+        title="What to look for in your AGP",
+        subtitle="Three common patterns",
+        body="An AGP is the 14-day curve your CGM app draws.",
+        bullets=[
+            "Sustained late-morning highs often point to a breakfast carb bump.",
+            "An overnight dip can indicate too-much basal or a wearing-off snack.",
+            "A widening 5-95% spread band means glucose is swinging day-to-day.",
+        ],
+    ).draw(c, TEMPLATE_6X9_POCKET, page_num=1)
+    c.showPage()
+    c.save()
+    assert _page_count(buf) == 1
+
+
+def test_text_block_page_truncates_overflow() -> None:
+    """If body + bullets exceed the safe box, the renderer must NOT crash —
+    it stops drawing once it runs out of vertical space (caller paginates)."""
+    c, buf = _new_canvas(TEMPLATE_6X9_POCKET)
+    huge_body = "\n\n".join(["This is a paragraph that says some things."] * 50)
+    TextBlockPage(title="Overflow test", body=huge_body).draw(
+        c, TEMPLATE_6X9_POCKET, page_num=1
+    )
+    c.showPage()
+    c.save()
+    assert _page_count(buf) == 1
+```
+
+- [ ] **Step 2: Run the test to verify it fails**
+
+Run:
+```bash
+python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v --rootdir=projects/kdp-puzzle-press
+```
+
+Expected: collection fails with `ImportError: cannot import name 'TextBlockPage'`.
+
+- [ ] **Step 3: Implement `TextBlockPage`**
+
+In `journal_templates.py`, after `CarbReferencePage`, add:
+
+```python
+# Prose text-block page
+
+@dataclass
+class TextBlockPage:
+    """Single page of body prose with a bold title bar.
+
+    `body` is rendered with word-wrap, splitting on \\n\\n for paragraph
+    breaks. Optional `bullets` render below the body as a dotted list.
+    If content overflows the safe box, drawing stops cleanly — the caller
+    is responsible for splitting long content across multiple instances.
+    """
+    title: str = ""
+    subtitle: str = ""
+    body: str = ""
+    bullets: Sequence[str] = field(default_factory=list)
+    body_font_size: float = 11.0
+    body_line_spacing: float = 16.0
+    paragraph_spacing: float = 8.0
+
+    def draw(self, c: rl_canvas.Canvas, template: PageTemplate, page_num: int = 1) -> None:
+        _ensure_fonts()
+        x, y, w, h = safe_box(template, page_num)
+        top = y + h
+
+        # Title bar
+        if self.title:
+            c.setFillGray(0.0)
+            c.setFont("Helvetica-Bold", 18)
+            c.drawString(x, top - 20, self.title)
+            c.setLineWidth(HEAVY_LINE_W)
+            c.line(x, top - 26, x + w, top - 26)
+            top = top - 36
+
+        # Subtitle
+        if self.subtitle:
+            c.setFont("Helvetica-Oblique", 11)
+            c.drawString(x, top - 14, self.subtitle)
+            top = top - 22
+
+        # Body paragraphs
+        c.setFont("Helvetica", self.body_font_size)
+        cy = top - self.body_line_spacing
+        for paragraph in self.body.split("\n\n"):
+            paragraph = paragraph.strip()
+            if not paragraph:
+                continue
+            for line in _wrap_text(c, paragraph, "Helvetica", self.body_font_size, w):
+                if cy < y + 12:
+                    return  # overflow — caller paginates
+                c.drawString(x, cy, line)
+                cy -= self.body_line_spacing
+            cy -= self.paragraph_spacing
+
+        # Bullets
+        if self.bullets:
+            cy -= self.paragraph_spacing  # extra gap before bullets
+            bullet_indent = 14
+            for bullet in self.bullets:
+                if cy < y + 12:
+                    return
+                # Bullet glyph
+                c.setFont("Helvetica-Bold", self.body_font_size)
+                c.drawString(x, cy, "•")
+                c.setFont("Helvetica", self.body_font_size)
+                wrapped = _wrap_text(
+                    c, bullet, "Helvetica", self.body_font_size, w - bullet_indent
+                )
+                for i, line in enumerate(wrapped):
+                    if cy < y + 12:
+                        return
+                    c.drawString(x + bullet_indent, cy, line)
+                    cy -= self.body_line_spacing
+                cy -= 4  # small inter-bullet gap
+```
+
+Then, also in `journal_templates.py`, add this module-level helper (e.g. near the other helpers at the top, after `safe_box`):
+
+```python
+def _wrap_text(
+    c: rl_canvas.Canvas,
+    text: str,
+    font_name: str,
+    font_size: float,
+    max_width: float,
+) -> list[str]:
+    """Greedy word-wrap. Returns a list of lines that each fit in max_width."""
+    words = text.split()
+    if not words:
+        return []
+    lines: list[str] = []
+    cur = ""
+    for word in words:
+        trial = (cur + " " + word).strip()
+        if c.stringWidth(trial, font_name, font_size) <= max_width:
+            cur = trial
+        else:
+            if cur:
+                lines.append(cur)
+            cur = word
+    if cur:
+        lines.append(cur)
+    return lines
+```
+
+- [ ] **Step 4: Update `__all__`**
+
+Add `"TextBlockPage"` to the `__all__` list at the bottom of `journal_templates.py`.
+
+- [ ] **Step 5: Run all template tests**
+
+Run:
+```bash
+python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v --rootdir=projects/kdp-puzzle-press
+```
+
+Expected: 14 tests PASS (11 from prior tasks + 3 new TextBlockPage tests).
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py projects/kdp-puzzle-press/tests/test_diabetes_templates.py
+git commit -m "$(cat <<'EOF'
+feat(journal): add TextBlockPage template with body + bullets + overflow guard
+
+Single-page prose renderer with title bar, optional subtitle,
+word-wrapped paragraphs (split on \\n\\n), and an optional bullet
+list. Stops cleanly on overflow — caller paginates long content
+across multiple instances. Used by SKU C for the CGM primer,
+AGP reader, glossary, and sample DVP pages.
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+EOF
+)"
+```
+
+---
+
+## Task 8: SKU A — `large_print_diabetes_log_v1.py` book module
 
 Wire SKU A together: 4 carb pages + sample week + 104 weekly logs + 8 quarterly DVP pages + 2 end-matter pages. Total target: 124 pp.
 
@@ -1159,7 +1383,7 @@ EOF
 
 ---
 
-## Task 8: SKU A — metadata JSON
+## Task 9: SKU A — metadata JSON
 
 The bundle pipeline reads `metadata/<book_id_underscored>.json`. Mirrors `garden_companion.json` schema.
 
@@ -1311,7 +1535,7 @@ EOF
 
 ---
 
-## Task 9: SKU A — listing.md
+## Task 10: SKU A — listing.md
 
 Customer-facing copy used when actually filling in the KDP web form. Mirrors `garden-companion/listing.md`.
 
@@ -1456,7 +1680,7 @@ EOF
 
 ---
 
-## Task 10: Add the font-size audit assertion
+## Task 11: Add the font-size audit assertion
 
 Audit a sampled weekly-log page and confirm the embedded text content is large enough. SKU A target: >= 18pt body. SKU C target: >= 11pt.
 
@@ -1559,7 +1783,7 @@ def test_sku_a_passes_min_font_size_audit(tmp_path: Path) -> None:
     assert result.passed, result.detail
 ```
 
-Note: we assert `min_pt=8.0` in the smoke test, not 18 — the page contains both the 18pt date numbers and the 9pt column headers. Use 8.0 as the structural lower bound (catches a regression where someone uses 6pt by accident). The "real 18pt" promise applies to the user-fill-in fields specifically, which we verify by spot-checking with `preview_pdfs.py` in Task 13.
+Note: we assert `min_pt=8.0` in the smoke test, not 18 — the page contains both the 18pt date numbers and the 9pt column headers. Use 8.0 as the structural lower bound (catches a regression where someone uses 6pt by accident). The "real 18pt" promise applies to the user-fill-in fields specifically, which we verify by spot-checking with `preview_pdfs.py` in Task 12.
 
 - [ ] **Step 4: Run the test to verify it passes**
 
@@ -1588,7 +1812,7 @@ EOF
 
 ---
 
-## Task 11: SKU A — build artifacts, run full audit, bundle for KDP
+## Task 12: SKU A — build artifacts, run full audit, bundle for KDP
 
 End-to-end pipeline rehearsal for SKU A. After this task, the SKU is ready for human upload to KDP.
 
@@ -1669,9 +1893,9 @@ EOF
 
 ---
 
-## Task 12: SKU C — `cgm_companion_logbook_v1.py` book module
+## Task 13: SKU C — `cgm_companion_logbook_v1.py` book module
 
-Wires SKU C: CGM primer (1 + 1 + AGP reader 4) + sample week + 104 CGM weekly logs + 8 quarterly DVP + 8 GMI-vs-A1C compare pages + glossary + end matter. Total target: 140 pp.
+Wires SKU C: CGM primer prose (1 what-captures + 1 primer-continued + 4 AGP-reader pages) + sample week + 104 CGM weekly logs + 8 quarterly DVP + 8 GMI-vs-A1C compare pages + sample DVP (narrative + blank ref) + glossary + 4 end-matter pages. Target: ~137 pp (spec 140 ±4).
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/books/cgm_companion_logbook_v1.py`
@@ -1733,6 +1957,7 @@ from pocket_rooster_press.layout.journal_templates import (
     LinedNotePage,
     MonthlyA1CTrend,
     QuarterlyDoctorVisitPrep,
+    TextBlockPage,
 )
 from pocket_rooster_press.layout.templates import TEMPLATE_6X9_POCKET
 
@@ -1807,43 +2032,96 @@ def _renderer(template_obj) -> Callable:
     return _r
 
 
+SAMPLE_DVP_TEXT = (
+    "Example: filling out your quarterly Doctor Visit Prep page.\n\n"
+    "Before the visit, take ten minutes to look back through the last 13 "
+    "weeks of your weekly logs. Note the moments when your TIR dropped "
+    "below 70%, the weeks where your average climbed, and any new patterns "
+    "you spotted.\n\n"
+    "Write your A1C goal in the first box (the number your care team last "
+    "set). Leave the actual blank — your doctor will fill it in after the "
+    "lab draw, and you'll have both side-by-side for next quarter.\n\n"
+    "In the medications box, list everything you take now and any dose "
+    "change since last visit. In the questions box, write what you want "
+    "to leave the visit having answered — be specific. \"Why did my "
+    "overnight low keep happening on Tuesdays?\" is better than \"sleep.\""
+)
+
+
 def _build_page_renderers() -> list[Callable]:
     pages: list[Callable] = []
 
-    # Front matter: primer + AGP reader + what-this-book-captures, each
-    # rendered as LinedNotePage holding the text in its title slot is wrong.
-    # We need a text page; the journal pipeline already exposes _draw_text_page
-    # through the assembler intro path, but only once. For multi-page front
-    # matter we use LinedNotePage with empty rules below a bold prompt — but
-    # that loses the body text.
-    #
-    # Pragmatic v1: the assembler's intro_text is rendered once, so we put
-    # the CGM primer in INTRO (already done above) and add the AGP reader as
-    # a second intro-like page by rendering it via a ReflectionPage with the
-    # text as the prompt (large block of text, no lines below — but draws
-    # too compactly). Simpler: ship the AGP reader content as 4 LinedNotePage
-    # pages with manually-chunked prompts, OR add a TextBlockPage template.
-    #
-    # For v1 we accept the AGP content lives in INTRO + a 2-page text spread
-    # rendered via two QuarterlyDoctorVisitPrep variants (label = the section
-    # heading). The page count below reflects 140 pp.
-    #
-    # Concrete realization for v1:
-    #   - INTRO is rendered by the assembler (CGM primer; 2 pp)
-    #   - "What this book captures" + "How to read your AGP" pages: 2 + 4 = 6 pp,
-    #     each as a single-page LinedNotePage with the text squashed into the
-    #     title slot is unworkable. Instead, we render them as standalone
-    #     "TextBlockPage" — but we have no such template. To stay within the
-    #     scope of this plan, treat those 6 pp as **placeholder lined-note
-    #     pages** (with section titles), and queue the TextBlockPage template
-    #     for v1.1. The cover and listing already promise the content; if the
-    #     reviewer notices, we ship a v1.1 with the actual prose before
-    #     marketing. (Risk acknowledged; pragmatic v1 trade-off.)
-    pages.append(_renderer(LinedNotePage(title="What this book captures")))
-    pages.append(_renderer(LinedNotePage(title="What this book captures (continued)")))
-    for i in range(4):
-        title = "How to read your AGP" if i == 0 else f"How to read your AGP (continued {i})"
-        pages.append(_renderer(LinedNotePage(title=title)))
+    # Front matter prose: 1 "what captures" + 1 CGM primer continued
+    # + 4 AGP reader pages. The first CGM primer page is rendered by the
+    # assembler from INTRO; the rest are explicit TextBlockPages here.
+    pages.append(_renderer(TextBlockPage(
+        title="What this book captures",
+        body=WHAT_BOOK_CAPTURES_TEXT,
+    )))
+    pages.append(_renderer(TextBlockPage(
+        title="How CGM data works (continued)",
+        body=CGM_PRIMER_TEXT,
+    )))
+    # AGP reader split into 4 pages: title + intro on page 1, then 3
+    # bullet-detail pages for the three patterns.
+    pages.append(_renderer(TextBlockPage(
+        title="How to read your AGP",
+        subtitle="Ambulatory Glucose Profile basics",
+        body=(
+            "An Ambulatory Glucose Profile (AGP) is the curve your CGM "
+            "app draws from the last 14 days, showing the median glucose "
+            "at each hour of the day with shaded bands for the 25-75% "
+            "and 5-95% spreads.\n\n"
+            "The median line tells you the centre of a typical day. The "
+            "spread bands tell you how steady or jumpy your glucose has "
+            "been at each hour. Together they show the shape of your "
+            "day in a way that a single number can't."
+        ),
+    )))
+    pages.append(_renderer(TextBlockPage(
+        title="Pattern 1: Late-morning highs",
+        body=(
+            "If the median line climbs sharply between 9am and noon and "
+            "stays elevated through lunch, the likely culprits are a "
+            "high-carb breakfast that wasn't fully covered by insulin, "
+            "a missed pre-meal dose, or a steroid medication."
+        ),
+        bullets=[
+            "Check the weekly logs for those mornings — what did you eat?",
+            "Note whether the high happened on workdays vs weekends.",
+            "Bring the AGP screenshot to your next visit and ask whether "
+            "your breakfast carb ratio needs adjusting.",
+        ],
+    )))
+    pages.append(_renderer(TextBlockPage(
+        title="Pattern 2: Overnight dips",
+        body=(
+            "If the median line drops below your target band between 2am "
+            "and 5am, you may be getting too much basal insulin or a "
+            "bedtime snack effect is wearing off before sunrise."
+        ),
+        bullets=[
+            "Note the timing — consistent dips at the same hour suggest "
+            "basal; varied timing suggests food or activity.",
+            "Cross-check with your weekly notes for late exercise.",
+            "Do not adjust your insulin without your care team — bring "
+            "the pattern to them.",
+        ],
+    )))
+    pages.append(_renderer(TextBlockPage(
+        title="Pattern 3: Widening spread band",
+        body=(
+            "If the shaded 5-95% spread band is getting wider month over "
+            "month, your glucose is swinging more day-to-day. The median "
+            "may look fine while the variability is climbing."
+        ),
+        bullets=[
+            "Variability often tracks with stress, illness, or schedule changes.",
+            "Look at the weekly mood/exercise/sleep columns for context.",
+            "Coefficient of Variation (CV) is the precise metric — your "
+            "care team aims for 36% or lower.",
+        ],
+    )))
 
     # Example week
     pages.append(_renderer(DiabetesWeeklySpread(
@@ -1882,14 +2160,21 @@ def _build_page_renderers() -> list[Callable]:
         include_gmi=True,
     )))
 
-    # Sample filled-in doctor visit prep (placeholder lined page; v1.1
-    # will replace with rendered prose).
-    pages.append(_renderer(LinedNotePage(title="Sample filled-in visit prep")))
-    pages.append(_renderer(LinedNotePage(title="Sample filled-in visit prep (continued)")))
+    # Sample filled-in doctor visit prep — narrative text + a blank DVP
+    # template the reader can use as a reference.
+    pages.append(_renderer(TextBlockPage(
+        title="Sample: filling in your DVP",
+        body=SAMPLE_DVP_TEXT,
+    )))
+    pages.append(_renderer(QuarterlyDoctorVisitPrep(
+        visit_label="Sample Doctor Visit Prep (reference)",
+    )))
 
-    # Glossary (placeholder)
-    pages.append(_renderer(LinedNotePage(title="Glossary")))
-    pages.append(_renderer(LinedNotePage(title="Glossary (continued)")))
+    # Glossary
+    pages.append(_renderer(TextBlockPage(
+        title="Glossary",
+        body=GLOSSARY_TEXT,
+    )))
 
     # End matter
     for _ in range(4):
@@ -1936,7 +2221,7 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
     return interior, cover
 ```
 
-> **Note for the implementer:** The v1 module uses `LinedNotePage` placeholders for the prose sections (What captures, AGP reader, sample DVP, glossary). The content lives in module-level constants (`CGM_PRIMER_TEXT`, `AGP_READER_TEXT`, etc.) ready for a v1.1 `TextBlockPage` template. This is a deliberate, declared scope cut to keep the plan to 5 days. The cover/listing promises are still met because TIR review, GMI vs A1C reconciliation, and doctor visit prep are rendered for real. If the user wants these pages rendered for v1 instead of v1.1, add a `TextBlockPage` template task here (~2 hours).
+> **Note for the implementer:** The prose sections (CGM primer, AGP reader patterns, sample DVP, glossary) all use the new `TextBlockPage` template added in Task 7. The example DVP page is rendered as a blank `QuarterlyDoctorVisitPrep` with the label "Sample Doctor Visit Prep (reference)" so the reader sees the actual form they'll be filling in. Expected page count: ~137 pp (spec target 140; ±4 window in the test).
 
 - [ ] **Step 4: Run the test to verify it passes**
 
@@ -1952,13 +2237,14 @@ Expected: PASS. If page count is outside [136, 144], reconcile renderer counts a
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/books/cgm_companion_logbook_v1.py projects/kdp-puzzle-press/tests/test_diabetes_log_books.py
 git commit -m "$(cat <<'EOF'
-feat(books): SKU C — CGM Companion Logbook (6x9, 140 pp)
+feat(books): SKU C — CGM Companion Logbook (6x9, ~137 pp)
 
 Brand-agnostic CGM supplement: 104 weekly CGM-mode spreads
 interleaved with 8 quarterly doctor visit prep pages and 8
-GMI-vs-A1C reconciliation pages. Front-matter prose (AGP reader,
-what-captures, sample DVP, glossary) ships as titled placeholder
-pages in v1; rendered prose deferred to v1.1 TextBlockPage.
+GMI-vs-A1C reconciliation pages. Front-matter prose (CGM
+primer, 3-pattern AGP reader, sample DVP, glossary) rendered
+via TextBlockPage. Sample DVP page is a labelled blank
+QuarterlyDoctorVisitPrep for visual reference.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -1967,7 +2253,7 @@ EOF
 
 ---
 
-## Task 13: SKU C — metadata JSON
+## Task 14: SKU C — metadata JSON
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`
@@ -2118,7 +2404,7 @@ EOF
 
 ---
 
-## Task 14: SKU C — listing.md
+## Task 15: SKU C — listing.md
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/output/kdp-ready/cgm-companion-logbook-v1/listing.md`
@@ -2263,7 +2549,7 @@ EOF
 
 ---
 
-## Task 15: SKU C — build artifacts, run full audit, bundle for KDP
+## Task 16: SKU C — build artifacts, run full audit, bundle for KDP
 
 **Files:**
 - No code changes; this task is build + verification.
@@ -2309,7 +2595,7 @@ Expected: `output/kdp-ready/cgm-companion-logbook-v1/` populated with interior, 
 
 - [ ] **Step 5: Commit bundle (if tracked)**
 
-Same check as Task 11 Step 6. If output is tracked:
+Same check as Task 12 Step 6. If output is tracked:
 
 ```bash
 git add projects/kdp-puzzle-press/output/kdp-ready/cgm-companion-logbook-v1/
@@ -2325,7 +2611,7 @@ EOF
 
 ---
 
-## Task 16: Final regression — full test suite + audit both books
+## Task 17: Final regression — full test suite + audit both books
 
 Catch any cross-book regression (e.g. a shared template change that broke one of the SKUs).
 
