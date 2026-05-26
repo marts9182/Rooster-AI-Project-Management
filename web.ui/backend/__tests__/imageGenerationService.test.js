@@ -3,7 +3,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
-import { ImageGenerationService, extractUpstreamMessage } from '../agents/ImageGenerationService.js';
+import { ImageGenerationService, extractUpstreamMessage } from '../ImageGenerationService.js';
 
 // 1x1 transparent PNG, base64-encoded — small fixture for "what the model returned".
 const FAKE_PNG_BASE64 =
