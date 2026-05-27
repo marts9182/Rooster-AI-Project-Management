@@ -45,5 +45,4 @@ data/
 .superpowers/
 
 # Plan E — Pinterest automation
-web.ui/backend/.pinterest-profile/
 output/pinterest/

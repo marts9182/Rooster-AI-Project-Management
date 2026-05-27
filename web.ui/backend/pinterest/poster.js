@@ -1,153 +1,145 @@
 /**
- * Pinterest poster worker.
+ * Pinterest poster worker — API edition.
  *
- * One iteration (`runOnce`) pulls the next due pending row, asks the
- * injected driver to (a) verify login, (b) post the pin. On success,
- * marks the row posted + records pinterest_history. On login-out, pauses
- * the queue, fires a "Re-login required" reminder, and sets the worker
- * status to error (red tray). On other errors, marks the row failed with
- * the error message.
+ * `runOnce({apiClient})` dequeues one due pending row, reads its PNG path,
+ * and calls `apiClient.createPin(...)`. On success → markPosted + history
+ * row (which also fires the `pinterest:pin-posted` SSE event). On failure
+ * → markFailed + history row (`pinterest:pin-failed`). On no resolvable
+ * board id → return early WITHOUT dequeuing, so the row stays pending.
  *
- * The driver interface is intentionally tiny so tests can pass a fake.
- * The real Playwright-backed driver is `playwrightDriver` below; it is
- * built only when not injected. Tests never import `playwright`.
+ * `startPosterWorker({apiClientFactory, intervalMs})` is a sleep-until-next
+ * supervisor loop. If no default board is configured at startup time, the
+ * worker sets a worker-status error and returns early instead of starting
+ * the interval — safer than picking the wrong board.
  *
- * Sleep-until-next strategy (`startPosterWorker`):
- *   - Compute msUntilNext from the earliest pending scheduled_for.
- *   - If nothing pending, sleep 5 minutes and re-check.
- *   - On consecutive failures, back off: 1m -> 5m -> 30m -> pauseQueue().
- *
- * Pinterest DOM selectors used by `playwrightDriver` are best-effort
- * guesses — Pinterest's pin builder UI changes frequently. The selectors
- * are kept in one place here so they're easy to update once the manual
- * live-test script (Task 20) shakes them out.
+ * No Playwright. No browser. The api_oauth + api_client layer handles auth.
  *
  * @module pinterest/poster
  */
 
 import fs from 'node:fs';
+import path from 'node:path';
 import { openDb } from '../db.js';
-import { recordEvent } from '../events.js';
 import { setWorkerHeartbeat, setWorkerError } from '../workerStatus.js';
 import { dequeueNext, markPosted, markFailed, pauseQueue } from './queue.js';
-import { defaultProfileDir } from './login.js';
+import { createPinterestApiClient } from './api_client.js';
 
 const WORKER_NAME = 'pinterest';
 
 /**
- * @typedef {Object} PinterestDriver
- * @property {() => Promise<boolean>} isLoggedIn
- * @property {(args: {imagePath: string, title: string, description: string, link: string}) => Promise<{pinId: string}>} postPin
- * @property {() => Promise<void>} [close]
+ * @typedef {Object} ApiClientLike
+ * @property {(args: {board_id: string, title: string, description: string, link: string, imagePath: string}) => Promise<{id: string}>} createPin
+ * @property {() => Promise<Array<{id: string, name: string}>>} [listBoards]
+ * @property {() => Promise<{username: string, business_name?: string}>} [getUserAccount]
+ * @property {() => Promise<{connected: boolean, expires_at: string|null}>} [getTokenStatus]
  */
 
 /**
  * @typedef {Object} RunOnceInput
- * @property {() => PinterestDriver | Promise<PinterestDriver>} [driverFactory]
+ * @property {ApiClientLike} [apiClient]
  */
 
 /**
  * @typedef {Object} RunOnceResult
- * @property {'idle'|'posted'|'failed'|'paused_login_required'} action
- * @property {number|null} [queueId]
+ * @property {'idle'|'posted'|'failed'|'no_default_board'} action
+ * @property {boolean} [posted]
+ * @property {string} [reason]
+ * @property {number} [queueId]
  * @property {string} [pinId]
  * @property {string} [error]
  */
 
 /**
- * Process at most one pending pin. Pure of timers — the supervisor loop
- * (`startPosterWorker`) handles cadence.
+ * Resolve the default Pinterest board id from env. Returns null if the env
+ * var is missing or empty. Per the implementation override, we do NOT fall
+ * back to listBoards()[0] — picking the wrong board is worse than not
+ * posting at all.
+ *
+ * @returns {string|null}
+ */
+function resolveBoardId() {
+  const id = process.env.PINTEREST_DEFAULT_BOARD_ID;
+  if (!id || !id.trim()) return null;
+  return id.trim();
+}
+
+/**
+ * Process at most one pending pin.
  *
  * @param {RunOnceInput} [input]
  * @returns {Promise<RunOnceResult>}
  */
 export async function runOnce(input = {}) {
-  const driverFactory = input.driverFactory ?? (() => playwrightDriver());
+  // 1) Board-id gate — if no board is resolvable, do NOT dequeue or fail
+  //    any row. The row stays pending until the user configures one.
+  const boardId = resolveBoardId();
+  if (!boardId) {
+    setWorkerError(WORKER_NAME, 'no_default_board');
+    return { action: 'no_default_board', posted: false, reason: 'no_default_board' };
+  }
+
+  const apiClient = input.apiClient ?? defaultApiClient();
+
+  // 2) Dequeue one due row.
   const row = dequeueNext();
   if (!row) {
     setWorkerHeartbeat(WORKER_NAME);
-    return { action: 'idle' };
+    return { action: 'idle', posted: false, reason: 'no_due_row' };
   }
 
-  let driver;
-  try {
-    driver = await driverFactory();
-  } catch (err) {
-    const msg = err?.message || String(err);
-    markFailed(row.id, `driver failed to start: ${msg}`);
-    setWorkerError(WORKER_NAME, msg);
-    return { action: 'failed', queueId: row.id, error: `driver failed to start: ${msg}` };
+  // 3) Pre-flight: image must exist on disk.
+  if (!fs.existsSync(row.image_path)) {
+    const msg = `image_path missing: ${row.image_path}`;
+    markFailed(row.id, msg);
+    setWorkerError(WORKER_NAME, 'image missing');
+    return { action: 'failed', posted: false, queueId: row.id, error: msg };
   }
 
+  // 4) Call the API.
   try {
-    const loggedIn = await driver.isLoggedIn();
-    if (!loggedIn) {
-      // Re-mark this row pending so it doesn't get lost mid-flight.
-      const db = openDb();
-      db.prepare(`UPDATE pinterest_queue SET status='pending' WHERE id=?`).run(row.id);
-      const affected = pauseQueue();
-      // Insert a reminder so the user notices.
-      const dueAt = new Date(Date.now() + 60 * 1000).toISOString();
-      db.prepare(`
-        INSERT INTO reminders (title, body, due_at, channel, status, source_kind, source_id)
-        VALUES ('Pinterest re-login required',
-                'The dashboard could not post a pin because the Pinterest session expired. Open /pinterest and click "Sign in to Pinterest".',
-                ?, 'both', 'pending', 'pinterest.queue', ?)
-      `).run(dueAt, row.id);
-      setWorkerError(WORKER_NAME, 'login required');
-      recordEvent('pinterest:login-required', { queue_id: row.id, paused: affected });
-      return { action: 'paused_login_required', queueId: row.id };
-    }
-
-    if (!fs.existsSync(row.image_path)) {
-      const msg = `image_path missing: ${row.image_path}`;
-      markFailed(row.id, msg);
-      setWorkerError(WORKER_NAME, 'image missing');
-      return { action: 'failed', queueId: row.id, error: msg };
-    }
-
-    const result = await driver.postPin({
-      imagePath: row.image_path,
+    const result = await apiClient.createPin({
+      board_id: boardId,
       title: row.title,
       description: row.description,
       link: row.link_url,
+      imagePath: row.image_path,
     });
-    markPosted(row.id, result.pinId);
+    markPosted(row.id, result.id);
     setWorkerHeartbeat(WORKER_NAME);
-    return { action: 'posted', queueId: row.id, pinId: result.pinId };
+    return { action: 'posted', posted: true, queueId: row.id, pinId: result.id };
   } catch (err) {
-    const msg = err?.message || String(err);
+    const status = err && typeof err === 'object' && 'status' in err ? err.status : undefined;
+    const msg =
+      status === 401
+        ? 'auth failed after refresh'
+        : err?.message || String(err);
     markFailed(row.id, msg);
     setWorkerError(WORKER_NAME, msg);
-    return { action: 'failed', queueId: row.id, error: msg };
-  } finally {
-    if (driver?.close) {
-      try { await driver.close(); } catch { /* ignore */ }
-    }
+    return { action: 'failed', posted: false, queueId: row.id, error: msg };
   }
 }
 
 /**
- * Compute the milliseconds until the next pending row is due. Returns null
- * if no pending rows exist.
+ * Compute the milliseconds until the next pending row is due.
  *
  * @returns {number|null}
  */
 export function msUntilNextPending() {
   const db = openDb();
-  const row = db.prepare(`
-    SELECT scheduled_for FROM pinterest_queue
-     WHERE status='pending'
-     ORDER BY scheduled_for ASC
-     LIMIT 1
-  `).get();
+  const row = /** @type {{scheduled_for: string} | undefined} */ (
+    db.prepare(`
+      SELECT scheduled_for FROM pinterest_queue
+       WHERE status='pending'
+       ORDER BY scheduled_for ASC
+       LIMIT 1
+    `).get()
+  );
   if (!row) return null;
   return new Date(row.scheduled_for).getTime() - Date.now();
 }
 
 // --- Supervisor loop -------------------------------------------------------
 
-/** Module-state backoff tracker. Resets on success or queue-pause. */
 let consecutiveFailures = 0;
 const BACKOFF_MS = [60_000, 5 * 60_000, 30 * 60_000];
 
@@ -159,9 +151,14 @@ let workerCancelled = false;
  * Sleep-until-next supervisor loop. Idempotent: calling twice is a no-op
  * on the second call until `stopPosterWorker` runs.
  *
+ * If PINTEREST_DEFAULT_BOARD_ID is missing at startup the worker DOES NOT
+ * start the interval — it flips the worker-status to error and returns.
+ * The user must configure a board (env var) and restart for posting to
+ * resume.
+ *
  * @param {{
- *   db?: import('better-sqlite3').Database,
- *   driverFactory?: () => PinterestDriver | Promise<PinterestDriver>,
+ *   apiClient?: ApiClientLike,
+ *   apiClientFactory?: () => ApiClientLike,
  *   intervalMs?: number,
  *   idleCheckMs?: number,
  * }} [opts]
@@ -169,9 +166,17 @@ let workerCancelled = false;
  */
 export function startPosterWorker(opts = {}) {
   if (currentTimer) {
-    // Already running.
+    // Already running — idempotent.
     return stopPosterWorker;
   }
+
+  // Board-id gate at startup: bail out instead of spinning a worker that
+  // would short-circuit every tick anyway.
+  if (resolveBoardId() === null) {
+    setWorkerError(WORKER_NAME, 'no_default_board');
+    return stopPosterWorker;
+  }
+
   const idleCheckMs = opts.idleCheckMs ?? opts.intervalMs ?? 5 * 60 * 1000;
   workerCancelled = false;
   consecutiveFailures = 0;
@@ -180,11 +185,13 @@ export function startPosterWorker(opts = {}) {
     if (workerCancelled) return;
     let result;
     try {
-      result = await runOnce({ driverFactory: opts.driverFactory });
+      const apiClient = opts.apiClient
+        ?? (opts.apiClientFactory ? opts.apiClientFactory() : undefined);
+      result = await runOnce({ apiClient });
     } catch (err) {
       const msg = err?.message || String(err);
       setWorkerError(WORKER_NAME, msg);
-      result = { action: 'failed', error: msg };
+      result = { action: 'failed', posted: false, error: msg };
     }
 
     // Backoff bookkeeping.
@@ -193,14 +200,10 @@ export function startPosterWorker(opts = {}) {
     } else if (result.action === 'failed') {
       consecutiveFailures += 1;
       if (consecutiveFailures > BACKOFF_MS.length) {
-        // Exhausted the backoff ladder — pause the queue so the user sees
-        // the red tray and intervenes.
         try { pauseQueue(); } catch { /* ignore */ }
         setWorkerError(WORKER_NAME, 'paused after repeated failures');
         consecutiveFailures = 0;
       }
-    } else if (result.action === 'paused_login_required') {
-      consecutiveFailures = 0;
     }
 
     if (workerCancelled) return;
@@ -209,9 +212,7 @@ export function startPosterWorker(opts = {}) {
       delay = BACKOFF_MS[Math.min(consecutiveFailures - 1, BACKOFF_MS.length - 1)];
     } else {
       const ms = msUntilNextPending();
-      delay = ms === null
-        ? idleCheckMs
-        : Math.max(5_000, Math.min(idleCheckMs, ms));
+      delay = ms === null ? idleCheckMs : Math.max(5_000, Math.min(idleCheckMs, ms));
     }
     currentTimer = setTimeout(loop, delay);
   }
@@ -233,77 +234,23 @@ export function stopPosterWorker() {
   consecutiveFailures = 0;
 }
 
-// --- Real Playwright-backed driver ----------------------------------------
-
 /**
- * Real Playwright-backed driver. Built lazily so tests never load
- * `playwright`. Pinterest's pin-builder DOM selectors are best-effort and
- * will likely need adjusting once Task 20 runs the live smoke test.
+ * Build a real PinterestApiClient from env. Used when no apiClient is
+ * injected. Tests always inject a fake so this path is exercised only by
+ * production callers.
  *
- * @returns {Promise<PinterestDriver>}
+ * @returns {import('./api_client.js').PinterestApiClient}
  */
-async function playwrightDriver() {
-  const { chromium } = await import('playwright');
-  const profileDir = defaultProfileDir();
-  fs.mkdirSync(profileDir, { recursive: true });
-  const context = await chromium.launchPersistentContext(profileDir, {
-    headless: true,
-    viewport: { width: 1280, height: 800 },
-  });
-  const page = context.pages()[0] ?? (await context.newPage());
-
-  return {
-    async isLoggedIn() {
-      await page.goto('https://www.pinterest.com/', { waitUntil: 'domcontentloaded' });
-      // Pinterest redirects logged-out users to /login.
-      if (/\/login\b/.test(page.url())) return false;
-      // Belt-and-braces: presence of the profile-header avatar.
-      try {
-        await page.waitForSelector('[data-test-id="header-profile"]', { timeout: 5000 });
-        return true;
-      } catch {
-        return !/\/login\b/.test(page.url());
-      }
-    },
-    async postPin({ imagePath, title, description, link }) {
-      await page.goto('https://www.pinterest.com/pin-builder/', { waitUntil: 'domcontentloaded' });
-      // 1) Upload image.
-      const fileInput = await page.waitForSelector('input[type="file"]', { timeout: 30_000 });
-      await fileInput.setInputFiles(imagePath);
-      // 2) Title.
-      const titleEl = await page.waitForSelector(
-        'input[placeholder*="Add a title" i], [data-test-id="pin-draft-title"] input',
-        { timeout: 30_000 },
-      );
-      await titleEl.fill(title);
-      // 3) Description.
-      const descEl = await page.waitForSelector(
-        'textarea[placeholder*="Tell everyone what your Pin is about" i], [data-test-id="pin-draft-description"] textarea',
-        { timeout: 30_000 },
-      );
-      await descEl.fill(description);
-      // 4) Destination link.
-      const linkEl = await page.waitForSelector(
-        'input[placeholder*="Add a destination link" i], [data-test-id="pin-draft-link"] input',
-        { timeout: 30_000 },
-      );
-      await linkEl.fill(link);
-      // 5) Publish (selector list is intentionally broad; live smoke test
-      // will narrow it down).
-      const publishBtn = await page.waitForSelector(
-        'button[data-test-id="board-dropdown-save-button"], button:has-text("Publish"), button:has-text("Save")',
-        { timeout: 30_000 },
-      );
-      await publishBtn.click();
-      // 6) Wait for the post-success redirect (/pin/<id>/).
-      await page.waitForURL(/pinterest\.com\/pin\/\d+\/?/, { timeout: 5 * 60_000 });
-      const m = /pinterest\.com\/pin\/(\d+)\//.exec(page.url());
-      return { pinId: m ? m[1] : page.url() };
-    },
-    async close() {
-      await context.close();
-    },
-  };
+function defaultApiClient() {
+  const tokenStorePath = path.resolve(
+    process.env.ROOSTER_PINTEREST_TOKEN_PATH || 'data/pinterest_token.json',
+  );
+  const appId = process.env.PINTEREST_APP_ID || '1572111';
+  const appSecret = process.env.PINTEREST_APP_SECRET;
+  if (!appSecret) {
+    throw new Error('PINTEREST_APP_SECRET env var is required');
+  }
+  return createPinterestApiClient({ tokenStorePath, appId, appSecret });
 }
 
 /** Test-only: clear module-level backoff state. */

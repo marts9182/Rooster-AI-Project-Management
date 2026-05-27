@@ -40,7 +40,11 @@ import { EtsyClient } from './etsy/client.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
 import { createPlansRouter } from './plans/routes.js';
-import { installPinterestModule, startPosterWorker } from './pinterest/index.js';
+import {
+  installPinterestModule,
+  startPosterWorker,
+  createPinterestApiClient,
+} from './pinterest/index.js';
 import { startScheduler as startReminderScheduler } from './reminders/scheduler.js';
 import { sendToast } from './reminders/toast.js';
 import { sendEmail } from './reminders/email.js';
@@ -307,8 +311,34 @@ app.use('/api/kdp', auditRoutes);
   mountEtsyRoutes(app, { db: openDb(), runSyncPass: runEtsySync });
 }
 
-// ── /api/pinterest/* — queue / history / pause / resume / login / edit / cancel ─
-installPinterestModule(app);
+// ── /api/pinterest/* — queue / history / pause / resume / edit / cancel
+//    plus whoami / boards / token-status / refresh (api-backed).
+// The apiClient is constructed only when PINTEREST_APP_SECRET is set; the
+// four api-backed routes respond 503 when the client is absent so the
+// dashboard can boot without Pinterest configured.
+{
+  /** @type {import('./pinterest/api_client.js').PinterestApiClient | null} */
+  let pinterestApiClient = null;
+  if (process.env.PINTEREST_APP_SECRET) {
+    try {
+      const tokenStorePath = path.resolve(
+        process.env.ROOSTER_PINTEREST_TOKEN_PATH ||
+          path.resolve(__dirname, '..', '..', 'data', 'pinterest_token.json'),
+      );
+      pinterestApiClient = createPinterestApiClient({
+        tokenStorePath,
+        appId: process.env.PINTEREST_APP_ID || '1572111',
+        appSecret: process.env.PINTEREST_APP_SECRET,
+      });
+    } catch (err) {
+      logger.warn(
+        { err: err.message },
+        'pinterest api client init failed',
+      );
+    }
+  }
+  installPinterestModule(app, { apiClient: pinterestApiClient });
+}
 
 // ── /api/calendar/* — unified event stream over kdp/etsy/reminders/pinterest
 mountCalendarRoutes(app, { db: openDb() });

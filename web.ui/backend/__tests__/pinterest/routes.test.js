@@ -1,10 +1,10 @@
 /**
  * Tests for pinterest/routes.js — Express REST routes for queue, history,
- * pause/resume, edit, cancel, and the visible Playwright login trigger.
+ * pause/resume, edit, cancel, and the API-backed whoami/boards/token-status/
+ * refresh endpoints.
  *
- * No real Playwright fires: the login endpoint is exercised by replacing
- * `pinterest/login.js` via `vi.doMock` before the routes module is
- * (re-)imported.
+ * No real Pinterest API calls fire: the whoami/boards/token-status/refresh
+ * tests pass a fake apiClient via installPinterestModule(app, {apiClient}).
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import express from 'express';
@@ -35,6 +35,17 @@ async function makeApp() {
   return a;
 }
 
+async function makeAppWithApi(api) {
+  const events = await import('../../events.js');
+  subscribe = events.subscribe;
+  _resetSubscribersForTests = events._resetSubscribersForTests;
+  const { installPinterestModule } = await import('../../pinterest/index.js');
+  const a = express();
+  a.use(express.json());
+  installPinterestModule(a, { apiClient: api });
+  return a;
+}
+
 beforeEach(async () => {
   tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'pin-routes-'));
   process.env.ROOSTER_DB_PATH = path.join(tmpRoot, 'dashboard.db');
@@ -46,7 +57,6 @@ beforeEach(async () => {
 afterEach(() => {
   _resetForTests();
   _resetSubscribersForTests();
-  vi.doUnmock('../../pinterest/login.js');
   vi.resetModules();
   try {
     fs.rmSync(tmpRoot, { recursive: true, force: true });
@@ -186,31 +196,174 @@ describe('PUT /api/pinterest/queue/:id', () => {
   });
 });
 
-describe('POST /api/pinterest/login', () => {
-  it('invokes the login helper and emits pinterest:login-requested', async () => {
-    // Replace the login module before re-importing routes.js.
-    const fake = {
-      runVisibleLogin: vi.fn(async () => {}),
-      defaultProfileDir: () => '/tmp',
+// --- API-backed routes (whoami / boards / token-status / refresh) ---------
+
+describe('GET /api/pinterest/whoami', () => {
+  it('returns the user account from apiClient.getUserAccount', async () => {
+    const api = {
+      getUserAccount: vi.fn(async () => ({
+        username: 'prp',
+        business_name: 'Pocket Rooster Press',
+      })),
+      listBoards: vi.fn(),
+      getTokenStatus: vi.fn(),
+      createPin: vi.fn(),
+      _forceRefresh: vi.fn(),
     };
-    vi.doMock('../../pinterest/login.js', () => fake);
-    _resetForTests();
-    vi.resetModules();
-    const a2 = await makeApp();
-    _resetSubscribersForTests();
-
-    const seen = [];
-    const off = subscribe((evt) => seen.push(evt.kind));
-
-    const res = await request(a2).post('/api/pinterest/login').send({});
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).get('/api/pinterest/whoami');
     expect(res.status).toBe(200);
-    expect(res.body.ok).toBe(true);
-    expect(res.body.launched).toBe(true);
-    // Allow the fire-and-forget microtask to drain.
-    await new Promise((r) => setImmediate(r));
-    expect(fake.runVisibleLogin).toHaveBeenCalled();
+    expect(res.body.username).toBe('prp');
+    expect(res.body.business_name).toBe('Pocket Rooster Press');
+    expect(api.getUserAccount).toHaveBeenCalled();
+  });
 
-    off();
-    expect(seen).toContain('pinterest:login-requested');
+  it('returns 500 with the api error message on failure', async () => {
+    const api = {
+      getUserAccount: vi.fn(async () => {
+        throw new Error('upstream 401');
+      }),
+      listBoards: vi.fn(),
+      getTokenStatus: vi.fn(),
+      createPin: vi.fn(),
+      _forceRefresh: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).get('/api/pinterest/whoami');
+    expect(res.status).toBe(500);
+    expect(res.body.error).toMatch(/upstream 401/);
+  });
+
+  it('returns 503 when no apiClient is configured', async () => {
+    const res = await request(app).get('/api/pinterest/whoami');
+    expect(res.status).toBe(503);
+    expect(res.body.error).toBe('api_client_unavailable');
+  });
+});
+
+describe('GET /api/pinterest/boards', () => {
+  it('returns boards array from apiClient.listBoards', async () => {
+    const api = {
+      listBoards: vi.fn(async () => [
+        { id: 'B1', name: 'Coloring' },
+        { id: 'B2', name: 'Sudoku' },
+      ]),
+      getUserAccount: vi.fn(),
+      getTokenStatus: vi.fn(),
+      createPin: vi.fn(),
+      _forceRefresh: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).get('/api/pinterest/boards');
+    expect(res.status).toBe(200);
+    expect(res.body.boards).toHaveLength(2);
+    expect(res.body.boards[0].id).toBe('B1');
+  });
+
+  it('returns 500 with the api error message on failure', async () => {
+    const api = {
+      listBoards: vi.fn(async () => {
+        throw new Error('boards fetch failed');
+      }),
+      getUserAccount: vi.fn(),
+      getTokenStatus: vi.fn(),
+      createPin: vi.fn(),
+      _forceRefresh: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).get('/api/pinterest/boards');
+    expect(res.status).toBe(500);
+    expect(res.body.error).toMatch(/boards fetch failed/);
+  });
+});
+
+describe('GET /api/pinterest/token-status', () => {
+  it('returns connected/expires_at envelope from apiClient.getTokenStatus', async () => {
+    const api = {
+      getTokenStatus: vi.fn(async () => ({
+        connected: true,
+        expires_at: '2026-06-26T18:32:00.000Z',
+      })),
+      listBoards: vi.fn(),
+      getUserAccount: vi.fn(),
+      createPin: vi.fn(),
+      _forceRefresh: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).get('/api/pinterest/token-status');
+    expect(res.status).toBe(200);
+    expect(res.body.connected).toBe(true);
+    expect(res.body.expires_at).toBe('2026-06-26T18:32:00.000Z');
+  });
+
+  it('returns 500 with the api error message on failure', async () => {
+    const api = {
+      getTokenStatus: vi.fn(async () => {
+        throw new Error('disk read failed');
+      }),
+      listBoards: vi.fn(),
+      getUserAccount: vi.fn(),
+      createPin: vi.fn(),
+      _forceRefresh: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).get('/api/pinterest/token-status');
+    expect(res.status).toBe(500);
+    expect(res.body.error).toMatch(/disk read failed/);
+  });
+});
+
+describe('POST /api/pinterest/refresh', () => {
+  it('calls apiClient._forceRefresh then returns getTokenStatus()', async () => {
+    const api = {
+      _forceRefresh: vi.fn(async () => {}),
+      getTokenStatus: vi.fn(async () => ({
+        connected: true,
+        expires_at: '2026-07-26T18:32:00.000Z',
+      })),
+      listBoards: vi.fn(),
+      getUserAccount: vi.fn(),
+      createPin: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).post('/api/pinterest/refresh').send({});
+    expect(res.status).toBe(200);
+    expect(res.body.connected).toBe(true);
+    expect(api._forceRefresh).toHaveBeenCalled();
+    expect(api.getTokenStatus).toHaveBeenCalled();
+  });
+
+  it('surfaces a 401 when the refresh-token is expired', async () => {
+    const err = new Error('Pinterest refresh token expired — re-auth required');
+    /** @type {any} */ (err).status = 401;
+    const api = {
+      _forceRefresh: vi.fn(async () => {
+        throw err;
+      }),
+      getTokenStatus: vi.fn(),
+      listBoards: vi.fn(),
+      getUserAccount: vi.fn(),
+      createPin: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).post('/api/pinterest/refresh').send({});
+    expect(res.status).toBe(401);
+    expect(res.body.error).toMatch(/re-auth/i);
+  });
+
+  it('returns 500 on a non-401 refresh failure', async () => {
+    const api = {
+      _forceRefresh: vi.fn(async () => {
+        throw new Error('network error: ECONNRESET');
+      }),
+      getTokenStatus: vi.fn(),
+      listBoards: vi.fn(),
+      getUserAccount: vi.fn(),
+      createPin: vi.fn(),
+    };
+    const a2 = await makeAppWithApi(api);
+    const res = await request(a2).post('/api/pinterest/refresh').send({});
+    expect(res.status).toBe(500);
+    expect(res.body.error).toMatch(/ECONNRESET/);
   });
 });
