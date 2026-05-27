@@ -103,11 +103,7 @@ export default function PinPreviewModal({ row, onClose, onEdit }: Props) {
           ×
         </button>
         <h2>{isEditing ? 'Edit pin' : row.title}</h2>
-        <img
-          src={src}
-          alt={row.title}
-          style={{ maxWidth: '500px', maxHeight: '750px' }}
-        />
+        <img src={src} alt={row.title} />
         {isEditing ? (
           <div className="pin-preview-edit">
             <label>

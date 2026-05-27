@@ -6,21 +6,18 @@
  * - Shows the last-audit timestamp.
  * - Re-audit button POSTs to /api/kdp/books/:slug/audit-puzzles.
  * - The per-puzzle breakdown is collapsible (collapsed by default).
+ *
+ * Styling lives in shell.css under `.puzzle-audit-card` so the card themes
+ * through CSS variables (light/dark). The status-chip pastels are
+ * theme-invariant on purpose — they read in both modes.
  */
 import { useMemo, useState } from 'react';
-import type { CSSProperties } from 'react';
 import { auditPuzzles, type KdpBook, type PuzzleAuditSummary } from '../api/kdp';
 
 interface Props {
   book: KdpBook;
   onAudited: (updated: KdpBook) => void;
 }
-
-const CHIP_STYLES: Record<string, CSSProperties> = {
-  passed: { background: '#dcfce7', color: '#166534', borderColor: '#86efac' },
-  failed: { background: '#fee2e2', color: '#991b1b', borderColor: '#fca5a5' },
-  unchecked: { background: '#f3f4f6', color: '#4b5563', borderColor: '#d1d5db' },
-};
 
 const CHIP_LABEL: Record<string, string> = {
   passed: 'Passed',
@@ -65,62 +62,38 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
     : 'never';
 
   return (
-    <section
-      style={{
-        marginTop: '24px',
-        padding: '16px',
-        border: '1px solid #e5e7eb',
-        borderRadius: 8,
-        background: '#fafafa',
-      }}
-      aria-label="Puzzle audit"
-    >
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          flexWrap: 'wrap',
-        }}
-      >
-        <h3 style={{ margin: 0 }}>Puzzle audit</h3>
-        <span
-          style={{
-            padding: '2px 10px',
-            borderRadius: 999,
-            border: '1px solid',
-            fontSize: '0.85rem',
-            ...CHIP_STYLES[status],
-          }}
-        >
+    <section className="puzzle-audit-card" aria-label="Puzzle audit">
+      <header className="puzzle-audit-card-header">
+        <h3>Puzzle audit</h3>
+        <span className={`puzzle-audit-chip status-${status}`}>
           {CHIP_LABEL[status]}
         </span>
-        <span style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+        <span className="puzzle-audit-last">
           Last audit: {lastAuditDisplay}
         </span>
         <button
           type="button"
           onClick={handleReaudit}
           disabled={busy}
-          style={{ marginLeft: 'auto' }}
+          className="puzzle-audit-reaudit"
         >
           {busy ? 'Auditing…' : 'Re-audit'}
         </button>
       </header>
 
       {error && (
-        <p role="alert" style={{ color: 'crimson', marginTop: 8 }}>
+        <p role="alert" className="puzzle-audit-error">
           {error}
         </p>
       )}
 
       {summary && summary.totals && (
-        <p style={{ marginTop: 8, color: '#4b5563', fontSize: '0.9rem' }}>
+        <p className="puzzle-audit-totals">
           {summary.totals.passed} / {summary.totals.checked} puzzles passed
           {summary.totals.failed > 0 && (
             <>
               {' · '}
-              <span style={{ color: '#b91c1c' }}>
+              <span className="puzzle-audit-failures">
                 {summary.totals.uniqueness_failures} uniqueness ·{' '}
                 {summary.totals.symmetry_failures} symmetry ·{' '}
                 {summary.totals.tier_mismatches} tier mismatches
@@ -131,7 +104,7 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
       )}
 
       {summary && summary.puzzles && summary.puzzles.length > 0 && (
-        <div style={{ marginTop: 12 }}>
+        <div className="puzzle-audit-details">
           <button
             type="button"
             onClick={() => setShowDetails((v) => !v)}
@@ -140,14 +113,7 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
             {showDetails ? 'Hide details' : 'Show details'}
           </button>
           {showDetails && (
-            <table
-              style={{
-                marginTop: 8,
-                fontSize: '0.85rem',
-                borderCollapse: 'collapse',
-                width: '100%',
-              }}
-            >
+            <table className="puzzle-audit-table">
               <thead>
                 <tr>
                   <th align="left">#</th>
@@ -161,7 +127,7 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
               </thead>
               <tbody>
                 {summary.puzzles.map((p) => (
-                  <tr key={p.index} style={{ borderTop: '1px solid #e5e7eb' }}>
+                  <tr key={p.index}>
                     <td>{p.index}</td>
                     <td>{p.difficulty}</td>
                     <td>{p.clue_count}</td>

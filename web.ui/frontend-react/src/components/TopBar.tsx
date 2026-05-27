@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSseEvents } from '../hooks/useSseEvents';
 import { listReminders, type Reminder } from '../api/reminders';
 import BellPopover from './BellPopover';
+import ThemeToggle from './ThemeToggle';
 import './../styles/shell.css';
 
 interface Props {
@@ -94,6 +95,7 @@ export default function TopBar({ pendingRemindersCount }: Props) {
         title={connected ? 'Live updates connected' : 'Reconnecting…'}
         aria-label={connected ? 'connected' : 'disconnected'}
       />
+      <ThemeToggle />
       <button
         type="button"
         className="bell"

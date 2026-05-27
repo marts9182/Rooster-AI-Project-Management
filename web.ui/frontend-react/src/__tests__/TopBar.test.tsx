@@ -122,6 +122,17 @@ describe('TopBar', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
+  it('renders the ThemeToggle button', async () => {
+    vi.spyOn(remindersApi, 'listReminders').mockResolvedValue([]);
+    render(<TopBar />);
+    // The toggle's accessible name is one of the two switch-to-* labels.
+    const toggle = screen.getByRole('button', {
+      name: /switch to (dark|light) mode/i,
+    });
+    expect(toggle).toBeInTheDocument();
+    expect(toggle.className).toContain('theme-toggle');
+  });
+
   it('refetches count when a reminder:fired SSE event arrives', async () => {
     const spy = vi
       .spyOn(remindersApi, 'listReminders')

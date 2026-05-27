@@ -75,32 +75,14 @@ export default function MarkPublishedModal({ book, onClose, onSuccess }: Props) 
       role="dialog"
       aria-modal="true"
       aria-label={`Mark live: ${book.title}`}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(0,0,0,0.4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}
+      className="mark-published-modal"
       onClick={(e) => {
         if (e.target === e.currentTarget) closeIfIdle();
       }}
     >
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          background: '#fff',
-          padding: '24px',
-          minWidth: '380px',
-          maxWidth: '440px',
-          borderRadius: '8px',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-        }}
-      >
-        <h2 style={{ marginTop: 0 }}>Mark live: {book.title}</h2>
-        <label style={{ display: 'block', marginBottom: '12px' }}>
+      <form onSubmit={handleSubmit} className="mark-published-modal-panel">
+        <h2>Mark live: {book.title}</h2>
+        <label className="mark-published-modal-field">
           <span>
             ASIN <HelpIcon field="asin" />
           </span>
@@ -112,10 +94,10 @@ export default function MarkPublishedModal({ book, onClose, onSuccess }: Props) 
             maxLength={10}
             autoFocus
             disabled={busy}
-            style={{ display: 'block', width: '100%', marginTop: '4px' }}
+            className="mark-published-modal-input"
           />
         </label>
-        <label style={{ display: 'block', marginBottom: '12px' }}>
+        <label className="mark-published-modal-field">
           <span>
             Release date <HelpIcon field="release_date" />
           </span>
@@ -125,15 +107,15 @@ export default function MarkPublishedModal({ book, onClose, onSuccess }: Props) 
             onChange={(e) => setReleaseDate(e.target.value)}
             required
             disabled={busy}
-            style={{ display: 'block', marginTop: '4px' }}
+            className="mark-published-modal-date"
           />
         </label>
         {error && (
-          <p role="alert" style={{ color: 'crimson', marginTop: 0 }}>
+          <p role="alert" className="mark-published-modal-error">
             {error}
           </p>
         )}
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <div className="mark-published-modal-actions">
           <button
             type="button"
             onClick={onClose}
