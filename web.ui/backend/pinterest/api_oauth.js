@@ -53,6 +53,15 @@ export async function ensureFreshToken({
     return stored.access_token;
   }
 
+  // Trial-mode tokens often arrive without a refresh_token (Pinterest's
+  // "Generate access token" button gives you just the access token; users
+  // regenerate manually every ~30 days). If we have no refresh token, hand
+  // back the access token and let the next API call surface a 401 with a
+  // clear message instead of crashing the whole refresh path here.
+  if (!stored.refresh_token) {
+    return stored.access_token;
+  }
+
   /** @type {Response} */
   let resp;
   try {
@@ -124,13 +133,18 @@ function loadOrBootstrap(tokenStorePath) {
     );
   }
   const access = process.env.PINTEREST_ACCESS_TOKEN;
-  const refresh = process.env.PINTEREST_REFRESH_TOKEN;
-  if (!access || !refresh) {
+  if (!access) {
     throw new Error(
       `Pinterest token file not found at ${tokenStorePath}. ` +
-        'Set PINTEREST_ACCESS_TOKEN + PINTEREST_REFRESH_TOKEN in .env.local for first-run bootstrap.',
+        'Set PINTEREST_ACCESS_TOKEN in .env.local for first-run bootstrap ' +
+        '(PINTEREST_REFRESH_TOKEN optional — trial-mode users typically ' +
+        "regenerate manually from the dev portal every ~30 days).",
     );
   }
+  // Refresh token is optional. In Pinterest's "Generate access token"
+  // trial flow, no refresh token is issued — the user re-pastes a fresh
+  // access_token when this one expires.
+  const refresh = process.env.PINTEREST_REFRESH_TOKEN || '';
   const expiresAt =
     process.env.PINTEREST_TOKEN_EXPIRES_AT ||
     new Date(Date.now() + DEFAULT_BOOTSTRAP_TTL_MS).toISOString();

@@ -313,13 +313,18 @@ app.use('/api/kdp', auditRoutes);
 
 // ── /api/pinterest/* — queue / history / pause / resume / edit / cancel
 //    plus whoami / boards / token-status / refresh (api-backed).
-// The apiClient is constructed only when PINTEREST_APP_SECRET is set; the
-// four api-backed routes respond 503 when the client is absent so the
-// dashboard can boot without Pinterest configured.
+// The apiClient is constructed when either PINTEREST_CLIENT_SECRET (canonical
+// per Pinterest's docs + parked pin-bot work) or PINTEREST_APP_SECRET (the
+// spec's mistakenly-named alias) is set; api-backed routes respond 503 when
+// the client is absent so the dashboard can boot without Pinterest configured.
 {
   /** @type {import('./pinterest/api_client.js').PinterestApiClient | null} */
   let pinterestApiClient = null;
-  if (process.env.PINTEREST_APP_SECRET) {
+  const appSecret =
+    process.env.PINTEREST_CLIENT_SECRET || process.env.PINTEREST_APP_SECRET;
+  const appId =
+    process.env.PINTEREST_CLIENT_ID || process.env.PINTEREST_APP_ID || '1572111';
+  if (appSecret || process.env.PINTEREST_ACCESS_TOKEN) {
     try {
       const tokenStorePath = path.resolve(
         process.env.ROOSTER_PINTEREST_TOKEN_PATH ||
@@ -327,8 +332,8 @@ app.use('/api/kdp', auditRoutes);
       );
       pinterestApiClient = createPinterestApiClient({
         tokenStorePath,
-        appId: process.env.PINTEREST_APP_ID || '1572111',
-        appSecret: process.env.PINTEREST_APP_SECRET,
+        appId,
+        appSecret: appSecret || '',
       });
     } catch (err) {
       logger.warn(
