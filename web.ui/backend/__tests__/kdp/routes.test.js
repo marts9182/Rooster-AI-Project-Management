@@ -25,33 +25,47 @@ import { createKdpRouter } from '../../kdp/routes.js';
 let tmpRoot;
 let tmpDb;
 let app;
-let planCalls;
+let enqueueCalls;
 let previewCalls;
 
 function buildApp() {
-  const planSixPinsFactory = (book, fromDate) => {
-    planCalls.push({ slug: book.slug, asin: book.asin });
+  // Stub the Plan E enqueue function so the test doesn't render real PNGs.
+  // It inserts six rows directly into pinterest_queue (mirroring what the
+  // real enqueuePinsForBook does after generating the PNGs) and returns them.
+  const enqueuePinsForBookFn = async (bookId) => {
+    const db = openDb();
+    const book = db.prepare('SELECT * FROM kdp_books WHERE id=?').get(bookId);
+    enqueueCalls.push({ bookId, slug: book?.slug, asin: book?.asin });
+    if (!book || !book.asin) return [];
+    const linkUrl = `https://www.amazon.com/dp/${book.asin}`;
+    const now = new Date();
+    const insert = db.prepare(`
+      INSERT INTO pinterest_queue
+        (kdp_book_id, pin_type, image_path, title, description, link_url, status, scheduled_for)
+      VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
+    `);
     const rows = [];
-    // Stub: 1 cover_hero + 5 interior_preview
-    rows.push({
-      kdp_book_id: book.id,
-      pin_type: 'cover_hero',
-      image_path: `output/pinterest/${book.slug}/cover-hero.png`,
-      title: book.title,
-      description: 'desc',
-      link_url: `https://www.amazon.com/dp/${book.asin}`,
-      scheduled_for: new Date(fromDate.getTime() + 86_400_000).toISOString(),
-    });
-    for (let i = 1; i <= 5; i++) {
-      rows.push({
-        kdp_book_id: book.id,
-        pin_type: 'interior_preview',
-        image_path: `output/pinterest/${book.slug}/interior-0${i}.png`,
+    const specs = [
+      { type: 'cover_hero', file: 'cover_hero-0.png', title: book.title },
+      ...[1, 2, 3, 4, 5].map((i) => ({
+        type: 'interior_preview',
+        file: `interior_preview-${i}.png`,
         title: `${book.title} - inside ${i}`,
-        description: 'desc',
-        link_url: `https://www.amazon.com/dp/${book.asin}`,
-        scheduled_for: new Date(fromDate.getTime() + (i + 1) * 86_400_000).toISOString(),
-      });
+      })),
+    ];
+    for (let i = 0; i < specs.length; i++) {
+      const s = specs[i];
+      const scheduledFor = new Date(now.getTime() + (i + 1) * 3600_000).toISOString();
+      const info = insert.run(
+        book.id,
+        s.type,
+        `output/pinterest/${book.slug}/${s.file}`,
+        s.title,
+        'desc',
+        linkUrl,
+        scheduledFor,
+      );
+      rows.push(db.prepare('SELECT * FROM pinterest_queue WHERE id=?').get(Number(info.lastInsertRowid)));
     }
     return rows;
   };
@@ -63,7 +77,7 @@ function buildApp() {
 
   const a = express();
   a.use(express.json());
-  a.use('/api/kdp', createKdpRouter({ planSixPinsFactory, previewRendererFactory }));
+  a.use('/api/kdp', createKdpRouter({ enqueuePinsForBookFn, previewRendererFactory }));
   return a;
 }
 
@@ -73,7 +87,7 @@ beforeEach(() => {
   process.env.ROOSTER_DB_PATH = tmpDb;
   _resetForTests();
   _resetSubscribersForTests();
-  planCalls = [];
+  enqueueCalls = [];
   previewCalls = [];
   app = buildApp();
 
@@ -227,8 +241,10 @@ describe('POST /api/kdp/books/:slug/mark-published', () => {
     const diffDays = Math.round((dueDate.getTime() - release.getTime()) / 86_400_000);
     expect(diffDays).toBe(30);
 
-    // The planner factory was called with the updated book
-    expect(planCalls).toContainEqual({ slug: 'book-a', asin: 'B0NEWBOOK1' });
+    // The enqueue function was called with the updated book
+    expect(enqueueCalls).toContainEqual(
+      expect.objectContaining({ slug: 'book-a', asin: 'B0NEWBOOK1' }),
+    );
   });
 
   it('404 on unknown slug', async () => {

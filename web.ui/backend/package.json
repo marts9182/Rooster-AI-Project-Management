@@ -10,11 +10,13 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p jsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:pinterest:live": "node scripts/test_pinterest_live.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.40.0",
     "@google/genai": "^2.0.1",
+    "@napi-rs/canvas": "^0.1.100",
     "better-sqlite3": "^11.10.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
@@ -26,6 +28,8 @@
     "pdf2pic": "^3.2.0",
     "pino": "^9.14.0",
     "pino-pretty": "^11.3.0",
+    "playwright": "^1.60.0",
+    "sharp": "^0.33.5",
     "systray2": "^2.1.4"
   },
   "devDependencies": {

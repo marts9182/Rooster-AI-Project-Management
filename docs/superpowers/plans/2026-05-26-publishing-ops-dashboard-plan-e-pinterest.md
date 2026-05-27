@@ -3708,35 +3708,35 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ## Task 22: Definition of Done checklist
 
-- [ ] Spec coverage check. Read this list and confirm each item is shipped:
+- [x] Spec coverage check. Read this list and confirm each item is shipped:
 
-  - [ ] `pinterest_queue` and `pinterest_history` tables are written by Plan A (verified by reading `web.ui/backend/migrations/0001_init.sql`).
-  - [ ] cover_hero and interior_preview pin templates emit 1000×1500 PNGs.
-  - [ ] Pin generator writes to `output/pinterest/<slug>/<pin_type>-<idx>.png`.
-  - [ ] Scheduler assigns 3–5/day jittered slots inside [09:00, 21:00] in
+  - [x] `pinterest_queue` and `pinterest_history` tables are written by Plan A (verified by reading `web.ui/backend/migrations/0001_init.sql`).
+  - [x] cover_hero and interior_preview pin templates emit 1000×1500 PNGs.
+  - [x] Pin generator writes to `output/pinterest/<slug>/<pin_type>-<idx>.png`.
+  - [x] Scheduler assigns 3–5/day jittered slots inside [09:00, 21:00] in
     `profile.time_zone`.
-  - [ ] `enqueuePinsForBook(bookId)` is called from `/api/kdp/books/:slug/mark-published`.
-  - [ ] Poster worker (a) detects logged-out state, (b) pauses the queue,
+  - [x] `enqueuePinsForBook(bookId)` is called from `/api/kdp/books/:slug/mark-published`.
+  - [x] Poster worker (a) detects logged-out state, (b) pauses the queue,
     (c) fires a "Pinterest re-login required" reminder, (d) sets the tray
     icon red via `setWorkerError('pinterest', ...)`.
-  - [ ] Poster worker retries handled via `markFailed` + `attempts` column;
+  - [x] Poster worker retries handled via `markFailed` + `attempts` column;
     exponential backoff schedule documented in `poster.js`.
-  - [ ] `/api/pinterest/queue`, `/history`, `/queue/:id/cancel`, `/queue/:id`
+  - [x] `/api/pinterest/queue`, `/history`, `/queue/:id/cancel`, `/queue/:id`
     (PUT), `/pause`, `/resume`, `/login` all wired and tested.
-  - [ ] SSE channels `pinterest:pin-scheduled`, `pinterest:pin-posted`,
+  - [x] SSE channels `pinterest:pin-scheduled`, `pinterest:pin-posted`,
     `pinterest:pin-failed`, `pinterest:login-required` are all fired from
     `queue.js` + `poster.js`.
-  - [ ] `/pinterest` UI page renders Queue + History + Settings, auto-refreshes
+  - [x] `/pinterest` UI page renders Queue + History + Settings, auto-refreshes
     on any `pinterest:*` SSE event, and exposes pause/resume + re-login + edit
     + cancel actions per spec §6.8.
-  - [ ] `help/pinterest_first_login.md` exists and is reachable at
+  - [x] `help/pinterest_first_login.md` exists and is reachable at
     `/api/help/pinterest_first_login`.
-  - [ ] `web.ui/backend/.pinterest-profile/` and `output/pinterest/` are
+  - [x] `web.ui/backend/.pinterest-profile/` and `output/pinterest/` are
     gitignored.
-  - [ ] Real Playwright is exercised only via the manual `npm run test:pinterest:live`
+  - [x] Real Playwright is exercised only via the manual `npm run test:pinterest:live`
     script; unit + integration tests use the injected fake driver.
 
-- [ ] Placeholder scan — confirm none of the Plan E source files contain TODO / TBD / "implement later":
+- [x] Placeholder scan — confirm none of the Plan E source files contain TODO / TBD / "implement later":
 
   ```bash
   grep -rn "TODO\|TBD\|implement later\|placeholder" \
@@ -3752,7 +3752,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: no matches.
 
-- [ ] Done. Hand off to Plan A merge train.
+- [x] Done. Hand off to Plan A merge train.
 
 ---
 

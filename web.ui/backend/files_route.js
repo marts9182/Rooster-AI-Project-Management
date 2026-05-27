@@ -1,15 +1,16 @@
 /**
- * /files static route — serves cover.pdf, interior.pdf, and preview PNGs to
- * the React UI without exposing the rest of the repo.
+ * /files static route — serves cover.pdf, interior.pdf, preview PNGs, and
+ * Pinterest pin PNGs to the React UI without exposing the rest of the repo.
  *
  * Allow-list (all paths are repo-root-relative):
  *   - data/cache/previews/**                         — any file
  *   - projects/kdp-puzzle-press/output/kdp-ready/<slug>/
  *         (only cover.pdf | cover.png | cover.jpg | interior.pdf)
+ *   - output/pinterest/<slug>/**                     — only .png / .jpg / .jpeg
  *
  * Anything else — path traversal, files in an allowed root but with a
- * disallowed name, or files outside both roots — returns 404 with
- * `{ error: 'forbidden_or_not_found' }`. We deliberately do not
+ * disallowed extension, or files outside all three roots — returns 404
+ * with `{ error: 'forbidden_or_not_found' }`. We deliberately do not
  * distinguish "exists but blocked" from "missing" so the route never
  * leaks filesystem layout.
  *
@@ -47,6 +48,9 @@ const KDP_READY_ALLOWED_NAMES = new Set([
   'interior.pdf',
 ]);
 
+/** Extensions permitted inside output/pinterest/<slug>/. */
+const PINTEREST_ALLOWED_EXTS = new Set(['.png', '.jpg', '.jpeg']);
+
 /**
  * Case-insensitive "is path inside root" check that handles Windows drive
  * letters. Both arguments are expected to be absolute, already-normalized.
@@ -78,6 +82,7 @@ function isAllowed(absPath) {
     'output',
     'kdp-ready',
   );
+  const pinterestRoot = path.join(root, 'output', 'pinterest');
 
   // Any file under data/cache/previews/ is fair game.
   if (isInside(absPath, previewsRoot)) {
@@ -88,6 +93,14 @@ function isAllowed(absPath) {
   if (isInside(absPath, kdpReadyRoot)) {
     const basename = path.basename(absPath).toLowerCase();
     return KDP_READY_ALLOWED_NAMES.has(basename);
+  }
+
+  // Inside output/pinterest/, only allow image extensions. Pin PNGs are
+  // generated under output/pinterest/<slug>/<pin_type>-<index>.png by
+  // pinterest/generator.js (Plan E Task 4).
+  if (isInside(absPath, pinterestRoot)) {
+    const ext = path.extname(absPath).toLowerCase();
+    return PINTEREST_ALLOWED_EXTS.has(ext);
   }
 
   return false;

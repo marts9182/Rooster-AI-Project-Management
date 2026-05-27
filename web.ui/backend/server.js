@@ -40,6 +40,7 @@ import { EtsyClient } from './etsy/client.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
 import { createPlansRouter } from './plans/routes.js';
+import { installPinterestModule, startPosterWorker } from './pinterest/index.js';
 import { startScheduler as startReminderScheduler } from './reminders/scheduler.js';
 import { sendToast } from './reminders/toast.js';
 import { sendEmail } from './reminders/email.js';
@@ -89,6 +90,20 @@ if (
       { err: err.message },
       'etsy worker init failed (config missing?)',
     );
+  }
+}
+
+// Start the Pinterest poster worker. Same gating model as the other
+// workers: PORT !== 0 (vitest harness sets PORT=0) and ROOSTER_SKIP_PINTEREST_POSTER
+// lets a developer disable it during local dev.
+if (
+  PORT !== 0 &&
+  process.env.ROOSTER_SKIP_PINTEREST_POSTER !== '1'
+) {
+  try {
+    startPosterWorker({ db: openDb() });
+  } catch (err) {
+    logger.warn({ err: err.message }, 'pinterest poster init failed');
   }
 }
 
@@ -291,6 +306,9 @@ app.use('/api/kdp', auditRoutes);
   }
   mountEtsyRoutes(app, { db: openDb(), runSyncPass: runEtsySync });
 }
+
+// ── /api/pinterest/* — queue / history / pause / resume / login / edit / cancel ─
+installPinterestModule(app);
 
 // ── /api/calendar/* — unified event stream over kdp/etsy/reminders/pinterest
 mountCalendarRoutes(app, { db: openDb() });

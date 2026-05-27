@@ -35,6 +35,10 @@ export function useSseEvents(): SseState {
       'etsy:synced', 'etsy:status-changed', 'etsy:sale-detected',
       'pinterest:pin-scheduled', 'pinterest:pin-posted',
       'pinterest:pin-failed', 'pinterest:login-required',
+      // Plan E Task 11/17 — pause/resume + cancel/update + login flow.
+      'pinterest:paused', 'pinterest:resumed',
+      'pinterest:queue-row-cancelled', 'pinterest:queue-row-updated',
+      'pinterest:login-requested',
       'reminder:fired', 'reminder:dismissed', 'reminder:failed',
       'system:worker-heartbeat', 'system:worker-error', 'system:tray-state-changed',
     ];

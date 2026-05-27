@@ -1,13 +1,15 @@
 /**
  * Plan B Task 16 — /files static route.
  *
- * The route serves files from two explicitly-allowed roots:
+ * The route serves files from three explicitly-allowed roots:
  *   - <repo-root>/data/cache/previews/**          (any file)
  *   - <repo-root>/projects/kdp-puzzle-press/output/kdp-ready/<slug>/
  *       (only cover.{pdf,png,jpg} or interior.pdf)
+ *   - <repo-root>/output/pinterest/<slug>/**      (only .png/.jpg/.jpeg)
  *
  * Everything else — path-traversal escapes, non-matching files inside
- * kdp-ready, files outside both roots — returns 404.
+ * kdp-ready, non-image files inside output/pinterest, files outside all
+ * three roots — returns 404.
  *
  * The route resolves the repo root from the module's own location, so it
  * works regardless of process.cwd(). We point it at a tmp dir via the
@@ -47,7 +49,23 @@ beforeEach(() => {
   // A file that exists but is NOT in the allow-list (e.g. metadata.json).
   fs.writeFileSync(path.join(kdpReadyDir, 'metadata.json'), '{}');
 
-  // A file outside both roots that an attacker might try to read.
+  // Plan E Task 17 — pin PNGs under output/pinterest/<slug>/.
+  const pinterestDir = path.join(
+    tmpRoot,
+    'output',
+    'pinterest',
+    'demo-slug',
+  );
+  fs.mkdirSync(pinterestDir, { recursive: true });
+  fs.writeFileSync(path.join(pinterestDir, 'cover_hero-0.png'), 'PIN-BYTES');
+  fs.writeFileSync(
+    path.join(pinterestDir, 'interior_preview-1.jpg'),
+    'PIN-JPG',
+  );
+  // A non-image file inside the pinterest root that must NOT be served.
+  fs.writeFileSync(path.join(pinterestDir, 'caption.txt'), 'caption-data');
+
+  // A file outside all allowed roots that an attacker might try to read.
   fs.writeFileSync(path.join(tmpRoot, 'secret.txt'), 'SHHH');
 
   // The module reads ROOSTER_REPO_ROOT lazily at request time, so the
@@ -112,6 +130,40 @@ describe('GET /files — allow-listed kdp-ready files', () => {
   it('blocks metadata.json (not in allow-list)', async () => {
     const res = await request(app).get(
       '/files/projects/kdp-puzzle-press/output/kdp-ready/demo-book/metadata.json',
+    );
+    expect(res.status).toBe(404);
+  });
+});
+
+describe('GET /files — allow-listed pinterest pins (Plan E Task 17)', () => {
+  it('serves a PNG under output/pinterest/<slug>/', async () => {
+    const res = await request(app)
+      .get('/files/output/pinterest/demo-slug/cover_hero-0.png')
+      .buffer(true);
+    expect(res.status).toBe(200);
+    expect(bodyAsString(res)).toBe('PIN-BYTES');
+    expect(res.headers['content-type']).toMatch(/png/);
+  });
+
+  it('serves a JPG under output/pinterest/<slug>/', async () => {
+    const res = await request(app)
+      .get('/files/output/pinterest/demo-slug/interior_preview-1.jpg')
+      .buffer(true);
+    expect(res.status).toBe(200);
+    expect(bodyAsString(res)).toBe('PIN-JPG');
+  });
+
+  it('blocks non-image files inside the pinterest root', async () => {
+    const res = await request(app).get(
+      '/files/output/pinterest/demo-slug/caption.txt',
+    );
+    expect(res.status).toBe(404);
+    expect(res.text).not.toContain('caption-data');
+  });
+
+  it('404s on a missing pin PNG', async () => {
+    const res = await request(app).get(
+      '/files/output/pinterest/demo-slug/cover_hero-99.png',
     );
     expect(res.status).toBe(404);
   });

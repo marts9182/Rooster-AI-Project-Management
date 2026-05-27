@@ -79,3 +79,36 @@ body { margin: 0; font-family: system-ui, -apple-system, sans-serif; color: var(
 .help-card:hover { border-color: var(--accent); transform: translateY(-1px); }
 .help-card-emoji { font-size: 1.6rem; display: block; margin-bottom: 0.4rem; }
 .help-card-title { font-weight: 600; }
+
+/* Plan E — Pinterest page */
+.pin-queue-table, .pin-history-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1.5rem; }
+.pin-queue-table th, .pin-history-table th { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
+.pin-queue-table td, .pin-history-table td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
+.pin-queue-table tr.status-paused { opacity: 0.6; }
+.pin-queue-table tr.status-failed { background: #fff5f5; }
+.status-badge { padding: 2px 8px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+.status-badge.status-pending { background: #e0f2fe; color: #075985; }
+.status-badge.status-posting { background: #fef3c7; color: #92400e; }
+.status-badge.status-posted { background: #d1fae5; color: #065f46; }
+.status-badge.status-paused  { background: #f3f4f6; color: #374151; }
+.status-badge.status-failed  { background: #fee2e2; color: #991b1b; }
+.status-badge.status-cancelled { background: #f3f4f6; color: #6b7280; }
+.badge { padding: 2px 8px; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+.badge-ok { background: #d1fae5; color: #065f46; }
+.badge-fail { background: #fee2e2; color: #991b1b; }
+.pin-settings { padding: 1rem; background: #fff; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1.5rem; }
+.pin-settings-row { display: flex; justify-content: space-between; align-items: center; }
+.pin-settings-actions { display: flex; gap: 0.5rem; }
+.pin-settings-actions button { padding: 0.4rem 0.8rem; border: 1px solid var(--border); background: white; border-radius: 6px; cursor: pointer; }
+.pin-settings-status { margin-top: 0.5rem; color: var(--muted); }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.modal { background: white; padding: 1.5rem; border-radius: 8px; max-width: 90vw; max-height: 90vh; overflow: auto; position: relative; }
+.modal-close { position: absolute; top: 0.5rem; right: 0.75rem; border: none; background: transparent; font-size: 1.6rem; cursor: pointer; }
+.pin-preview-modal img { display: block; margin: 1rem auto; border: 1px solid var(--border); }
+.pin-preview-edit label { display: block; margin: 0.5rem 0; }
+.pin-preview-edit input, .pin-preview-edit textarea { display: block; width: 100%; margin-top: 0.25rem; padding: 0.4rem; border: 1px solid var(--border); border-radius: 4px; font: inherit; }
+.pin-preview-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+.pin-preview-actions button { padding: 0.4rem 0.8rem; border: 1px solid var(--border); background: white; border-radius: 6px; cursor: pointer; }
+.link-btn { background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; font: inherit; }
+.muted { color: var(--muted); }
+.empty { color: var(--muted); font-style: italic; }

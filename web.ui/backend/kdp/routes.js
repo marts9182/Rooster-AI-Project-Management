@@ -15,7 +15,7 @@
 import express from 'express';
 import { openDb } from '../db.js';
 import { recordEvent } from '../events.js';
-import { planSixPinsForBook } from './pinterest_planner.js';
+import { enqueuePinsForBook } from '../pinterest/queue.js';
 import { renderPreviewsForBook } from './preview_renderer.js';
 
 /** Amazon ASIN format: 'B0' followed by 8 uppercase alphanumerics. */
@@ -26,8 +26,9 @@ const RELEASE_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /**
  * @typedef {Object} KdpRouterOptions
- * @property {(book: object, fromDate: Date) => Array<object>} [planSixPinsFactory]
- *   Replaces the Pinterest planner. Defaults to `planSixPinsForBook`.
+ * @property {(bookId: number) => Promise<Array<object>>} [enqueuePinsForBookFn]
+ *   Replaces the Plan E enqueue function. Defaults to `enqueuePinsForBook`.
+ *   Tests inject a stub so they don't have to render real PNGs.
  * @property {(book: object) => Promise<string[]>} [previewRendererFactory]
  *   Replaces the preview renderer. Defaults to `renderPreviewsForBook`.
  */
@@ -53,7 +54,7 @@ function getBySlug(db, slug) {
  * @returns {import('express').Router}
  */
 export function createKdpRouter(opts = {}) {
-  const planSixPinsFactory = opts.planSixPinsFactory ?? planSixPinsForBook;
+  const enqueuePinsForBookFn = opts.enqueuePinsForBookFn ?? enqueuePinsForBook;
   const previewRendererFactory = opts.previewRendererFactory ?? renderPreviewsForBook;
 
   const router = express.Router();
@@ -133,7 +134,7 @@ export function createKdpRouter(opts = {}) {
   });
 
   // ── Mark published ──────────────────────────────────────────────────────
-  router.post('/books/:slug/mark-published', (req, res) => {
+  router.post('/books/:slug/mark-published', async (req, res) => {
     const db = openDb();
     const book = getBySlug(db, req.params.slug);
     if (!book) {
@@ -183,36 +184,17 @@ export function createKdpRouter(opts = {}) {
       updated.id,
     );
 
-    // Six Pinterest queue rows via injected planner.
-    const pinRows = planSixPinsFactory(
-      {
-        id: updated.id,
-        slug: updated.slug,
-        title: updated.title,
-        asin,
-        blurb: updated.blurb,
-      },
-      new Date(),
-    );
-    const insertPin = db.prepare(
-      `INSERT INTO pinterest_queue
-         (kdp_book_id, pin_type, image_path, title, description, link_url, status, scheduled_for)
-       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
-    );
-    const insertMany = db.transaction((rows) => {
-      for (const r of rows) {
-        insertPin.run(
-          r.kdp_book_id,
-          r.pin_type,
-          r.image_path,
-          r.title,
-          r.description,
-          r.link_url,
-          r.scheduled_for,
-        );
-      }
-    });
-    insertMany(pinRows);
+    // Plan E — materialise PNG pins + insert pinterest_queue rows.
+    // Failures here MUST NOT fail the mark-published response; users can
+    // re-queue manually from the /pinterest page.
+    let pinsQueued = 0;
+    try {
+      const rows = await enqueuePinsForBookFn(updated.id);
+      pinsQueued = Array.isArray(rows) ? rows.length : 0;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(`enqueuePinsForBook(${updated.id}) failed: ${err?.message || err}`);
+    }
 
     recordEvent('kdp:published', {
       slug: updated.slug,
@@ -220,7 +202,7 @@ export function createKdpRouter(opts = {}) {
       release_date: releaseDate,
     });
 
-    res.json({ book: updated, pins_queued: pinRows.length });
+    res.json({ book: updated, pins_queued: pinsQueued });
   });
 
   return router;
