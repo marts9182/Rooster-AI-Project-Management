@@ -14,12 +14,14 @@ import Chat from './pages/Chat';
 import ChatDrawer from './components/chat/ChatDrawer';
 import { ChatDrawerProvider, useChatDrawer } from './components/chat/ChatDrawerContext';
 import { ChatBlobProvider } from './components/chat/ChatBlobContext';
+import { useChatKeyboard } from './hooks/useChatKeyboard';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './styles/shell.css';
 
 function ChatDrawerHost() {
   const { isOpen, close } = useChatDrawer();
+  useChatKeyboard();
   return <ChatDrawer isOpen={isOpen} onClose={close} />;
 }
 

@@ -25,4 +25,12 @@ describe('ChatDrawerContext', () => {
     act(() => result.current.toggle());
     expect(result.current.isOpen).toBe(false);
   });
+  it('initial open state reads from localStorage', () => {
+    localStorage.setItem('chat_drawer_open', '1');
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <ChatDrawerProvider>{children}</ChatDrawerProvider>
+    );
+    const { result } = renderHook(() => useChatDrawer(), { wrapper });
+    expect(result.current.isOpen).toBe(true);
+  });
 });

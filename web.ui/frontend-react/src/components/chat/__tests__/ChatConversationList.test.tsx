@@ -33,3 +33,26 @@ describe('ChatConversationList', () => {
     expect(onSelect).toHaveBeenCalledWith(2);
   });
 });
+
+describe('ChatConversationList rename + delete', () => {
+  it('double-click title enters edit mode; Enter fires onRename', async () => {
+    const onRename = vi.fn();
+    render(<ChatConversationList conversations={items} currentId={1}
+      onSelect={() => {}} onCreate={() => {}} onRename={onRename} onDelete={() => {}} />);
+    await userEvent.dblClick(screen.getByText('Sudoku rework'));
+    const input = screen.getByDisplayValue('Sudoku rework');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'Renamed{Enter}');
+    expect(onRename).toHaveBeenCalledWith(1, 'Renamed');
+  });
+
+  it('delete button shows confirm modal then fires onDelete', async () => {
+    const onDelete = vi.fn();
+    render(<ChatConversationList conversations={items} currentId={1}
+      onSelect={() => {}} onCreate={() => {}} onRename={() => {}} onDelete={onDelete} />);
+    await userEvent.click(screen.getByLabelText('Delete Sudoku rework'));
+    expect(screen.getByText(/Cannot be undone/i)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    expect(onDelete).toHaveBeenCalledWith(1);
+  });
+});

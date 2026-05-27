@@ -288,3 +288,21 @@
   25% { transform: translateX(-4px); }
   75% { transform: translateX(4px); }
 }
+
+.chat-code-block { position: relative; margin: 0.5em 0; }
+.chat-code-block pre { padding: 0.75em; border-radius: 6px; overflow-x: auto; font-size: 0.85em; }
+.chat-code-inline {
+  background: var(--surface-hover);
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+}
+.chat-code-copy {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 0.75em; padding: 2px 8px;
+  background: rgba(255,255,255,0.15); color: #eee;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 4px; cursor: pointer;
+}
+.chat-code-copy:hover { background: rgba(255,255,255,0.25); }

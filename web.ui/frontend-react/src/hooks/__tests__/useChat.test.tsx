@@ -33,4 +33,16 @@ describe('useChat', () => {
     expect(result.current.currentConversation?.id).toBe(7);
     expect(fetchSpy).toHaveBeenCalled();
   });
+
+  it('restores last conversation from localStorage on mount', async () => {
+    localStorage.setItem('last_chat_conversation_id', '42');
+    vi.spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response(JSON.stringify({ conversations: [] }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({
+        conversation: { id: 42, title: 'Restored', claude_session_id: null, created_at: '', updated_at: '', messages: [] },
+      }), { status: 200 }));
+    const { result } = renderHook(() => useChat());
+    await waitFor(() => expect(result.current.currentConversation?.id).toBe(42));
+    localStorage.removeItem('last_chat_conversation_id');
+  });
 });
