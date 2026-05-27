@@ -38,6 +38,7 @@
     "@types/supertest": "^6.0.2",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
+    "msw": "^2.14.6",
     "supertest": "^7.0.0",
     "typescript": "~5.9.3",
     "vitest": "^2.1.9"

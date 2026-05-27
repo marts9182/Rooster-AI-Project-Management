@@ -21,7 +21,7 @@ import { fileURLToPath } from 'url';
 import { marked } from 'marked';
 import { ImageGenerationService } from './ImageGenerationService.js';
 import { openDb } from './db.js';
-import { subscribe, replayRecent } from './events.js';
+import { subscribe, replayRecent, recordEvent } from './events.js';
 import { getAllStatuses, trayColor } from './workerStatus.js';
 import { startBackupCron } from './backupCron.js';
 import { startTray } from './tray.js';
@@ -30,6 +30,14 @@ import kdpRoutes from './kdp/routes.js';
 import { startScanner as startKdpScanner } from './kdp/scanner.js';
 import profileRoutes from './profile/routes.js';
 import filesRoute from './files_route.js';
+import { mountEtsyRoutes } from './etsy/routes.js';
+import { runSyncPass as runEtsySyncPass } from './etsy/syncer.js';
+import { startEtsyWorkerDefault } from './etsy/worker.js';
+import { etsyConfig } from './etsy/config.js';
+import { ensureFreshToken } from './etsy/oauth.js';
+import { EtsyClient } from './etsy/client.js';
+import { mountCalendarRoutes } from './calendar/routes.js';
+import { mountReminderActionRoutes } from './reminders/routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,6 +66,24 @@ if (PORT !== 0) {
 // explicitly during local dev or integration tests.
 if (PORT !== 0 && process.env.ROOSTER_SKIP_KDP_SCANNER !== '1') {
   startKdpScanner();
+}
+
+// Start the Etsy 30-min syncer. Same gating model as the KDP scanner, plus
+// a requirement that ETSY_KEYSTRING is set (so a dev without Etsy creds
+// doesn't see noise on every tick). ROOSTER_SKIP_ETSY_WORKER=1 disables.
+if (
+  PORT !== 0 &&
+  process.env.ROOSTER_SKIP_ETSY_WORKER !== '1' &&
+  process.env.ETSY_KEYSTRING
+) {
+  try {
+    startEtsyWorkerDefault({ db: openDb(), emit: recordEvent });
+  } catch (err) {
+    logger.warn(
+      { err: err.message },
+      'etsy worker init failed (config missing?)',
+    );
+  }
 }
 
 // ── Image generation (Nano Banana Pro) — retained from previous app ────────
@@ -195,6 +221,48 @@ app.get('/api/help/:field', (req, res) => {
 
 // ── /api/kdp/* — KDP book list, detail, mark-in-review, mark-published ──
 app.use('/api/kdp', kdpRoutes);
+
+// ── /api/etsy/* — Etsy listings list/detail + manual sync trigger ───────
+// The real EtsyClient (and therefore sync-now) only works when Etsy
+// credentials are configured; we still mount the read endpoints so the
+// UI can render whatever was last cached. A separate client factory keeps
+// the route module test-friendly.
+{
+  /** @type {(() => Promise<{inserted:number,updated:number,statusChanged:number}>)} */
+  let runEtsySync;
+  if (process.env.ETSY_KEYSTRING) {
+    try {
+      const cfg = etsyConfig();
+      const etsyClient = new EtsyClient({
+        keystring: cfg.keystring,
+        sharedSecret: cfg.sharedSecret,
+        shopId: cfg.shopId,
+        getAccessToken: () => ensureFreshToken({ cfg }),
+      });
+      runEtsySync = () =>
+        runEtsySyncPass({ db: openDb(), client: etsyClient, emit: recordEvent });
+    } catch (err) {
+      logger.warn(
+        { err: err.message },
+        'etsy routes: sync-now disabled (config invalid?)',
+      );
+      runEtsySync = async () => {
+        throw new Error('Etsy not configured');
+      };
+    }
+  } else {
+    runEtsySync = async () => {
+      throw new Error('Etsy not configured (ETSY_KEYSTRING missing)');
+    };
+  }
+  mountEtsyRoutes(app, { db: openDb(), runSyncPass: runEtsySync });
+}
+
+// ── /api/calendar/* — unified event stream over kdp/etsy/reminders/pinterest
+mountCalendarRoutes(app, { db: openDb() });
+
+// ── /api/reminders/* — snooze + dismiss action endpoints ────────────────
+mountReminderActionRoutes(app, { db: openDb() });
 
 // ── /api/profile — single-row profile read/write ────────────────────────
 app.use('/api/profile', profileRoutes);
