@@ -109,7 +109,9 @@ export default function Pinterest() {
 
   return (
     <section className="page-pinterest">
-      <h1>Pinterest</h1>
+      <div className="page-header">
+        <h1>Pinterest</h1>
+      </div>
       {err && (
         <p className="error" role="alert">
           {err}

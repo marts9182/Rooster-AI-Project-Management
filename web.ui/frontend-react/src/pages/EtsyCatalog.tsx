@@ -261,23 +261,17 @@ export default function EtsyCatalog() {
 
   return (
     <section>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
-        <h1 style={{ margin: 0 }}>Etsy catalog</h1>
-        <span style={{ flex: 1 }} />
-        <button
-          type="button"
-          onClick={() => void onSyncNow()}
-          disabled={syncing}
-        >
-          {syncing ? 'Syncing…' : 'Sync now'}
-        </button>
+      <div className="page-header">
+        <h1>Etsy catalog</h1>
+        <div className="page-header-actions">
+          <button
+            type="button"
+            onClick={() => void onSyncNow()}
+            disabled={syncing}
+          >
+            {syncing ? 'Syncing…' : 'Sync now'}
+          </button>
+        </div>
       </div>
 
       {toast && (

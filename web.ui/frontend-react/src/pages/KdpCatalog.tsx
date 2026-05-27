@@ -108,19 +108,13 @@ export default function KdpCatalog() {
 
   return (
     <section>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1rem',
-          marginBottom: '1rem',
-        }}
-      >
-        <h1 style={{ margin: 0 }}>KDP catalog</h1>
-        <span style={{ flex: 1 }} />
-        <button type="button" onClick={handleAddManually}>
-          + Add manually
-        </button>
+      <div className="page-header">
+        <h1>KDP catalog</h1>
+        <div className="page-header-actions">
+          <button type="button" onClick={handleAddManually}>
+            + Add manually
+          </button>
+        </div>
       </div>
 
       {error && (

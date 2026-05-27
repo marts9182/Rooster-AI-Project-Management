@@ -43,7 +43,9 @@ export default function Plans() {
 
   return (
     <section className="plans-page">
-      <h1 className="plans-page__heading">Specs &amp; Implementation Plans</h1>
+      <div className="page-header">
+        <h1 className="plans-page__heading">Specs &amp; Implementation Plans</h1>
+      </div>
 
       {err && (
         <div className="plans-page__error" role="alert">

@@ -35,7 +35,9 @@ export default function Help() {
 
   return (
     <section>
-      <h1>❓ Help</h1>
+      <div className="page-header">
+        <h1>❓ Help</h1>
+      </div>
       <p>
         Quick answers for the things you usually have to copy/paste from
         Amazon, Etsy, Pinterest, or Gmail. Pick a topic to open the article.

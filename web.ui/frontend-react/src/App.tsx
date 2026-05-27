@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import TopBar from './components/TopBar';
+import Header from './components/Header';
 import Home from './pages/Home';
 import KdpCatalog from './pages/KdpCatalog';
 import KdpDetail from './pages/KdpDetail';
@@ -11,15 +10,16 @@ import Calendar from './pages/Calendar';
 import Pinterest from './pages/Pinterest';
 import Profile from './pages/Profile';
 import Help from './pages/Help';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
 import './styles/shell.css';
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="app-shell">
-        <Sidebar />
-        <TopBar />
-        <main className="page">
+        <Header />
+        <main className="app-main">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/kdp" element={<KdpCatalog />} />

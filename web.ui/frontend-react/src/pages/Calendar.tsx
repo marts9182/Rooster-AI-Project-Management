@@ -210,21 +210,12 @@ export default function Calendar() {
 
   return (
     <section className="calendar-page">
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '1rem',
-          marginBottom: '1rem',
-          flexWrap: 'wrap',
-        }}
-      >
-        <h1 style={{ margin: 0 }}>Calendar</h1>
-        <span style={{ flex: 1 }} />
+      <div className="page-header">
+        <h1>Calendar</h1>
         <div
           role="group"
           aria-label="Kind filters"
-          style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}
+          className="page-header-actions"
         >
           {ALL_KINDS.map((k) => {
             const on = enabled.has(k);

@@ -148,7 +148,9 @@ export default function Profile() {
 
   return (
     <section style={{ maxWidth: 640 }}>
-      <h1>Profile</h1>
+      <div className="page-header">
+        <h1>Profile</h1>
+      </div>
 
       {error && (
         <p role="alert" style={{ color: 'crimson' }}>
