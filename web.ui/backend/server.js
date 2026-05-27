@@ -18,7 +18,14 @@ import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { marked } from 'marked';
 import { ImageGenerationService } from './ImageGenerationService.js';
+import { openDb } from './db.js';
+import { subscribe, replayRecent } from './events.js';
+import { getAllStatuses, trayColor } from './workerStatus.js';
+import { startBackupCron } from './backupCron.js';
+import { startTray } from './tray.js';
+import { logger } from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,8 +34,20 @@ const DIST_DIR = path.resolve(__dirname, '../frontend-react/dist');
 const IMAGES_DIR = path.resolve(__dirname, 'generated-images');
 const PORT = process.env.PORT !== undefined ? Number(process.env.PORT) : 5000;
 
+const SSE_HEARTBEAT_MS = 20_000;
+
 const app = express();
 app.use(express.json({ limit: '25mb' }));
+
+// Open DB eagerly so migrations run before any request hits the API.
+openDb();
+
+// Schedule the nightly backup + log-prune cron alongside the live server.
+// Gated on PORT !== 0 so the test harness (which sets PORT=0) never schedules
+// a real cron during vitest runs.
+if (PORT !== 0) {
+  startBackupCron();
+}
 
 // ── Image generation (Nano Banana Pro) — retained from previous app ────────
 let imageService = null;
@@ -80,6 +99,89 @@ app.post('/api/generate-image', async (req, res) => {
   }
 });
 
+// ── /api/status — worker health (read-only) ────────────────────────────────
+app.get('/api/status', (_req, res) => {
+  res.json({
+    workers: getAllStatuses(),
+    tray_color: trayColor(),
+  });
+});
+
+// ── /api/events — SSE channel (consumed by frontend, written by Plans B-E) ─
+app.get('/api/events', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+  // Flush headers immediately so clients see the stream is live.
+  res.write(':\n\n');
+
+  // Replay the last 50 events so a freshly-loaded UI shows recent history.
+  for (const evt of replayRecent(50)) {
+    res.write(
+      `event: ${evt.kind}\ndata: ${JSON.stringify({ payload: evt.payload, occurred_at: evt.occurred_at })}\n\n`,
+    );
+  }
+
+  const unsubscribe = subscribe((evt) => {
+    try {
+      res.write(
+        `event: ${evt.kind}\ndata: ${JSON.stringify({ payload: evt.payload, occurred_at: evt.occurred_at })}\n\n`,
+      );
+    } catch {
+      // The close handler will tear things down; nothing else to do here.
+    }
+  });
+
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(': heartbeat\n\n');
+    } catch {
+      // ignored — close handler runs cleanup
+    }
+  }, SSE_HEARTBEAT_MS);
+
+  req.on('close', () => {
+    clearInterval(heartbeat);
+    unsubscribe();
+  });
+});
+
+// ── /api/help/:field — documentation articles (markdown → HTML) ──────────
+const HELP_DIR = path.resolve(__dirname, 'help');
+app.get('/api/help/:field', (req, res) => {
+  const { field } = req.params;
+
+  // Validate field name: alphanumeric + underscore only (no path traversal)
+  if (!/^[a-z0-9_]+$/.test(field)) {
+    return res.status(400).json({ error: 'invalid_field_name' });
+  }
+
+  const filePath = path.join(HELP_DIR, `${field}.md`);
+
+  // Ensure the resolved path is still within HELP_DIR (defense in depth)
+  if (!filePath.startsWith(HELP_DIR)) {
+    return res.status(400).json({ error: 'invalid_field_name' });
+  }
+
+  // Check if file exists
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'unknown_help_topic' });
+  }
+
+  try {
+    const markdown = fs.readFileSync(filePath, 'utf8');
+    const html = marked.parse(markdown);
+    res.set('Content-Type', 'text/markdown; charset=utf-8');
+    res.send(markdown);
+  } catch (err) {
+    logger.error({ err: err.message, field }, 'help endpoint error');
+    res.status(500).json({ error: 'failed_to_read_help' });
+  }
+});
+
 // ── Serve React build ────────────────────────────────────────────────────
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
@@ -93,10 +195,21 @@ if (fs.existsSync(DIST_DIR)) {
 }
 
 // ── Start ────────────────────────────────────────────────────────────────
+// The tray is gated on PORT !== 0 (so vitest's PORT=0 boot never spawns the
+// systray2 helper) and on ROOSTER_SKIP_TRAY !== '1' (so a developer running
+// the server in a non-tray environment — VS Code dev container, SSH, etc. —
+// can disable it explicitly).
 const server = PORT === 0
   ? null
-  : app.listen(PORT, '127.0.0.1', () => {
+  : app.listen(PORT, '127.0.0.1', async () => {
       console.log(`Publishing Ops Dashboard server running at http://127.0.0.1:${PORT}`);
+      if (process.env.ROOSTER_SKIP_TRAY !== '1') {
+        try {
+          await startTray();
+        } catch (err) {
+          logger.warn({ err: err.message }, 'tray failed to start');
+        }
+      }
     });
 
 export { app, server };

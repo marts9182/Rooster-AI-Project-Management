@@ -1,0 +1,45 @@
+/* Global shell styles — sidebar + topbar + drawer.
+   Plans B-E may add component CSS; this file defines only the chrome. */
+
+:root {
+  --sidebar-w: 220px;
+  --topbar-h: 48px;
+  --bg: #fafaf7;
+  --fg: #1a1a1a;
+  --accent: #0e7c66;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --ok: #10b981;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, sans-serif; color: var(--fg); background: var(--bg); }
+
+.app-shell { display: grid; grid-template-columns: var(--sidebar-w) 1fr; grid-template-rows: var(--topbar-h) 1fr; min-height: 100vh; }
+.sidebar { grid-row: 1 / span 2; background: #fff; border-right: 1px solid var(--border); padding: 1rem 0.5rem; }
+.sidebar-logo { font-size: 1.1rem; font-weight: 600; padding: 0.5rem 0.75rem 1rem; }
+.sidebar ul { list-style: none; margin: 0; padding: 0; }
+.sidebar-link { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; border-radius: 6px; color: var(--fg); text-decoration: none; font-size: 0.95rem; }
+.sidebar-link:hover { background: #f3f4f6; }
+.sidebar-link.active { background: var(--accent); color: white; }
+.sidebar-icon { font-size: 1.05rem; }
+
+.topbar { grid-column: 2; display: flex; align-items: center; gap: 1rem; padding: 0 1rem; border-bottom: 1px solid var(--border); background: #fff; }
+.topbar-spacer { flex: 1; }
+.sse-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.sse-dot-ok { background: var(--ok); }
+.sse-dot-down { background: var(--danger); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.bell { position: relative; text-decoration: none; font-size: 1.2rem; }
+.bell-badge { position: absolute; top: -6px; right: -10px; background: var(--danger); color: white; border-radius: 999px; font-size: 0.7rem; padding: 1px 5px; min-width: 16px; text-align: center; }
+.profile-link { text-decoration: none; font-size: 1.2rem; }
+
+.page { grid-column: 2; padding: 1.5rem; overflow: auto; }
+
+.help-drawer { position: fixed; top: 0; right: 0; width: 380px; height: 100vh; background: #fff; border-left: 1px solid var(--border); padding: 1rem 1.25rem; box-shadow: -4px 0 12px rgba(0,0,0,0.06); z-index: 50; overflow-y: auto; }
+.help-close { float: right; border: none; background: transparent; font-size: 1.5rem; cursor: pointer; }
+.help-error { color: var(--danger); }
+.help-body { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 0.85rem; }

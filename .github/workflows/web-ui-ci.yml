@@ -33,6 +33,11 @@ jobs:
       - name: Type-check
         run: npm run typecheck
       - name: Test
+        # Skip tray test on Linux runner — systray2 needs a display.
+        # Skip cron real-time / autostart tests by env flags.
+        env:
+          ROOSTER_SKIP_TRAY: '1'
+          ROOSTER_SKIP_CRON: '1'
         run: npm test
 
   frontend:
@@ -52,3 +57,7 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      # Plans B-E add `npm run test:e2e` here once they ship their first
+      # e2e specs. Plan A intentionally has no e2e tests to run yet.
