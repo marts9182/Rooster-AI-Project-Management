@@ -118,7 +118,7 @@ export default function KdpCatalog() {
       </div>
 
       {error && (
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       )}
@@ -130,11 +130,11 @@ export default function KdpCatalog() {
       )}
 
       {books.length > 0 && (
-        <table className="kdp-catalog-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table className="kdp-catalog-table">
           <thead>
             <tr>
-              <th style={{ textAlign: 'left' }}>Cover</th>
-              <th style={{ textAlign: 'left' }}>
+              <th>Cover</th>
+              <th>
                 <button
                   type="button"
                   onClick={() => toggleSort('title')}
@@ -143,7 +143,7 @@ export default function KdpCatalog() {
                   Title{sortIndicator('title')}
                 </button>
               </th>
-              <th style={{ textAlign: 'left' }}>
+              <th>
                 <button
                   type="button"
                   onClick={() => toggleSort('status')}
@@ -152,7 +152,7 @@ export default function KdpCatalog() {
                   Status{sortIndicator('status')}
                 </button>
               </th>
-              <th style={{ textAlign: 'left' }}>
+              <th>
                 <button
                   type="button"
                   onClick={() => toggleSort('asin')}
@@ -161,7 +161,7 @@ export default function KdpCatalog() {
                   ASIN{sortIndicator('asin')}
                 </button>
               </th>
-              <th style={{ textAlign: 'left' }}>
+              <th>
                 <button
                   type="button"
                   onClick={() => toggleSort('release_date')}
@@ -170,7 +170,7 @@ export default function KdpCatalog() {
                   Released{sortIndicator('release_date')}
                 </button>
               </th>
-              <th style={{ textAlign: 'left' }}>Actions</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -181,27 +181,16 @@ export default function KdpCatalog() {
                     <img
                       src={`/files/${b.cover_path}`}
                       alt=""
-                      style={{
-                        width: 40,
-                        height: 'auto',
-                        display: 'block',
-                        borderRadius: 2,
-                      }}
+                      className="kdp-cover-thumb"
                     />
                   ) : (
-                    <div
-                      style={{
-                        width: 40,
-                        height: 56,
-                        background: '#eee',
-                        borderRadius: 2,
-                      }}
-                      aria-hidden="true"
-                    />
+                    <div className="cover-placeholder" aria-hidden="true" />
                   )}
                 </td>
                 <td>
-                  <Link to={`/kdp/${b.slug}`}>{b.title}</Link>
+                  <Link to={`/kdp/${b.slug}`} className="row-title-link">
+                    {b.title}
+                  </Link>
                 </td>
                 <td>
                   <span

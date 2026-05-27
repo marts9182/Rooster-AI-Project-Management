@@ -118,7 +118,7 @@ export default function KdpDetail() {
   if (error && !book) {
     return (
       <section>
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       </section>
@@ -200,7 +200,7 @@ export default function KdpDetail() {
           </p>
 
           {error && (
-            <p role="alert" style={{ color: 'crimson' }}>
+            <p role="alert" className="error-text">
               {error}
             </p>
           )}

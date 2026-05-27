@@ -242,7 +242,7 @@ export default function Calendar() {
       </div>
 
       {error && (
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       )}

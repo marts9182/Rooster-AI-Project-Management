@@ -110,7 +110,7 @@ export default function Profile() {
   if (error && !p) {
     return (
       <section>
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       </section>
@@ -153,7 +153,7 @@ export default function Profile() {
       </div>
 
       {error && (
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       )}

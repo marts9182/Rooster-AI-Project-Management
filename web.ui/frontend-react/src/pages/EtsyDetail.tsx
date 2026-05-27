@@ -105,7 +105,7 @@ export default function EtsyDetail() {
   if (error && !row) {
     return (
       <section>
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
         <p>
@@ -147,7 +147,7 @@ export default function EtsyDetail() {
       </header>
 
       {error && (
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       )}

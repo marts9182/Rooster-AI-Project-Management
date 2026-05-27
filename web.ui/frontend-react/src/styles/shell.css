@@ -303,6 +303,58 @@ table.data-table tbody tr:hover { background: var(--surface-hover); }
 }
 .th-sort:hover { color: var(--fg); }
 
+/* ── Links: global theme-aware styling ───────────────────────────────
+   Browsers default `<a>` to blue/purple; route everything through
+   `--accent` instead so links read correctly in both themes. Links
+   inside table title cells use `.row-title-link` (inherit body color,
+   accent on hover) to keep tables looking like data rather than a
+   wall of brand color. */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+a:visited { color: var(--accent); }
+
+/* Table row title link — looks like body text, reveals affordance on hover. */
+.row-title-link {
+  color: var(--fg);
+  font-weight: 500;
+}
+.row-title-link:hover { color: var(--accent); }
+.row-title-link:visited { color: var(--fg); }
+
+/* Cover placeholder (shown when a book row has no cover_path). */
+.cover-placeholder {
+  width: 40px;
+  height: 56px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+/* KDP catalog cover thumbnail (uniform 40px wide, auto height). */
+.kdp-cover-thumb {
+  width: 40px;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+
+/* Inline error helper — replaces ad-hoc `style={{ color: 'crimson' }}`. */
+.error-text { color: var(--danger); }
+
 /* ── Dashboard tiles (Home) ───────────────────────────────────────── */
 .dashboard-home-header h1 { margin: 0; }
 .reset-layout-btn {

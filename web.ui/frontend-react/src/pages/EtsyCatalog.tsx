@@ -290,7 +290,7 @@ export default function EtsyCatalog() {
       )}
 
       {error && (
-        <p role="alert" style={{ color: 'crimson' }}>
+        <p role="alert" className="error-text">
           {error}
         </p>
       )}
@@ -437,7 +437,7 @@ export default function EtsyCatalog() {
             {sorted.map((r) => (
               <tr key={r.etsy_listing_id}>
                 <td>
-                  <Link to={`/etsy/${r.etsy_listing_id}`}>{r.title}</Link>
+                  <Link to={`/etsy/${r.etsy_listing_id}`} className="row-title-link">{r.title}</Link>
                 </td>
                 <td>
                   <span
