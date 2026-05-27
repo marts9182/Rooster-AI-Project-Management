@@ -38,6 +38,11 @@ import { ensureFreshToken } from './etsy/oauth.js';
 import { EtsyClient } from './etsy/client.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
+import { createPlansRouter } from './plans/routes.js';
+import { startScheduler as startReminderScheduler } from './reminders/scheduler.js';
+import { sendToast } from './reminders/toast.js';
+import { sendEmail } from './reminders/email.js';
+import { setWorkerHeartbeat, setWorkerError } from './workerStatus.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -82,6 +87,32 @@ if (
     logger.warn(
       { err: err.message },
       'etsy worker init failed (config missing?)',
+    );
+  }
+}
+
+// Start the reminders scheduler (node-cron, every minute). Gated on PORT !== 0
+// (vitest harness sets PORT=0) and on ROOSTER_SKIP_REMINDERS_SCHEDULER so a
+// developer can disable it explicitly. Keep a handle for graceful shutdown.
+/** @type {(() => void) | null} */
+let stopRemindersScheduler = null;
+if (
+  PORT !== 0 &&
+  process.env.ROOSTER_SKIP_REMINDERS_SCHEDULER !== '1'
+) {
+  try {
+    stopRemindersScheduler = startReminderScheduler(openDb(), {
+      cronExpression: '* * * * *',
+      sendToast,
+      sendEmail,
+      recordEvent,
+      onTick: () => setWorkerHeartbeat('reminders'),
+      onError: (msg) => setWorkerError('reminders', msg),
+    });
+  } catch (err) {
+    logger.warn(
+      { err: err.message },
+      'reminders scheduler init failed',
     );
   }
 }
@@ -264,6 +295,14 @@ mountCalendarRoutes(app, { db: openDb() });
 // ── /api/reminders/* — snooze + dismiss action endpoints ────────────────
 mountReminderActionRoutes(app, { db: openDb() });
 
+// ── /api/plans/* — read-only browser over docs/superpowers/{specs,plans} ─
+// ROOSTER_DOCS_ROOT lets tests/local dev override the docs path; default
+// points at the repo's docs/superpowers tree two levels up from web.ui/backend.
+const SUPERPOWERS_ROOT = process.env.ROOSTER_DOCS_ROOT
+  ? path.resolve(process.env.ROOSTER_DOCS_ROOT)
+  : path.resolve(__dirname, '..', '..', 'docs', 'superpowers');
+app.use('/api/plans', createPlansRouter({ superpowersRoot: SUPERPOWERS_ROOT }));
+
 // ── /api/profile — single-row profile read/write ────────────────────────
 app.use('/api/profile', profileRoutes);
 
@@ -361,5 +400,24 @@ const server = PORT === 0
         }
       }
     });
+
+// Graceful shutdown: stop the reminders cron job so node can exit cleanly
+// when the user hits Ctrl+C or systemd sends SIGTERM. Other background
+// workers (etsy, kdp) currently rely on `timer.unref()` for shutdown and
+// don't need explicit hooks here. Gated on PORT !== 0 so vitest (which
+// imports this module under PORT=0) doesn't accidentally install handlers
+// that would override its own signal disposition.
+if (PORT !== 0) {
+  const shutdown = () => {
+    try {
+      stopRemindersScheduler?.();
+    } catch {
+      /* ignore */
+    }
+    process.exit(0);
+  };
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+}
 
 export { app, server };
