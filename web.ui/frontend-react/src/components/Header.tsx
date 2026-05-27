@@ -4,6 +4,7 @@ import { useSseEvents } from '../hooks/useSseEvents';
 import { listReminders, type Reminder } from '../api/reminders';
 import ThemeToggle from './ThemeToggle';
 import BellPopover from './BellPopover';
+import { useChatDrawer } from './chat/ChatDrawerContext';
 import './../styles/shell.css';
 
 interface NavItem {
@@ -47,6 +48,7 @@ interface Props {
  */
 export default function Header({ pendingRemindersCount }: Props) {
   const { connected, lastEvent } = useSseEvents();
+  const { open: openDrawer } = useChatDrawer();
   const [count, setCount] = useState<number>(pendingRemindersCount ?? 0);
   const [popoverOpen, setPopoverOpen] = useState<boolean>(false);
   const lastSseRefreshAt = useRef<number>(0);
@@ -117,6 +119,17 @@ export default function Header({ pendingRemindersCount }: Props) {
           aria-label={connected ? 'connected' : 'disconnected'}
         />
         <ThemeToggle />
+        <button
+          type="button"
+          className="chat-blob-trigger"
+          onClick={openDrawer}
+          aria-label="Open Claude chat"
+          title="Claude chat"
+          data-testid="chat-blob-trigger"
+        >
+          {/* Phase 4 replaces this with <ChatBlob size="sm" /> */}
+          <span className="chat-blob-trigger-placeholder" />
+        </button>
         <button
           type="button"
           className="bell"

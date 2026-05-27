@@ -1,0 +1,283 @@
+/*
+ * Chat UI styles. Lightweight skeletons only — Phase 4/5 will polish.
+ * Uses theme tokens from shell.css so dark mode follows the rest of the app.
+ */
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  overflow-y: auto;
+}
+
+.chat-msg {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  color: var(--fg);
+}
+
+.chat-msg-user {
+  border-left: 3px solid var(--accent);
+}
+
+.chat-msg-assistant {
+  border-left: 3px solid var(--muted);
+}
+
+.chat-msg-role {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.chat-msg-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-msg-error {
+  margin-top: 0.5rem;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.chat-tool-list {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chat-tool-call {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  background: var(--surface-hover, var(--surface));
+  font-size: 0.85rem;
+}
+
+.chat-tool-call > summary {
+  cursor: pointer;
+  list-style: revert;
+}
+
+.chat-tool-ms {
+  color: var(--muted);
+  margin-left: 0.5rem;
+}
+
+.chat-tool-status {
+  color: var(--muted);
+  margin-left: 0.5rem;
+  font-style: italic;
+}
+
+.chat-tool-args {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  overflow-x: auto;
+}
+
+.chat-loading-dots {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.chat-loading-dots > span {
+  width: 0.4rem;
+  height: 0.4rem;
+  background: var(--muted);
+  border-radius: 50%;
+  display: inline-block;
+  animation: chat-dot-pulse 1.2s infinite ease-in-out;
+}
+
+.chat-loading-dots > span:nth-child(2) { animation-delay: 0.2s; }
+.chat-loading-dots > span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes chat-dot-pulse {
+  0%, 80%, 100% { opacity: 0.3; }
+  40% { opacity: 1; }
+}
+
+.chat-composer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.chat-composer-textarea {
+  flex: 1;
+  resize: none;
+  font: inherit;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--fg);
+  line-height: 20px;
+  min-height: 20px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.chat-composer-textarea:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.chat-composer-send {
+  align-self: flex-end;
+  padding: 0.4rem 0.8rem;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat-composer-send:disabled {
+  background: var(--muted);
+  cursor: not-allowed;
+}
+
+.chat-conversation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  min-width: 220px;
+}
+
+.chat-conversation-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.chat-conv-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.chat-conv-item.active {
+  background: var(--surface-hover, var(--surface));
+  border-color: var(--border);
+}
+
+.chat-conv-item-title {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  color: var(--fg);
+  cursor: pointer;
+  font: inherit;
+  grid-column: 1;
+}
+
+.chat-conv-item-title:hover {
+  text-decoration: underline;
+}
+
+.chat-conv-item-meta {
+  grid-column: 1;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.chat-conv-item-delete {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+
+.chat-conv-item-delete:hover {
+  color: var(--danger);
+}
+
+.chat-new-conv {
+  padding: 0.4rem 0.5rem;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.chat-delete-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: max-content;
+  height: max-content;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.chat-delete-modal button {
+  margin-right: 0.5rem;
+  padding: 0.3rem 0.75rem;
+}
+
+.chat-page { display: flex; gap: 16px; height: calc(100vh - var(--header-h, 64px) - 32px); }
+.chat-page .chat-conversation-list { width: 250px; flex-shrink: 0; }
+.chat-page-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.chat-page-main .chat-messages { flex: 1; overflow-y: auto; }
+.chat-page-blob { width: 250px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+
+.chat-drawer {
+  position: fixed; top: 0; right: 0; height: 100vh; width: 400px;
+  background: var(--surface); color: var(--fg);
+  box-shadow: -4px 0 16px rgba(0,0,0,.2);
+  display: flex; flex-direction: column;
+  z-index: 50;
+}
+.chat-drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 49; }
+.chat-drawer-header { display: flex; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid var(--border); }
+.chat-drawer-header select { flex: 1; }
+.chat-drawer-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.chat-drawer-body .chat-messages { flex: 1; overflow-y: auto; }
+
+.chat-blob-trigger { background: none; border: none; cursor: pointer; padding: 4px; }
+.chat-blob-trigger-placeholder {
+  display: inline-block; width: 36px; height: 36px; border-radius: 50%;
+  background: radial-gradient(#CAA457, #1F4F66);
+}

@@ -10,31 +10,43 @@ import Calendar from './pages/Calendar';
 import Pinterest from './pages/Pinterest';
 import Profile from './pages/Profile';
 import Help from './pages/Help';
+import Chat from './pages/Chat';
+import ChatDrawer from './components/chat/ChatDrawer';
+import { ChatDrawerProvider, useChatDrawer } from './components/chat/ChatDrawerContext';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import './styles/shell.css';
 
+function ChatDrawerHost() {
+  const { isOpen, close } = useChatDrawer();
+  return <ChatDrawer isOpen={isOpen} onClose={close} />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="app-shell">
-        <Header />
-        <main className="app-main">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/kdp" element={<KdpCatalog />} />
-            <Route path="/kdp/:slug" element={<KdpDetail />} />
-            <Route path="/etsy" element={<EtsyCatalog />} />
-            <Route path="/etsy/:listingId" element={<EtsyDetail />} />
-            <Route path="/plans" element={<Plans />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/pinterest" element={<Pinterest />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
-        </main>
-      </div>
+      <ChatDrawerProvider>
+        <div className="app-shell">
+          <Header />
+          <main className="app-main">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/kdp" element={<KdpCatalog />} />
+              <Route path="/kdp/:slug" element={<KdpDetail />} />
+              <Route path="/etsy" element={<EtsyCatalog />} />
+              <Route path="/etsy/:listingId" element={<EtsyDetail />} />
+              <Route path="/plans" element={<Plans />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/pinterest" element={<Pinterest />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="*" element={<Home />} />
+            </Routes>
+          </main>
+          <ChatDrawerHost />
+        </div>
+      </ChatDrawerProvider>
     </BrowserRouter>
   );
 }
