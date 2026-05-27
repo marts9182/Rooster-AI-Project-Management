@@ -281,3 +281,10 @@
   display: inline-block; width: 36px; height: 36px; border-radius: 50%;
   background: radial-gradient(#CAA457, #1F4F66);
 }
+
+.chat-blob-error { animation: chat-blob-shake 200ms ease-in-out 2; }
+@keyframes chat-blob-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}

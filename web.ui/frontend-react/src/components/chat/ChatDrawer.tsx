@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useChat } from '../../hooks/useChat';
 import ChatMessages from './ChatMessages';
 import ChatComposer from './ChatComposer';
+import ChatBlob from './ChatBlob';
 
 interface Props {
   isOpen: boolean;
@@ -34,8 +35,7 @@ export default function ChatDrawer({ isOpen, onClose }: Props) {
       <div className="chat-drawer" role="dialog" aria-label="Claude chat">
         <header className="chat-drawer-header">
           <div className="chat-drawer-blob-placeholder" data-testid="chat-drawer-blob-placeholder">
-            {/* Phase 4 mounts <ChatBlob size="md" /> here. */}
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: '#1F4F66' }} />
+            <ChatBlob size="md" />
           </div>
           <select
             value={chat.currentConversation?.id ?? ''}

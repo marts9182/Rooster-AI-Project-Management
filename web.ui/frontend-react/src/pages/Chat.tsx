@@ -2,6 +2,7 @@ import { useChat } from '../hooks/useChat';
 import ChatConversationList from '../components/chat/ChatConversationList';
 import ChatMessages from '../components/chat/ChatMessages';
 import ChatComposer from '../components/chat/ChatComposer';
+import ChatBlob from '../components/chat/ChatBlob';
 
 export default function Chat() {
   const chat = useChat();
@@ -25,8 +26,7 @@ export default function Chat() {
         />
       </section>
       <aside className="chat-page-blob" data-testid="chat-page-blob-placeholder">
-        {/* Phase 4 mounts <ChatBlob size="lg" /> here. */}
-        <div className="chat-blob-placeholder" style={{ width: 200, height: 200, borderRadius: '50%', background: '#1F4F66' }} />
+        <ChatBlob size="lg" />
       </aside>
     </div>
   );

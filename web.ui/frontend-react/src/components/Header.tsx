@@ -4,6 +4,7 @@ import { useSseEvents } from '../hooks/useSseEvents';
 import { listReminders, type Reminder } from '../api/reminders';
 import ThemeToggle from './ThemeToggle';
 import BellPopover from './BellPopover';
+import ChatBlob from './chat/ChatBlob';
 import { useChatDrawer } from './chat/ChatDrawerContext';
 import './../styles/shell.css';
 
@@ -127,8 +128,7 @@ export default function Header({ pendingRemindersCount }: Props) {
           title="Claude chat"
           data-testid="chat-blob-trigger"
         >
-          {/* Phase 4 replaces this with <ChatBlob size="sm" /> */}
-          <span className="chat-blob-trigger-placeholder" />
+          <ChatBlob size="sm" />
         </button>
         <button
           type="button"
