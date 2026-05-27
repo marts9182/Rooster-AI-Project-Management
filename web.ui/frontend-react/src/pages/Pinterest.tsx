@@ -116,7 +116,7 @@ export default function Pinterest() {
         </p>
       )}
 
-      <PinterestSettings queue={queue} onChanged={reload} />
+      <PinterestSettings />
 
       <h2>Queue</h2>
       <PinterestQueueTable

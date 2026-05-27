@@ -2,137 +2,268 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PinterestSettings from '../components/PinterestSettings';
-import type { PinterestQueueRow } from '../api/pinterest';
+import * as pinterestApi from '../api/pinterest';
+import type {
+  PinterestUser,
+  PinterestBoard,
+  PinterestTokenStatus,
+} from '../api/pinterest';
 
-function jsonOk(body: unknown): Response {
+const userBody: PinterestUser = {
+  username: 'pocketroosterpress',
+  business_name: 'Pocket Rooster Press',
+};
+const boardsBody: PinterestBoard[] = [
+  { id: 'B1', name: 'Cottagecore Coloring' },
+  { id: 'B2', name: 'Sudoku Puzzles' },
+];
+
+function statusFresh(): PinterestTokenStatus {
   return {
-    ok: true,
-    status: 200,
-    json: async () => body,
-    text: async () => JSON.stringify(body),
-  } as unknown as Response;
+    connected: true,
+    expires_at: new Date(Date.now() + 30 * 86400_000).toISOString(),
+    last_refresh_at: null,
+  };
 }
 
-const pendingRow: PinterestQueueRow = {
-  id: 1,
-  kdp_book_id: 1,
-  pin_type: 'cover_hero',
-  image_path: '/tmp/output/pinterest/sample/cover_hero-0.png',
-  title: 'A pending pin',
-  description: 'desc',
-  link_url: 'https://www.amazon.com/dp/B01ABCDEFG',
-  status: 'pending',
-  scheduled_for: '2026-06-01T15:00:00Z',
-  attempts: 0,
-  last_error: null,
-  created_at: '2026-05-26T00:00:00Z',
+function statusExpiringSoon(): PinterestTokenStatus {
+  return {
+    connected: true,
+    expires_at: new Date(Date.now() + 3 * 86400_000).toISOString(),
+    last_refresh_at: null,
+  };
+}
+
+const statusDisconnected: PinterestTokenStatus = {
+  connected: false,
+  expires_at: null,
+  last_refresh_at: null,
 };
 
-const pausedRow: PinterestQueueRow = { ...pendingRow, id: 2, status: 'paused' };
-
-let fetchMock: ReturnType<typeof vi.fn>;
+let getTokenStatusSpy: ReturnType<typeof vi.spyOn>;
+let listBoardsSpy: ReturnType<typeof vi.spyOn>;
+let getWhoamiSpy: ReturnType<typeof vi.spyOn>;
+let refreshTokenSpy: ReturnType<typeof vi.spyOn>;
+let listQueueSpy: ReturnType<typeof vi.spyOn>;
+let pauseQueueSpy: ReturnType<typeof vi.spyOn>;
+let resumeQueueSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
-  fetchMock = vi.fn();
-  vi.stubGlobal('fetch', fetchMock);
+  localStorage.clear();
+  getTokenStatusSpy = vi
+    .spyOn(pinterestApi, 'getTokenStatus')
+    .mockResolvedValue(statusFresh());
+  listBoardsSpy = vi
+    .spyOn(pinterestApi, 'listBoards')
+    .mockResolvedValue(boardsBody);
+  getWhoamiSpy = vi
+    .spyOn(pinterestApi, 'getWhoami')
+    .mockResolvedValue(userBody);
+  refreshTokenSpy = vi
+    .spyOn(pinterestApi, 'refreshToken')
+    .mockResolvedValue(undefined);
+  listQueueSpy = vi
+    .spyOn(pinterestApi, 'listQueue')
+    .mockResolvedValue([]);
+  pauseQueueSpy = vi
+    .spyOn(pinterestApi, 'pauseQueue')
+    .mockResolvedValue({ paused: 6 });
+  resumeQueueSpy = vi
+    .spyOn(pinterestApi, 'resumeQueue')
+    .mockResolvedValue({ resumed: 6 });
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  localStorage.clear();
 });
 
 describe('<PinterestSettings />', () => {
-  it('shows the pending and paused counts derived from the queue', () => {
-    render(
-      <PinterestSettings
-        queue={[pendingRow, pendingRow, pausedRow]}
-        onChanged={vi.fn()}
-      />,
+  it('renders the "Connected" chip when token-status returns connected=true with a selected board and >7d remaining', async () => {
+    localStorage.setItem('pinterest_default_board_id', 'B1');
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      expect(screen.getByText(/✓ Connected/i)).toBeInTheDocument(),
     );
-    const heading = screen.getByText(/pending/i);
-    // "2 pending · 1 paused" — assert both numbers appear.
-    expect(heading.textContent).toMatch(/2.*pending/);
-    expect(heading.textContent).toMatch(/1.*paused/);
+    expect(screen.getByText(/✓ Connected/i).getAttribute('data-tone')).toBe(
+      'ok',
+    );
   });
 
-  it('clicking "Pause queue" POSTs /api/pinterest/pause and calls onChanged', async () => {
-    fetchMock.mockResolvedValueOnce(jsonOk({ paused: 3 }));
-    const onChanged = vi.fn();
-    render(
-      <PinterestSettings queue={[pendingRow]} onChanged={onChanged} />,
+  it('renders an amber "Expires in Xd" chip when expires_at <= 7 days', async () => {
+    localStorage.setItem('pinterest_default_board_id', 'B1');
+    getTokenStatusSpy.mockResolvedValue(statusExpiringSoon());
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      expect(screen.getByText(/Expires in/i)).toBeInTheDocument(),
     );
+    expect(screen.getByText(/Expires in/i).getAttribute('data-tone')).toBe(
+      'warn',
+    );
+  });
+
+  it('renders a red "Disconnected" chip when token-status.connected=false', async () => {
+    getTokenStatusSpy.mockResolvedValue(statusDisconnected);
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      expect(screen.getByText(/✗ Disconnected/i)).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/✗ Disconnected/i).getAttribute('data-tone')).toBe(
+      'fail',
+    );
+    // listBoards is skipped when not connected.
+    expect(listBoardsSpy).not.toHaveBeenCalled();
+  });
+
+  it('renders an amber "Board not selected" chip when connected but no board chosen', async () => {
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      expect(screen.getByText(/Board not selected/i)).toBeInTheDocument(),
+    );
+    expect(
+      screen.getByText(/Board not selected/i).getAttribute('data-tone'),
+    ).toBe('warn');
+  });
+
+  it('"Test connection" button calls getWhoami and displays the username', async () => {
+    localStorage.setItem('pinterest_default_board_id', 'B1');
+    render(<PinterestSettings />);
+    await waitFor(() => screen.getByRole('button', { name: /Test connection/i }));
+    await userEvent.click(
+      screen.getByRole('button', { name: /Test connection/i }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Connected as @pocketroosterpress/i),
+      ).toBeInTheDocument(),
+    );
+    expect(getWhoamiSpy).toHaveBeenCalled();
+  });
+
+  it('"Refresh token now" button calls refreshToken and re-fetches token-status', async () => {
+    localStorage.setItem('pinterest_default_board_id', 'B1');
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      screen.getByRole('button', { name: /Refresh token now/i }),
+    );
+    // Clear the initial mount fetch call counts.
+    getTokenStatusSpy.mockClear();
+    refreshTokenSpy.mockClear();
+
+    await userEvent.click(
+      screen.getByRole('button', { name: /Refresh token now/i }),
+    );
+    await waitFor(() => expect(refreshTokenSpy).toHaveBeenCalled());
+    expect(getTokenStatusSpy).toHaveBeenCalled();
+  });
+
+  it('board dropdown populates from listBoards and selecting writes localStorage', async () => {
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      screen.getByRole('combobox', { name: /Default board/i }),
+    );
+    const select = screen.getByRole('combobox', { name: /Default board/i });
+    const opts = screen.getAllByRole('option').map((o) => o.textContent);
+    expect(opts).toContain('Cottagecore Coloring');
+    expect(opts).toContain('Sudoku Puzzles');
+
+    await userEvent.selectOptions(select, 'B2');
+    expect(localStorage.getItem('pinterest_default_board_id')).toBe('B2');
+  });
+
+  it('shows the board-warning banner when connected but no board selected, then hides it after selection', async () => {
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      expect(
+        screen.getByText(/Pick a default board to enable posting/i),
+      ).toBeInTheDocument(),
+    );
+    const select = await screen.findByRole('combobox', {
+      name: /Default board/i,
+    });
+    await userEvent.selectOptions(select, 'B1');
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/Pick a default board to enable posting/i),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it('displays an error message when getTokenStatus throws on mount', async () => {
+    getTokenStatusSpy.mockRejectedValue(new Error('network down'));
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      expect(screen.getByText(/network down/i)).toBeInTheDocument(),
+    );
+  });
+
+  it('"Pause queue" button calls pauseQueue and flips to "Resume queue" on success', async () => {
+    localStorage.setItem('pinterest_default_board_id', 'B1');
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      screen.getByRole('button', { name: /Pause queue/i }),
+    );
+    // Mount fetches listQueue once with no paused rows; arrange the post-toggle
+    // refresh to return a paused row so the button label flips.
+    listQueueSpy.mockResolvedValueOnce([
+      {
+        id: 99,
+        kdp_book_id: 1,
+        pin_type: 'cover_hero',
+        image_path: 'x.png',
+        title: 't',
+        description: 'd',
+        link_url: 'https://x',
+        status: 'paused',
+        scheduled_for: new Date().toISOString(),
+        attempts: 0,
+        last_error: null,
+        created_at: new Date().toISOString(),
+      },
+    ]);
     await userEvent.click(
       screen.getByRole('button', { name: /Pause queue/i }),
     );
-    await waitFor(() => expect(onChanged).toHaveBeenCalled());
-    expect(fetchMock).toHaveBeenCalledWith('/api/pinterest/pause', {
-      method: 'POST',
-    });
-    expect(screen.getByText(/Paused 3 pin\(s\)/i)).toBeInTheDocument();
+    await waitFor(() => expect(pauseQueueSpy).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Resume queue/i }),
+      ).toBeInTheDocument(),
+    );
   });
 
-  it('clicking "Resume queue" POSTs /api/pinterest/resume and calls onChanged', async () => {
-    fetchMock.mockResolvedValueOnce(jsonOk({ resumed: 2 }));
-    const onChanged = vi.fn();
-    render(
-      <PinterestSettings queue={[pausedRow]} onChanged={onChanged} />,
+  it('"Resume queue" button calls resumeQueue when starting in paused state', async () => {
+    localStorage.setItem('pinterest_default_board_id', 'B1');
+    listQueueSpy.mockResolvedValue([
+      {
+        id: 99,
+        kdp_book_id: 1,
+        pin_type: 'cover_hero',
+        image_path: 'x.png',
+        title: 't',
+        description: 'd',
+        link_url: 'https://x',
+        status: 'paused',
+        scheduled_for: new Date().toISOString(),
+        attempts: 0,
+        last_error: null,
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    render(<PinterestSettings />);
+    await waitFor(() =>
+      screen.getByRole('button', { name: /Resume queue/i }),
     );
+    // Arrange the post-toggle refresh to return no paused rows.
+    listQueueSpy.mockResolvedValueOnce([]);
     await userEvent.click(
       screen.getByRole('button', { name: /Resume queue/i }),
     );
-    await waitFor(() => expect(onChanged).toHaveBeenCalled());
-    expect(fetchMock).toHaveBeenCalledWith('/api/pinterest/resume', {
-      method: 'POST',
-    });
-    expect(screen.getByText(/Resumed 2 pin\(s\)/i)).toBeInTheDocument();
-  });
-
-  it('shows "Sign in to Pinterest" button that POSTs /api/pinterest/login', async () => {
-    fetchMock.mockResolvedValueOnce(jsonOk({ ok: true, launched: true }));
-    render(
-      <PinterestSettings queue={[pendingRow]} onChanged={vi.fn()} />,
-    );
-    await userEvent.click(
-      screen.getByRole('button', { name: /Sign in to Pinterest/i }),
-    );
+    await waitFor(() => expect(resumeQueueSpy).toHaveBeenCalled());
     await waitFor(() =>
-      expect(fetchMock).toHaveBeenCalledWith('/api/pinterest/login', {
-        method: 'POST',
-      }),
-    );
-    expect(
-      screen.getByText(/Browser window opening/i),
-    ).toBeInTheDocument();
-  });
-
-  it('shows the cadence summary in muted copy', () => {
-    render(<PinterestSettings queue={[]} onChanged={vi.fn()} />);
-    expect(
-      screen.getByText(/3.{1,3}5 pins\/day between 09:00 and 21:00/i),
-    ).toBeInTheDocument();
-  });
-
-  it('disables Pause when the queue has nothing pending', () => {
-    render(<PinterestSettings queue={[]} onChanged={vi.fn()} />);
-    const pauseBtn = screen.getByRole('button', { name: /Pause queue/i });
-    expect(pauseBtn).toBeDisabled();
-  });
-
-  it('renders an error message when pause fails', async () => {
-    fetchMock.mockResolvedValueOnce({
-      ok: false,
-      status: 500,
-      json: async () => ({ error: 'boom' }),
-    });
-    render(
-      <PinterestSettings queue={[pendingRow]} onChanged={vi.fn()} />,
-    );
-    await userEvent.click(
-      screen.getByRole('button', { name: /Pause queue/i }),
-    );
-    await waitFor(() =>
-      expect(screen.getByText(/Pause failed/i)).toBeInTheDocument(),
+      expect(
+        screen.getByRole('button', { name: /Pause queue/i }),
+      ).toBeInTheDocument(),
     );
   });
 });

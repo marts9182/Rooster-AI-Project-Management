@@ -6,10 +6,16 @@ import {
   resumeQueue,
   cancelQueueRow,
   updateQueueRow,
-  startLogin,
+  getWhoami,
+  listBoards,
+  getTokenStatus,
+  refreshToken,
   ApiError,
   type PinterestQueueRow,
   type PinterestHistoryRow,
+  type PinterestUser,
+  type PinterestBoard,
+  type PinterestTokenStatus,
 } from '../api/pinterest';
 
 function jsonResponse(status: number, body: unknown): Response {
@@ -230,30 +236,110 @@ describe('updateQueueRow', () => {
   });
 });
 
-describe('startLogin', () => {
-  it('POSTs /api/pinterest/login and returns the launch envelope', async () => {
+describe('getWhoami', () => {
+  it('GETs /api/pinterest/whoami and returns the user envelope', async () => {
+    const body: PinterestUser = {
+      username: 'pocketroosterpress',
+      business_name: 'Pocket Rooster Press',
+    };
     const fetchSpy = vi
       .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(jsonResponse(200, { ok: true, launched: true }));
-    const out = await startLogin();
-    expect(fetchSpy).toHaveBeenCalledWith('/api/pinterest/login', {
-      method: 'POST',
-    });
-    expect(out).toEqual({ ok: true, launched: true });
+      .mockResolvedValue(jsonResponse(200, body));
+    const out = await getWhoami();
+    expect(fetchSpy).toHaveBeenCalledWith('/api/pinterest/whoami');
+    expect(out).toEqual(body);
   });
 
-  it('throws ApiError on 404', async () => {
+  it('throws ApiError on 401', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse(404, { error: 'route_missing' }),
+      jsonResponse(401, { error: 'unauthorized' }),
     );
-    await expect(startLogin()).rejects.toMatchObject({ status: 404 });
+    await expect(getWhoami()).rejects.toBeInstanceOf(ApiError);
+    await expect(getWhoami()).rejects.toMatchObject({ status: 401 });
   });
 
   it('throws ApiError on 500', async () => {
     vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      jsonResponse(500, { error: 'playwright_failed' }),
+      jsonResponse(500, { error: 'upstream' }),
     );
-    await expect(startLogin()).rejects.toBeInstanceOf(ApiError);
-    await expect(startLogin()).rejects.toMatchObject({ status: 500 });
+    await expect(getWhoami()).rejects.toMatchObject({ status: 500 });
+  });
+});
+
+describe('listBoards', () => {
+  it('GETs /api/pinterest/boards and unwraps {boards}', async () => {
+    const boards: PinterestBoard[] = [
+      { id: 'B1', name: 'Cottagecore Coloring' },
+      { id: 'B2', name: 'Sudoku Puzzles' },
+    ];
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(jsonResponse(200, { boards }));
+    const out = await listBoards();
+    expect(fetchSpy).toHaveBeenCalledWith('/api/pinterest/boards');
+    expect(out).toEqual(boards);
+  });
+
+  it('throws ApiError on 500', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      jsonResponse(500, { error: 'upstream' }),
+    );
+    await expect(listBoards()).rejects.toMatchObject({ status: 500 });
+  });
+});
+
+describe('getTokenStatus', () => {
+  it('GETs /api/pinterest/token-status and returns the envelope', async () => {
+    const body: PinterestTokenStatus = {
+      connected: true,
+      expires_at: '2026-06-26T18:32:00.000Z',
+      last_refresh_at: '2026-05-27T10:00:00.000Z',
+    };
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(jsonResponse(200, body));
+    const out = await getTokenStatus();
+    expect(fetchSpy).toHaveBeenCalledWith('/api/pinterest/token-status');
+    expect(out).toEqual(body);
+  });
+
+  it('returns {connected: false} envelope for an unbootstrapped backend', async () => {
+    const body: PinterestTokenStatus = {
+      connected: false,
+      expires_at: null,
+      last_refresh_at: null,
+    };
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(jsonResponse(200, body));
+    const out = await getTokenStatus();
+    expect(out.connected).toBe(false);
+    expect(out.expires_at).toBeNull();
+  });
+
+  it('throws ApiError on 500', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      jsonResponse(500, { error: 'boom' }),
+    );
+    await expect(getTokenStatus()).rejects.toMatchObject({ status: 500 });
+  });
+});
+
+describe('refreshToken', () => {
+  it('POSTs /api/pinterest/refresh with no body and resolves to void', async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(jsonResponse(200, { connected: true }));
+    const out = await refreshToken();
+    expect(fetchSpy).toHaveBeenCalledWith('/api/pinterest/refresh', {
+      method: 'POST',
+    });
+    expect(out).toBeUndefined();
+  });
+
+  it('throws ApiError on 500', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      jsonResponse(500, { error: 'refresh failed' }),
+    );
+    await expect(refreshToken()).rejects.toBeInstanceOf(ApiError);
+    await expect(refreshToken()).rejects.toMatchObject({ status: 500 });
   });
 });

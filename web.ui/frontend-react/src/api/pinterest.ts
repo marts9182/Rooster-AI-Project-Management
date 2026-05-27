@@ -7,12 +7,15 @@
  *   resumeQueue()                → POST   /api/pinterest/resume
  *   cancelQueueRow(id)           → POST   /api/pinterest/queue/:id/cancel
  *   updateQueueRow(id, patch)    → PUT    /api/pinterest/queue/:id
- *   startLogin()                 → POST   /api/pinterest/login
+ *   getWhoami()                  → GET    /api/pinterest/whoami
+ *   listBoards()                 → GET    /api/pinterest/boards
+ *   getTokenStatus()             → GET    /api/pinterest/token-status
+ *   refreshToken()               → POST   /api/pinterest/refresh
  *
  * All functions throw an `ApiError` (re-exported from ./kdp) with `.status`
  * and `.body` on non-2xx. The backend wraps list responses in `{queue: [...]}`
- * / `{history: [...]}` envelopes — those are unwrapped here so callers see
- * plain arrays.
+ * / `{history: [...]}` / `{boards: [...]}` envelopes — those are unwrapped
+ * here so callers see plain arrays.
  *
  * Tests stub `globalThis.fetch`.
  */
@@ -61,6 +64,27 @@ export interface UpdateQueuePatch {
   title?: string;
   description?: string;
   scheduled_for?: string;
+}
+
+export interface PinterestUser {
+  username: string;
+  business_name?: string;
+  id?: string;
+}
+
+export interface PinterestBoard {
+  id: string;
+  name: string;
+  description?: string;
+  pin_count?: number;
+  privacy?: string;
+}
+
+export interface PinterestTokenStatus {
+  connected: boolean;
+  /** ISO timestamp, or null when the token has never been bootstrapped. */
+  expires_at: string | null;
+  last_refresh_at: string | null;
 }
 
 async function throwForStatus(r: Response, label: string): Promise<never> {
@@ -127,10 +151,28 @@ export async function updateQueueRow(
   return (await r.json()) as { ok: true };
 }
 
-export async function startLogin(): Promise<{ ok: true; launched: boolean }> {
-  const r = await fetch('/api/pinterest/login', { method: 'POST' });
-  if (!r.ok) await throwForStatus(r, 'startLogin');
-  return (await r.json()) as { ok: true; launched: boolean };
+export async function getWhoami(): Promise<PinterestUser> {
+  const r = await fetch('/api/pinterest/whoami');
+  if (!r.ok) await throwForStatus(r, 'getWhoami');
+  return (await r.json()) as PinterestUser;
+}
+
+export async function listBoards(): Promise<PinterestBoard[]> {
+  const r = await fetch('/api/pinterest/boards');
+  if (!r.ok) await throwForStatus(r, 'listBoards');
+  const data = (await r.json()) as { boards: PinterestBoard[] };
+  return data.boards;
+}
+
+export async function getTokenStatus(): Promise<PinterestTokenStatus> {
+  const r = await fetch('/api/pinterest/token-status');
+  if (!r.ok) await throwForStatus(r, 'getTokenStatus');
+  return (await r.json()) as PinterestTokenStatus;
+}
+
+export async function refreshToken(): Promise<void> {
+  const r = await fetch('/api/pinterest/refresh', { method: 'POST' });
+  if (!r.ok) await throwForStatus(r, 'refreshToken');
 }
 
 export { ApiError };

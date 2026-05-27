@@ -103,6 +103,26 @@ beforeEach(() => {
     if (u === '/api/pinterest/login') {
       return Promise.resolve(jsonOk({ ok: true, launched: true }));
     }
+    if (u === '/api/pinterest/token-status') {
+      return Promise.resolve(
+        jsonOk({
+          connected: true,
+          expires_at: new Date(Date.now() + 30 * 86400_000).toISOString(),
+          last_refresh_at: null,
+        }),
+      );
+    }
+    if (u === '/api/pinterest/boards') {
+      return Promise.resolve(jsonOk({ boards: [] }));
+    }
+    if (u === '/api/pinterest/whoami') {
+      return Promise.resolve(
+        jsonOk({ username: 'prp', business_name: 'Pocket Rooster Press' }),
+      );
+    }
+    if (u === '/api/pinterest/refresh') {
+      return Promise.resolve(jsonOk({}));
+    }
     return Promise.reject(new Error(`Unmocked fetch: ${u}`));
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -127,7 +147,7 @@ describe('<Pinterest />', () => {
       screen.getByRole('heading', { name: /Pinterest/i, level: 1 }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /Settings/i, level: 2 }),
+      screen.getByRole('heading', { name: /Pinterest Connection/i, level: 2 }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /^Queue$/i, level: 2 }),

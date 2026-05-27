@@ -1,143 +1,241 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  getTokenStatus,
+  getWhoami,
+  listBoards,
+  listQueue,
   pauseQueue,
+  refreshToken,
   resumeQueue,
-  startLogin,
-  type PinterestQueueRow,
+  type PinterestUser,
+  type PinterestBoard,
+  type PinterestTokenStatus,
 } from '../api/pinterest';
 
-interface Props {
-  /**
-   * The current queue. Any row in `paused` state implies the queue itself is
-   * paused (the backend has no separate "queue paused" flag — pausing flips
-   * every pending row to `paused`).
-   */
-  queue: PinterestQueueRow[];
-  /** Called after a successful pause/resume so the parent refetches the queue. */
-  onChanged: () => void | Promise<void>;
-}
-
 /**
- * Pause/resume queue toggle, a sign-in-to-Pinterest button, and a read-only
- * cadence summary. After kicking off the login flow the component polls the
- * parent's `onChanged` every 5s for the next 60s so the queue UI catches up
- * once Playwright finishes — the SSE `pinterest:login-requested` event also
- * triggers a refetch via the page, but the timer provides belt-and-braces
- * coverage when the browser window stays open longer than expected.
+ * Pinterest connection status + board picker.
+ *
+ * On mount we fetch /token-status. When connected, we fetch /boards. The
+ * chip is green when token-status returns connected=true, a default board
+ * is selected, AND expires_at is more than 7 days away. Amber inside
+ * 7 days or when no board is selected. Red when not connected.
+ *
+ * "Test connection" calls /whoami and shows the username on success.
+ * "Refresh token now" POSTs /refresh (forces ensureFreshToken on the
+ * backend) and re-fetches token-status.
+ *
+ * The default board choice persists to localStorage under the key
+ * `pinterest_default_board_id` until a server-side `profile.pinterest_default_board_id`
+ * field lands in a follow-up.
  */
-export default function PinterestSettings({ queue, onChanged }: Props) {
-  const [status, setStatus] = useState<string>('');
-  const [busy, setBusy] = useState(false);
-  const pollerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pollerStopRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+export default function PinterestSettings() {
+  const [tokenStatus, setTokenStatus] = useState<PinterestTokenStatus | null>(
+    null,
+  );
+  const [whoami, setWhoami] = useState<PinterestUser | null>(null);
+  const [boards, setBoards] = useState<PinterestBoard[] | null>(null);
+  const [selectedBoardId, setSelectedBoardId] = useState<string>(() =>
+    localStorage.getItem('pinterest_default_board_id') ?? '',
+  );
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [queueIsPaused, setQueueIsPaused] = useState(false);
+  const [isPauseToggling, setIsPauseToggling] = useState(false);
+
+  // Derive queue-pause state from the row statuses (backend POST /pause sets
+  // all 'pending' rows to 'paused'; POST /resume reverses it).
+  async function refreshPauseState(): Promise<void> {
+    try {
+      const rows = await listQueue();
+      setQueueIsPaused(rows.some((r) => r.status === 'paused'));
+    } catch {
+      // Best-effort — don't surface as a top-level error.
+    }
+  }
 
   useEffect(() => {
-    return () => stopPolling();
+    let cancelled = false;
+    (async () => {
+      try {
+        const ts = await getTokenStatus();
+        if (cancelled) return;
+        setTokenStatus(ts);
+        if (ts.connected) {
+          const b = await listBoards();
+          if (cancelled) return;
+          setBoards(b);
+        }
+        await refreshPauseState();
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : String(e));
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const pendingCount = queue.filter((r) => r.status === 'pending').length;
-  const pausedCount = queue.filter((r) => r.status === 'paused').length;
-  const isPaused = pausedCount > 0;
-
-  function stopPolling() {
-    if (pollerRef.current) {
-      clearInterval(pollerRef.current);
-      pollerRef.current = null;
-    }
-    if (pollerStopRef.current) {
-      clearTimeout(pollerStopRef.current);
-      pollerStopRef.current = null;
-    }
-  }
-
-  function startPolling() {
-    stopPolling();
-    pollerRef.current = setInterval(() => {
-      void onChanged();
-    }, 5000);
-    // Stop after 60s — by then the user has either finished login or given up.
-    pollerStopRef.current = setTimeout(() => {
-      stopPolling();
-    }, 60_000);
-  }
-
-  async function handlePause() {
-    setBusy(true);
+  const handleTestConnection = async () => {
+    setIsTesting(true);
+    setTestResult(null);
     try {
-      const r = await pauseQueue();
-      setStatus(`Paused ${r.paused} pin(s).`);
-      await onChanged();
-    } catch (err) {
-      setStatus(`Pause failed: ${String((err as Error).message ?? err)}`);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleResume() {
-    setBusy(true);
-    try {
-      const r = await resumeQueue();
-      setStatus(`Resumed ${r.resumed} pin(s).`);
-      await onChanged();
-    } catch (err) {
-      setStatus(`Resume failed: ${String((err as Error).message ?? err)}`);
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function handleLogin() {
-    setStatus(
-      'Browser window opening… complete the login in the new Chromium window that just appeared.',
-    );
-    try {
-      await startLogin();
-      startPolling();
-    } catch (err) {
-      setStatus(
-        `Login launch failed: ${String((err as Error).message ?? err)}`,
+      const u = await getWhoami();
+      setWhoami(u);
+      setTestResult(`Connected as @${u.username}`);
+    } catch (e) {
+      setTestResult(
+        `Failed: ${e instanceof Error ? e.message : String(e)}`,
       );
+    } finally {
+      setIsTesting(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setError(null);
+    try {
+      await refreshToken();
+      const ts = await getTokenStatus();
+      setTokenStatus(ts);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleBoardChange = (id: string) => {
+    setSelectedBoardId(id);
+    localStorage.setItem('pinterest_default_board_id', id);
+  };
+
+  const handlePauseToggle = async () => {
+    setIsPauseToggling(true);
+    setError(null);
+    try {
+      if (queueIsPaused) {
+        await resumeQueue();
+      } else {
+        await pauseQueue();
+      }
+      await refreshPauseState();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setIsPauseToggling(false);
+    }
+  };
+
+  // Chip thresholds: >7d = green, <=7d = amber, disconnected = red,
+  // connected-but-no-board = amber warning.
+  function chipState(): { label: string; tone: 'ok' | 'warn' | 'fail' } {
+    if (!tokenStatus?.connected) {
+      return { label: '✗ Disconnected', tone: 'fail' };
+    }
+    if (!selectedBoardId) {
+      return { label: '⚠ Board not selected', tone: 'warn' };
+    }
+    if (tokenStatus.expires_at) {
+      const ms = new Date(tokenStatus.expires_at).getTime() - Date.now();
+      const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+      if (days <= 0) return { label: '✗ Token expired', tone: 'fail' };
+      if (days <= 7) return { label: `⚠ Expires in ${days}d`, tone: 'warn' };
+    }
+    return { label: '✓ Connected', tone: 'ok' };
   }
+
+  function daysUntil(iso: string | null): string {
+    if (!iso) return 'unknown';
+    const ms = new Date(iso).getTime() - Date.now();
+    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+    return days > 0 ? `${days} days` : 'expired';
+  }
+
+  const chip = chipState();
+  const showBoardWarning = !!tokenStatus?.connected && !selectedBoardId;
 
   return (
-    <section className="pin-settings" aria-label="Pinterest settings">
-      <h2>Settings</h2>
-      <div className="pin-settings-row">
-        <div>
-          <strong>{pendingCount}</strong> pending ·{' '}
-          <strong>{pausedCount}</strong> paused
-        </div>
-        <div className="pin-settings-actions">
-          {isPaused ? (
-            <button type="button" onClick={handleResume} disabled={busy}>
-              Resume queue
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handlePause}
-              disabled={busy || pendingCount === 0}
-            >
-              Pause queue
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={handleLogin}
-            title="Open a visible Chromium window to log in"
-          >
-            Sign in to Pinterest
-          </button>
-        </div>
+    <section className="pinterest-settings" aria-label="Pinterest settings">
+      <h2>Pinterest Connection</h2>
+      <div
+        className={`status-chip status-${chip.tone}`}
+        data-tone={chip.tone}
+      >
+        {chip.label}
       </div>
-      <p className="muted">
-        Posting cadence: 3–5 pins/day between 09:00 and 21:00 in your
-        profile time zone. Edit the time zone on /profile to shift the
-        window.
-      </p>
-      {status && <p className="pin-settings-status">{status}</p>}
+      {whoami && <p>Signed in as @{whoami.username}</p>}
+      {tokenStatus?.expires_at && (
+        <p>
+          Token expires: {tokenStatus.expires_at.slice(0, 10)} (
+          {daysUntil(tokenStatus.expires_at)})
+        </p>
+      )}
+      {tokenStatus?.last_refresh_at && (
+        <p>
+          Last refresh:{' '}
+          {tokenStatus.last_refresh_at.slice(0, 16).replace('T', ' ')}
+        </p>
+      )}
+      <div className="settings-actions">
+        <button
+          type="button"
+          onClick={handleTestConnection}
+          disabled={isTesting}
+        >
+          {isTesting ? 'Testing…' : 'Test connection'}
+        </button>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={isRefreshing}
+        >
+          {isRefreshing ? 'Refreshing…' : 'Refresh token now'}
+        </button>
+        <button
+          type="button"
+          onClick={handlePauseToggle}
+          disabled={isPauseToggling}
+          aria-pressed={queueIsPaused}
+        >
+          {isPauseToggling
+            ? 'Working…'
+            : queueIsPaused
+              ? '▶ Resume queue'
+              : '⏸ Pause queue'}
+        </button>
+      </div>
+      {testResult && <p className="test-result">{testResult}</p>}
+      {error && <p className="error">{error}</p>}
+
+      {showBoardWarning && (
+        <div className="board-warning" role="alert">
+          ⚠ Pick a default board to enable posting.
+        </div>
+      )}
+
+      {boards && (
+        <div className="board-picker">
+          <label htmlFor="pinterest-default-board">Default board:</label>
+          <select
+            id="pinterest-default-board"
+            aria-label="Default board"
+            value={selectedBoardId}
+            onChange={(e) => handleBoardChange(e.target.value)}
+          >
+            <option value="">(none)</option>
+            {boards.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </section>
   );
 }

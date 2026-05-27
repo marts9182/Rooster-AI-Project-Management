@@ -38,7 +38,7 @@ const ARTICLES = [
   ['pinterest_url', 'pinterest.com'],
   ['bisac_code', 'BISAC'],
   ['release_date', 'release date'],
-  ['pinterest_first_login', 'Sign in to Pinterest'],
+  ['pinterest_api_setup', 'Pinterest API Setup'],
 ];
 
 describe('Plan B Task 9 — help articles served by /api/help/:field', () => {
