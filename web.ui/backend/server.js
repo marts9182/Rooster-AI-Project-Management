@@ -40,6 +40,7 @@ import { EtsyClient } from './etsy/client.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
 import { createPlansRouter } from './plans/routes.js';
+import { mountChatRoutes } from './chat/routes.js';
 import {
   installPinterestModule,
   startPosterWorker,
@@ -358,6 +359,9 @@ const SUPERPOWERS_ROOT = process.env.ROOSTER_DOCS_ROOT
   ? path.resolve(process.env.ROOSTER_DOCS_ROOT)
   : path.resolve(__dirname, '..', '..', 'docs', 'superpowers');
 app.use('/api/plans', createPlansRouter({ superpowersRoot: SUPERPOWERS_ROOT }));
+
+// ── /api/chat/* — Claude Code chat (conversations + SSE-streamed turns) ──
+mountChatRoutes(app, { db: openDb() });
 
 // ── /api/profile — single-row profile read/write ────────────────────────
 app.use('/api/profile', profileRoutes);

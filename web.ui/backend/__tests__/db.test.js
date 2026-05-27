@@ -59,3 +59,37 @@ describe('db.js', () => {
     expect(count).toBeGreaterThanOrEqual(7);
   });
 });
+
+describe('chat schema (0003_chat.sql)', () => {
+  it('creates conversations + messages tables with FK cascade', () => {
+    const db = openDb();
+    const names = db
+      .prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+      .all()
+      .map((r) => r.name);
+    expect(names).toEqual(expect.arrayContaining(['conversations', 'messages']));
+    const conv = db.prepare(
+      "INSERT INTO conversations(title) VALUES ('t') RETURNING id",
+    ).get();
+    db.prepare(
+      "INSERT INTO messages(conversation_id, role, content) VALUES (?, 'user', 'hi')",
+    ).run(conv.id);
+    db.prepare('DELETE FROM conversations WHERE id=?').run(conv.id);
+    const remaining = db
+      .prepare('SELECT COUNT(*) AS n FROM messages WHERE conversation_id=?')
+      .get(conv.id).n;
+    expect(remaining).toBe(0);
+  });
+
+  it('rejects messages.role outside (user, assistant, tool)', () => {
+    const db = openDb();
+    const conv = db.prepare(
+      "INSERT INTO conversations(title) VALUES ('t') RETURNING id",
+    ).get();
+    expect(() =>
+      db.prepare(
+        "INSERT INTO messages(conversation_id, role, content) VALUES (?, 'system', 'x')",
+      ).run(conv.id),
+    ).toThrow();
+  });
+});
