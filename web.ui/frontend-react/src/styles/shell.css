@@ -39,7 +39,24 @@ body { margin: 0; font-family: system-ui, -apple-system, sans-serif; color: var(
 
 .page { grid-column: 2; padding: 1.5rem; overflow: auto; }
 
-.help-drawer { position: fixed; top: 0; right: 0; width: 380px; height: 100vh; background: #fff; border-left: 1px solid var(--border); padding: 1rem 1.25rem; box-shadow: -4px 0 12px rgba(0,0,0,0.06); z-index: 50; overflow-y: auto; }
-.help-close { float: right; border: none; background: transparent; font-size: 1.5rem; cursor: pointer; }
+.help-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 49; }
+.help-drawer { position: fixed; top: 0; right: 0; width: 420px; max-width: 90vw; height: 100vh; background: #fff; border-left: 1px solid var(--border); padding: 1rem 1.25rem; box-shadow: -4px 0 16px rgba(0,0,0,0.15); z-index: 50; overflow-y: auto; animation: help-slide-in 180ms ease-out; }
+@keyframes help-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.help-close { float: right; border: none; background: transparent; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0 0.25rem; }
+.help-title { text-transform: capitalize; margin-top: 0; }
 .help-error { color: var(--danger); }
-.help-body { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+.help-loading { color: var(--muted); font-style: italic; }
+.help-body { font-size: 0.95rem; line-height: 1.5; }
+.help-body h1, .help-body h2, .help-body h3 { margin-top: 1.25rem; }
+.help-body code { background: #f3f4f6; padding: 0 0.25rem; border-radius: 3px; font-size: 0.85em; }
+.help-body pre { background: #f3f4f6; padding: 0.75rem; border-radius: 4px; overflow-x: auto; }
+.help-body a { color: var(--accent); }
+
+.help-icon { background: transparent; border: 1px solid var(--muted); border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; line-height: 1; padding: 0; color: var(--muted); margin-left: 0.35rem; vertical-align: middle; }
+.help-icon:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.help-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+.help-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: left; cursor: pointer; font-size: 0.95rem; font-family: inherit; color: var(--fg); transition: border-color 120ms, transform 120ms; }
+.help-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.help-card-emoji { font-size: 1.6rem; display: block; margin-bottom: 0.4rem; }
+.help-card-title { font-weight: 600; }

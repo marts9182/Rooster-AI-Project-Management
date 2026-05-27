@@ -18,10 +18,12 @@
     "better-sqlite3": "^11.10.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "gray-matter": "^4.0.3",
     "marked": "^18.0.4",
     "node-cron": "^3.0.3",
     "node-notifier": "^10.0.1",
     "nodemailer": "^6.10.1",
+    "pdf2pic": "^3.2.0",
     "pino": "^9.14.0",
     "pino-pretty": "^11.3.0",
     "systray2": "^2.1.4"

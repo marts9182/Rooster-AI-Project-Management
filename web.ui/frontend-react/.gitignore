@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/data/dashboard-e2e.db*
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

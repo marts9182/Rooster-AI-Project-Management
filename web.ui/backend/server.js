@@ -26,6 +26,10 @@ import { getAllStatuses, trayColor } from './workerStatus.js';
 import { startBackupCron } from './backupCron.js';
 import { startTray } from './tray.js';
 import { logger } from './logger.js';
+import kdpRoutes from './kdp/routes.js';
+import { startScanner as startKdpScanner } from './kdp/scanner.js';
+import profileRoutes from './profile/routes.js';
+import filesRoute from './files_route.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -47,6 +51,13 @@ openDb();
 // a real cron during vitest runs.
 if (PORT !== 0) {
   startBackupCron();
+}
+
+// Start the KDP filesystem scanner. Gated on PORT !== 0 (test harness uses
+// PORT=0) and on ROOSTER_SKIP_KDP_SCANNER so developers can disable it
+// explicitly during local dev or integration tests.
+if (PORT !== 0 && process.env.ROOSTER_SKIP_KDP_SCANNER !== '1') {
+  startKdpScanner();
 }
 
 // ── Image generation (Nano Banana Pro) — retained from previous app ────────
@@ -181,6 +192,77 @@ app.get('/api/help/:field', (req, res) => {
     res.status(500).json({ error: 'failed_to_read_help' });
   }
 });
+
+// ── /api/kdp/* — KDP book list, detail, mark-in-review, mark-published ──
+app.use('/api/kdp', kdpRoutes);
+
+// ── /api/profile — single-row profile read/write ────────────────────────
+app.use('/api/profile', profileRoutes);
+
+// ── /files/* — allow-listed static assets (covers, preview PNGs) ────────
+app.use('/files', filesRoute);
+
+// ── /api/__test__/* — E2E-only seed/reset endpoints ─────────────────────
+// Gated on ROOSTER_E2E=1 so production never exposes mutation shortcuts.
+// Used by Playwright specs in web.ui/frontend-react/tests/e2e/.
+if (process.env.ROOSTER_E2E === '1') {
+  app.post('/api/__test__/reset', (_req, res) => {
+    const db = openDb();
+    db.exec(
+      `DELETE FROM pinterest_history;
+       DELETE FROM pinterest_queue;
+       DELETE FROM reminders;
+       DELETE FROM kdp_books;
+       DELETE FROM events;
+       UPDATE profile
+          SET display_name=NULL, pen_names_json=NULL, kdp_author_url=NULL,
+              etsy_shop_url=NULL, pinterest_url=NULL, gmail_address=NULL,
+              brand_palette_json=NULL, time_zone='America/Los_Angeles'
+        WHERE id=1;`,
+    );
+    res.json({ ok: true });
+  });
+
+  app.post('/api/__test__/seed-kdp-book', (req, res) => {
+    const db = openDb();
+    const body = req.body ?? {};
+    const slug = String(body.slug || 'e2e-book');
+    const title = String(body.title || 'E2E Book');
+    const status = String(body.status || 'built');
+    const outputDir = String(body.output_dir || `./tmp/${slug}`);
+    const subtitle = body.subtitle ?? null;
+    const trim = body.trim_size ?? '6x9';
+    const pages = body.page_count ?? 120;
+    const price = body.price_usd ?? 9.99;
+    const blurb = body.blurb ?? 'A test book for E2E.';
+    const coverPath = body.cover_path ?? null;
+    const asin = body.asin ?? null;
+    const releaseDate = body.release_date ?? null;
+    const listingUrl = body.listing_url ?? null;
+    db.prepare(
+      `INSERT OR REPLACE INTO kdp_books
+         (slug, title, subtitle, asin, status, release_date, listing_url,
+          page_count, trim_size, price_usd, blurb, cover_path, output_dir)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).run(
+      slug,
+      title,
+      subtitle,
+      asin,
+      status,
+      releaseDate,
+      listingUrl,
+      pages,
+      trim,
+      price,
+      blurb,
+      coverPath,
+      outputDir,
+    );
+    const row = db.prepare('SELECT * FROM kdp_books WHERE slug=?').get(slug);
+    res.json({ book: row });
+  });
+}
 
 // ── Serve React build ────────────────────────────────────────────────────
 if (fs.existsSync(DIST_DIR)) {
