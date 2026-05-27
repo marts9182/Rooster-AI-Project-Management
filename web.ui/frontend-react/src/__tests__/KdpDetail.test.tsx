@@ -119,4 +119,12 @@ describe('KdpDetail', () => {
     await userEvent.click(screen.getByRole('button', { name: /mark live/i }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+
+  it('mounts the PuzzleAuditCard with the loaded book', async () => {
+    renderAtSlug('book-a');
+    await waitFor(() => screen.getByText('Book A'));
+    // The card is identified by its aria-label and the Re-audit button.
+    expect(screen.getByRole('region', { name: /puzzle audit/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /re-audit/i })).toBeInTheDocument();
+  });
 });

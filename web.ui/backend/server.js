@@ -27,6 +27,7 @@ import { startBackupCron } from './backupCron.js';
 import { startTray } from './tray.js';
 import { logger } from './logger.js';
 import kdpRoutes from './kdp/routes.js';
+import auditRoutes from './kdp/audit_routes.js';
 import { startScanner as startKdpScanner } from './kdp/scanner.js';
 import profileRoutes from './profile/routes.js';
 import filesRoute from './files_route.js';
@@ -252,6 +253,8 @@ app.get('/api/help/:field', (req, res) => {
 
 // ── /api/kdp/* — KDP book list, detail, mark-in-review, mark-published ──
 app.use('/api/kdp', kdpRoutes);
+// ── /api/kdp/books/:slug/audit-puzzles — puzzle audit (spec §3.3, §4, §8) ──
+app.use('/api/kdp', auditRoutes);
 
 // ── /api/etsy/* — Etsy listings list/detail + manual sync trigger ───────
 // The real EtsyClient (and therefore sync-now) only works when Etsy

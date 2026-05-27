@@ -27,6 +27,9 @@ export interface KdpBook {
   cover_path: string | null;
   blurb?: string | null;
   output_dir?: string | null;
+  puzzle_audit_status?: 'unchecked' | 'passed' | 'failed' | null;
+  puzzle_audit_at?: string | null;
+  puzzle_audit_summary_json?: string | null;
   updated_at: string;
 }
 
@@ -104,6 +107,49 @@ export async function markPublished(
     },
   );
   if (!r.ok) await throwForStatus(r, 'markPublished');
+  const data = (await r.json()) as { book: KdpBook };
+  return data.book;
+}
+
+// ── Puzzle audit ──────────────────────────────────────────────────────────
+
+export interface PuzzleAuditEntry {
+  index: number;
+  difficulty: 'easy' | 'medium' | 'hard' | 'expert';
+  clue_count: number;
+  is_unique: boolean;
+  symmetric_180: boolean;
+  technique_tier:
+    | 'naked_singles'
+    | 'hidden_singles'
+    | 'locked_candidates'
+    | 'naked_pairs'
+    | 'naked_triples'
+    | 'backtracking';
+  match_difficulty: boolean;
+}
+
+export interface PuzzleAuditTotals {
+  checked: number;
+  passed: number;
+  failed: number;
+  uniqueness_failures: number;
+  symmetry_failures: number;
+  tier_mismatches: number;
+}
+
+export interface PuzzleAuditSummary {
+  puzzles: PuzzleAuditEntry[];
+  totals: PuzzleAuditTotals;
+  error?: string;
+}
+
+export async function auditPuzzles(slug: string): Promise<KdpBook> {
+  const r = await fetch(
+    `/api/kdp/books/${encodeURIComponent(slug)}/audit-puzzles`,
+    { method: 'POST' },
+  );
+  if (!r.ok) await throwForStatus(r, 'auditPuzzles');
   const data = (await r.json()) as { book: KdpBook };
   return data.book;
 }

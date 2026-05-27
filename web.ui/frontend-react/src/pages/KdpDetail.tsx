@@ -23,6 +23,7 @@ import {
 } from '../api/kdp';
 import MarkPublishedModal from '../components/MarkPublishedModal';
 import HelpIcon from '../components/HelpIcon';
+import PuzzleAuditCard from '../components/PuzzleAuditCard';
 
 const STATUS_LABEL: Record<KdpStatus, string> = {
   built: 'Built',
@@ -266,6 +267,11 @@ export default function KdpDetail() {
           )}
         </div>
       </div>
+
+      <PuzzleAuditCard
+        book={book}
+        onAudited={(updated) => setBook(updated)}
+      />
 
       <section style={{ marginTop: '32px' }}>
         <h3>Interior preview</h3>
