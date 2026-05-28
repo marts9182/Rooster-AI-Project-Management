@@ -153,3 +153,71 @@ export async function auditPuzzles(slug: string): Promise<KdpBook> {
   const data = (await r.json()) as { book: KdpBook };
   return data.book;
 }
+
+export interface IngestedBook {
+  asin: string;
+  kdp_title: string;
+  kdp_status: string;
+  format?: string;
+}
+
+export interface IngestPreviewMatch {
+  kind: 'MATCHED_BY_ASIN' | 'MATCHED_BY_TITLE';
+  dashboard_slug: string;
+  dashboard_title_before: string;
+  scraped: IngestedBook;
+  new_dashboard_status: string | null;
+  title_will_change: boolean;
+  status_ambiguous: boolean;
+}
+
+export interface IngestPreviewAmbiguous {
+  scraped: IngestedBook;
+  candidate_slugs: string[];
+}
+
+export interface IngestPreviewOrphan {
+  scraped: IngestedBook;
+}
+
+export interface IngestPreviewMissing {
+  dashboard_slug: string;
+  dashboard_title: string;
+}
+
+export interface IngestPreview {
+  preview_id: string;
+  created_at: string;
+  matches: IngestPreviewMatch[];
+  ambiguous: IngestPreviewAmbiguous[];
+  orphans: IngestPreviewOrphan[];
+  missing_from_kdp: IngestPreviewMissing[];
+}
+
+export interface CommitResult {
+  applied: number;
+  created: number;
+  skipped: number;
+  errors: string[];
+}
+
+export async function getPendingIngest(): Promise<IngestPreview | null> {
+  const r = await fetch('/api/kdp/ingest-bookshelf/pending');
+  if (!r.ok) await throwForStatus(r, 'getPendingIngest');
+  const data = (await r.json()) as { preview: IngestPreview | null };
+  return data.preview;
+}
+
+export async function commitIngest(args: {
+  preview_id: string;
+  confirmed_orphans: string[];
+  ambiguous_resolutions: Record<string, string | null>;
+}): Promise<CommitResult> {
+  const r = await fetch('/api/kdp/ingest-bookshelf/commit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(args),
+  });
+  if (!r.ok) await throwForStatus(r, 'commitIngest');
+  return (await r.json()) as CommitResult;
+}
