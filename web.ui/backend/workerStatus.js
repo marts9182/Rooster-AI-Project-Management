@@ -65,7 +65,13 @@ export function setWorkerError(worker, message) {
 /**
  * Return a snapshot of every registered worker, keyed by name.
  *
- * @returns {Record<string, WorkerStatus>}
+ * The `_success_seq` / `_error_seq` fields are monotonic ordering tokens
+ * that callers can use as a tie-breaker when `last_success_at` and
+ * `last_error_at` collide within a single millisecond (common on Windows
+ * where setTimeout/sync calls share a ms). They are prefixed with `_`
+ * to mark them as internal-but-exposed.
+ *
+ * @returns {Record<string, WorkerStatus & {_success_seq: number, _error_seq: number}>}
  */
 export function getAllStatuses() {
   return Object.fromEntries(
@@ -75,6 +81,8 @@ export function getAllStatuses() {
         last_success_at: s.last_success_at,
         last_error_at: s.last_error_at,
         last_error_message: s.last_error_message,
+        _success_seq: s._success_seq,
+        _error_seq: s._error_seq,
       },
     ]),
   );
