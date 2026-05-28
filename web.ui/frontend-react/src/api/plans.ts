@@ -35,6 +35,10 @@ export interface PlanEntry {
   status: PlanStatus;
   path: string;
   progress?: PlanProgress;
+  /** ISO datetime; only set on entries with status === 'done'. */
+  completedAt: string | null;
+  /** True on a spec when a same-slug plan has status === 'done'. */
+  shipped?: boolean;
 }
 
 export interface PlanDetail extends PlanEntry {
