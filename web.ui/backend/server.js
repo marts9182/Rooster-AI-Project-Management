@@ -37,6 +37,7 @@ import { startEtsyWorkerDefault } from './etsy/worker.js';
 import { etsyConfig } from './etsy/config.js';
 import { ensureFreshToken } from './etsy/oauth.js';
 import { EtsyClient } from './etsy/client.js';
+import { getEtsyStatus } from './etsy/status.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
 import { createPlansRouter } from './plans/routes.js';
@@ -85,15 +86,23 @@ if (PORT !== 0 && process.env.ROOSTER_SKIP_KDP_SCANNER !== '1') {
 // doesn't see noise on every tick). ROOSTER_SKIP_ETSY_WORKER=1 disables.
 if (
   PORT !== 0 &&
-  process.env.ROOSTER_SKIP_ETSY_WORKER !== '1' &&
-  process.env.ETSY_KEYSTRING
+  process.env.ROOSTER_SKIP_ETSY_WORKER !== '1'
 ) {
-  try {
-    startEtsyWorkerDefault({ db: openDb(), emit: recordEvent });
-  } catch (err) {
+  const missing = ['ETSY_KEYSTRING', 'ETSY_SHARED_SECRET', 'ETSY_SHOP_ID']
+    .filter((k) => !process.env[k]);
+  if (missing.length === 0) {
+    try {
+      startEtsyWorkerDefault({ db: openDb(), emit: recordEvent });
+    } catch (err) {
+      logger.warn(
+        { err: err.message },
+        'etsy worker init failed (config invalid?)',
+      );
+    }
+  } else {
     logger.warn(
-      { err: err.message },
-      'etsy worker init failed (config missing?)',
+      { missing },
+      'etsy worker skipped — required env vars are not set',
     );
   }
 }
@@ -309,7 +318,11 @@ app.use('/api/kdp', auditRoutes);
       throw new Error('Etsy not configured (ETSY_KEYSTRING missing)');
     };
   }
-  mountEtsyRoutes(app, { db: openDb(), runSyncPass: runEtsySync });
+  mountEtsyRoutes(app, {
+    db: openDb(),
+    runSyncPass: runEtsySync,
+    getStatus: getEtsyStatus,
+  });
 }
 
 // ── /api/pinterest/* — queue / history / pause / resume / edit / cancel
