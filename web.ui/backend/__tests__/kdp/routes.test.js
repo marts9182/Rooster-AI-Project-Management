@@ -21,6 +21,7 @@ import os from 'node:os';
 import { openDb, _resetForTests } from '../../db.js';
 import { _resetSubscribersForTests, subscribe } from '../../events.js';
 import { createKdpRouter } from '../../kdp/routes.js';
+import { _resetForTests as _resetPreviewStore } from '../../kdp/preview_store.js';
 
 let tmpRoot;
 let tmpDb;
@@ -252,5 +253,106 @@ describe('POST /api/kdp/books/:slug/mark-published', () => {
       .post('/api/kdp/books/nonesuch/mark-published')
       .send({ asin: 'B0NEWBOOK1', release_date: '2026-05-26' });
     expect(res.status).toBe(404);
+  });
+});
+
+describe('Ingest routes', () => {
+  beforeEach(() => {
+    _resetPreviewStore();
+  });
+
+  it('POST /ingest-bookshelf returns a preview', async () => {
+    const db = openDb();
+    db.prepare(
+      `INSERT INTO kdp_books (slug, title, status, output_dir)
+       VALUES ('foo', 'Foo Book', 'built', ?)`,
+    ).run(tmpRoot);
+
+    const resp = await request(app)
+      .post('/api/kdp/ingest-bookshelf')
+      .send({
+        books: [
+          { asin: 'B0CFOOFOOFO', kdp_title: 'Foo Book', kdp_status: 'Live' },
+        ],
+      });
+
+    expect(resp.status).toBe(200);
+    expect(typeof resp.body.preview_id).toBe('string');
+    expect(resp.body.matches).toHaveLength(1);
+    expect(resp.body.matches[0].dashboard_slug).toBe('foo');
+  });
+
+  it('POST /ingest-bookshelf with invalid body returns 400', async () => {
+    const resp = await request(app)
+      .post('/api/kdp/ingest-bookshelf')
+      .send({ books: [{ kdp_title: 'no asin' }] });
+    expect(resp.status).toBe(400);
+    expect(resp.body.error).toBeTruthy();
+  });
+
+  it('GET /ingest-bookshelf/pending returns null when no preview', async () => {
+    const resp = await request(app).get('/api/kdp/ingest-bookshelf/pending');
+    expect(resp.status).toBe(200);
+    expect(resp.body).toEqual({ preview: null });
+  });
+
+  it('GET /ingest-bookshelf/pending returns the latest preview after a POST', async () => {
+    await request(app)
+      .post('/api/kdp/ingest-bookshelf')
+      .send({
+        books: [
+          { asin: 'B0CFOOFOOFO', kdp_title: 'Foo Book', kdp_status: 'Live' },
+        ],
+      });
+    const resp = await request(app).get('/api/kdp/ingest-bookshelf/pending');
+    expect(resp.status).toBe(200);
+    expect(resp.body.preview).not.toBeNull();
+    expect(typeof resp.body.preview.preview_id).toBe('string');
+  });
+
+  it('POST /ingest-bookshelf/commit applies the preview and clears it', async () => {
+    const db = openDb();
+    db.prepare(
+      `INSERT INTO kdp_books (slug, title, status, output_dir, asin)
+       VALUES ('foo', 'Foo Book', 'built', ?, 'B0CFOOFOOFO')`,
+    ).run(tmpRoot);
+
+    const previewResp = await request(app)
+      .post('/api/kdp/ingest-bookshelf')
+      .send({
+        books: [
+          { asin: 'B0CFOOFOOFO', kdp_title: 'Foo Book Updated', kdp_status: 'Live' },
+        ],
+      });
+    const previewId = previewResp.body.preview_id;
+
+    const commitResp = await request(app)
+      .post('/api/kdp/ingest-bookshelf/commit')
+      .send({
+        preview_id: previewId,
+        confirmed_orphans: [],
+        ambiguous_resolutions: {},
+      });
+    expect(commitResp.status).toBe(200);
+    expect(commitResp.body.applied).toBe(1);
+
+    const row = db.prepare('SELECT * FROM kdp_books WHERE slug=?').get('foo');
+    expect(row.title).toBe('Foo Book Updated');
+    expect(row.asin).toBe('B0CFOOFOOFO');
+    expect(row.status).toBe('published');
+
+    const after = await request(app).get('/api/kdp/ingest-bookshelf/pending');
+    expect(after.body).toEqual({ preview: null });
+  });
+
+  it('POST /ingest-bookshelf/commit returns 404 for unknown preview_id', async () => {
+    const resp = await request(app)
+      .post('/api/kdp/ingest-bookshelf/commit')
+      .send({
+        preview_id: '00000000-0000-0000-0000-000000000000',
+        confirmed_orphans: [],
+        ambiguous_resolutions: {},
+      });
+    expect(resp.status).toBe(404);
   });
 });

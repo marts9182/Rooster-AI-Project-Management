@@ -17,6 +17,13 @@ import { openDb } from '../db.js';
 import { recordEvent } from '../events.js';
 import { enqueuePinsForBook } from '../pinterest/queue.js';
 import { renderPreviewsForBook } from './preview_renderer.js';
+import { computeIngestPreview, applyIngestCommit } from './ingest.js';
+import {
+  putPreview,
+  getPreview,
+  getLatestPreview,
+  deletePreview,
+} from './preview_store.js';
 
 /** Amazon ASIN format: 'B0' followed by 8 uppercase alphanumerics. */
 const ASIN_RE = /^B0[A-Z0-9]{8}$/;
@@ -58,6 +65,25 @@ export function createKdpRouter(opts = {}) {
   const previewRendererFactory = opts.previewRendererFactory ?? renderPreviewsForBook;
 
   const router = express.Router();
+
+  /** Schema-validate one scraped book entry. Returns a list of error strings. */
+  function validateBook(book, idx) {
+    const errors = [];
+    if (!book || typeof book !== 'object') {
+      errors.push(`books[${idx}] must be an object`);
+      return errors;
+    }
+    if (typeof book.asin !== 'string' || book.asin.trim() === '') {
+      errors.push(`books[${idx}].asin must be a non-empty string`);
+    }
+    if (typeof book.kdp_title !== 'string' || book.kdp_title.trim() === '') {
+      errors.push(`books[${idx}].kdp_title must be a non-empty string`);
+    }
+    if (typeof book.kdp_status !== 'string' || book.kdp_status.trim() === '') {
+      errors.push(`books[${idx}].kdp_status must be a non-empty string`);
+    }
+    return errors;
+  }
 
   // ── List ─────────────────────────────────────────────────────────────────
   router.get('/books', (req, res) => {
@@ -203,6 +229,69 @@ export function createKdpRouter(opts = {}) {
     });
 
     res.json({ book: updated, pins_queued: pinsQueued });
+  });
+
+  // ── Ingest: POST scraped bookshelf, return preview ──────────────────────
+  router.post('/ingest-bookshelf', (req, res) => {
+    const body = req.body ?? {};
+    const books = Array.isArray(body.books) ? body.books : null;
+    if (!books) {
+      return res.status(400).json({ error: 'body.books must be an array' });
+    }
+    /** @type {string[]} */
+    const allErrors = [];
+    for (let i = 0; i < books.length; i++) {
+      allErrors.push(...validateBook(books[i], i));
+    }
+    if (allErrors.length > 0) {
+      return res.status(400).json({ error: 'validation_failed', details: allErrors });
+    }
+    const db = openDb();
+    const preview = computeIngestPreview({ db, scraped: books });
+    putPreview(preview);
+    res.json(preview);
+  });
+
+  // ── Ingest: GET pending preview ─────────────────────────────────────────
+  router.get('/ingest-bookshelf/pending', (_req, res) => {
+    const preview = getLatestPreview();
+    res.json({ preview });
+  });
+
+  // ── Ingest: POST commit ─────────────────────────────────────────────────
+  router.post('/ingest-bookshelf/commit', (req, res) => {
+    const body = req.body ?? {};
+    const previewId = typeof body.preview_id === 'string' ? body.preview_id : null;
+    if (!previewId) {
+      return res.status(400).json({ error: 'preview_id required' });
+    }
+    const preview = getPreview(previewId);
+    if (!preview) {
+      return res.status(404).json({ error: 'preview not found or expired' });
+    }
+    const confirmedOrphans = Array.isArray(body.confirmed_orphans)
+      ? body.confirmed_orphans
+      : [];
+    const ambiguousResolutions =
+      body.ambiguous_resolutions && typeof body.ambiguous_resolutions === 'object'
+        ? body.ambiguous_resolutions
+        : {};
+    const db = openDb();
+    const result = applyIngestCommit({
+      db,
+      preview,
+      confirmedOrphans,
+      ambiguousResolutions,
+    });
+    deletePreview(previewId);
+    recordEvent('kdp:ingest-applied', {
+      preview_id: previewId,
+      applied: result.applied,
+      created: result.created,
+      skipped: result.skipped,
+      errors: result.errors.length,
+    });
+    res.json(result);
   });
 
   return router;
