@@ -1,4 +1,4 @@
-# Etsy Dashboard Port Implementation Plan
+﻿# Etsy Dashboard Port Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -15,19 +15,19 @@
 ## File Structure
 
 **Created:**
-- `web.ui/backend/etsy/status.js` — pure function `getEtsyStatus(opts)` returning the status payload.
-- `web.ui/backend/__tests__/etsy/status.test.js` — unit tests for the four banner states.
-- `web.ui/frontend-react/src/components/EtsyStatusBanner.tsx` — React component (state-machine driven).
-- `web.ui/frontend-react/src/components/__tests__/EtsyStatusBanner.test.tsx` — banner state tests.
+- `web.ui/backend/etsy/status.js` â€” pure function `getEtsyStatus(opts)` returning the status payload.
+- `web.ui/backend/__tests__/etsy/status.test.js` â€” unit tests for the four banner states.
+- `web.ui/frontend-react/src/components/EtsyStatusBanner.tsx` â€” React component (state-machine driven).
+- `web.ui/frontend-react/src/components/__tests__/EtsyStatusBanner.test.tsx` â€” banner state tests.
 
 **Modified:**
-- `web.ui/backend/etsy/routes.js` — accept `getStatus` in `MountArgs`, add `GET /status` handler.
-- `web.ui/backend/__tests__/etsy/routes.test.js` — add `GET /status` cases.
-- `web.ui/backend/server.js` — wire real `getEtsyStatus` into `mountEtsyRoutes`; add one warn log when Etsy is skipped because config is missing.
-- `web.ui/backend/.env.example` — replace the bare Etsy block with a comment explaining the credential-share with `projects/etsy-rooster-shop` + the bootstrap-script path.
-- `web.ui/frontend-react/src/api/etsy.ts` — add `EtsyStatus` interface + `getStatus()` function.
-- `web.ui/frontend-react/src/pages/EtsyCatalog.tsx` — mount banner above the table, remove the now-redundant top-of-page Sync-now button and toast (banner owns sync UX).
-- `web.ui/frontend-react/src/__tests__/EtsyCatalog.test.tsx` — update to mock `/api/etsy/status` and assert the banner-driven sync flow.
+- `web.ui/backend/etsy/routes.js` â€” accept `getStatus` in `MountArgs`, add `GET /status` handler.
+- `web.ui/backend/__tests__/etsy/routes.test.js` â€” add `GET /status` cases.
+- `web.ui/backend/server.js` â€” wire real `getEtsyStatus` into `mountEtsyRoutes`; add one warn log when Etsy is skipped because config is missing.
+- `web.ui/backend/.env.example` â€” replace the bare Etsy block with a comment explaining the credential-share with `projects/etsy-rooster-shop` + the bootstrap-script path.
+- `web.ui/frontend-react/src/api/etsy.ts` â€” add `EtsyStatus` interface + `getStatus()` function.
+- `web.ui/frontend-react/src/pages/EtsyCatalog.tsx` â€” mount banner above the table, remove the now-redundant top-of-page Sync-now button and toast (banner owns sync UX).
+- `web.ui/frontend-react/src/__tests__/EtsyCatalog.test.tsx` â€” update to mock `/api/etsy/status` and assert the banner-driven sync flow.
 
 ---
 
@@ -39,7 +39,7 @@
 
 Pure function. Reads `process.env` + the on-disk token file + the in-memory worker map. No mutation, no refresh attempts. Dependencies are injectable so tests can stub them.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `web.ui/backend/__tests__/etsy/status.test.js`:
 
@@ -178,12 +178,12 @@ describe('getEtsyStatus', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/etsy/status.test.js`
 Expected: FAIL with `Cannot find module '../../etsy/status.js'`.
 
-- [ ] **Step 3: Implement `getEtsyStatus()`**
+- [x] **Step 3: Implement `getEtsyStatus()`**
 
 `web.ui/backend/etsy/status.js`:
 
@@ -251,7 +251,7 @@ export function getEtsyStatus(opts = {}) {
         tokenExpiresAt = new Date(parsed.expires_at * 1000).toISOString();
       }
     } catch {
-      // Present but unparseable — leave tokenExpiresAt null.
+      // Present but unparseable â€” leave tokenExpiresAt null.
     }
   } catch {
     // Not present.
@@ -278,12 +278,12 @@ export function getEtsyStatus(opts = {}) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/etsy/status.test.js`
 Expected: PASS (7 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/etsy/status.js web.ui/backend/__tests__/etsy/status.test.js
@@ -300,7 +300,7 @@ git commit -m "feat(etsy): add getEtsyStatus reader for /api/etsy/status"
 
 Extend `mountEtsyRoutes`'s injection contract with `getStatus`, register the handler. server.js wiring is done in Task 3.
 
-- [ ] **Step 1: Write the failing test (extend routes.test.js)**
+- [x] **Step 1: Write the failing test (extend routes.test.js)**
 
 Append to `web.ui/backend/__tests__/etsy/routes.test.js` after the existing `POST /api/etsy/sync-now` describe:
 
@@ -340,12 +340,12 @@ describe('GET /api/etsy/status', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/etsy/routes.test.js`
-Expected: FAIL — `Cannot GET /api/etsy/status`.
+Expected: FAIL â€” `Cannot GET /api/etsy/status`.
 
-- [ ] **Step 3: Add `getStatus` to MountArgs and register the route**
+- [x] **Step 3: Add `getStatus` to MountArgs and register the route**
 
 Edit `web.ui/backend/etsy/routes.js`:
 
@@ -379,12 +379,12 @@ Then, just before the closing `}` of `mountEtsyRoutes`, add:
   });
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/etsy/routes.test.js`
 Expected: PASS (all original tests + 2 new ones).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/etsy/routes.js web.ui/backend/__tests__/etsy/routes.test.js
@@ -398,9 +398,9 @@ git commit -m "feat(etsy): GET /api/etsy/status route"
 **Files:**
 - Modify: `web.ui/backend/server.js`
 
-Two surgical changes: (a) import `getEtsyStatus` and pass it to `mountEtsyRoutes`, (b) when the worker is skipped because keys are missing, log one warn with the missing key list (today this branch is silent — that's the trap the spec calls out).
+Two surgical changes: (a) import `getEtsyStatus` and pass it to `mountEtsyRoutes`, (b) when the worker is skipped because keys are missing, log one warn with the missing key list (today this branch is silent â€” that's the trap the spec calls out).
 
-- [ ] **Step 1: Import `getEtsyStatus` and wire it**
+- [x] **Step 1: Import `getEtsyStatus` and wire it**
 
 In `web.ui/backend/server.js`, add to the existing etsy imports block (around lines 34-39):
 
@@ -424,7 +424,7 @@ to:
   });
 ```
 
-- [ ] **Step 2: Add the missing-config startup warn**
+- [x] **Step 2: Add the missing-config startup warn**
 
 In `web.ui/backend/server.js`, replace the existing worker-start block at lines 86-99:
 
@@ -466,18 +466,18 @@ if (
   } else {
     logger.warn(
       { missing },
-      'etsy worker skipped — required env vars are not set',
+      'etsy worker skipped â€” required env vars are not set',
     );
   }
 }
 ```
 
-- [ ] **Step 3: Verify the existing backend test suite still passes**
+- [x] **Step 3: Verify the existing backend test suite still passes**
 
 Run: `cd web.ui/backend && npm test`
-Expected: all tests PASS. We are not adding a new server.js test — the wiring is exercised end-to-end by Task 2's routes tests and the manual smoke step.
+Expected: all tests PASS. We are not adding a new server.js test â€” the wiring is exercised end-to-end by Task 2's routes tests and the manual smoke step.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/backend/server.js
@@ -493,12 +493,12 @@ git commit -m "feat(etsy): wire status endpoint + warn when worker skipped"
 
 The four keys already exist (lines 31-39). We're improving the comment so the next person knows where the values come from and how to bootstrap the token file.
 
-- [ ] **Step 1: Replace the Etsy block**
+- [x] **Step 1: Replace the Etsy block**
 
 In `web.ui/backend/.env.example`, replace the existing Etsy section (currently lines 31-39):
 
 ```
-# ── Etsy v3 — required for the etsy syncer ──────────────────────────────────
+# â”€â”€ Etsy v3 â€” required for the etsy syncer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ETSY_KEYSTRING=
 ETSY_SHARED_SECRET=
 ETSY_SHOP_ID=
@@ -512,7 +512,7 @@ ETSY_TOKEN_PATH=
 with:
 
 ```
-# ── Etsy v3 — required for the etsy syncer ──────────────────────────────────
+# â”€â”€ Etsy v3 â€” required for the etsy syncer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Copy ETSY_KEYSTRING, ETSY_SHARED_SECRET, ETSY_SHOP_ID from the Python
 # project's env at `projects/etsy-rooster-shop/.env.local`. Both projects
 # share the same Etsy app + the same OAuth token file; the dashboard
@@ -534,7 +534,7 @@ ROOSTER_ETSY_TOKEN_PATH=
 ETSY_TOKEN_PATH=
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add web.ui/backend/.env.example
@@ -543,14 +543,14 @@ git commit -m "docs(etsy): point .env.example at the python project for creds"
 
 ---
 
-## Task 5: Frontend API client — `getStatus()` + `EtsyStatus` type
+## Task 5: Frontend API client â€” `getStatus()` + `EtsyStatus` type
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/api/etsy.ts`
 
 Thin typed fetch wrapper following the same pattern as `listListings` / `syncNow`.
 
-- [ ] **Step 1: Add the interface and function**
+- [x] **Step 1: Add the interface and function**
 
 At the end of `web.ui/frontend-react/src/api/etsy.ts`, before the final `export { ApiError };` line, insert:
 
@@ -572,12 +572,12 @@ export async function getStatus(): Promise<EtsyStatus> {
 }
 ```
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/api/etsy.ts
@@ -594,7 +594,7 @@ git commit -m "feat(etsy): add getStatus() and EtsyStatus type to api client"
 
 State-machine driven from the status payload. Banner owns the Sync-now button. Parent passes a callback for refetching the listings table after a successful sync.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `web.ui/frontend-react/src/components/__tests__/EtsyStatusBanner.test.tsx`:
 
@@ -711,12 +711,12 @@ describe('EtsyStatusBanner', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/EtsyStatusBanner.test.tsx`
-Expected: FAIL — `Cannot find module '../EtsyStatusBanner'`.
+Expected: FAIL â€” `Cannot find module '../EtsyStatusBanner'`.
 
-- [ ] **Step 3: Implement the banner**
+- [x] **Step 3: Implement the banner**
 
 `web.ui/frontend-react/src/components/EtsyStatusBanner.tsx`:
 
@@ -788,7 +788,7 @@ export default function EtsyStatusBanner({ onSynced }: Props) {
       disabled={syncing || !status?.configured || !status?.tokenPresent}
       style={{ marginLeft: 'auto' }}
     >
-      {syncing ? 'Syncing…' : 'Sync now'}
+      {syncing ? 'Syncingâ€¦' : 'Sync now'}
     </button>
   );
 
@@ -802,7 +802,7 @@ export default function EtsyStatusBanner({ onSynced }: Props) {
   };
 
   if (kind === 'loading') {
-    return <div role="status" style={baseStyle}>Loading Etsy status…</div>;
+    return <div role="status" style={baseStyle}>Loading Etsy statusâ€¦</div>;
   }
 
   if (kind === 'not-configured' && status) {
@@ -848,19 +848,19 @@ export default function EtsyStatusBanner({ onSynced }: Props) {
   const when = status ? relTime(status.lastSyncAt) : '';
   return (
     <div role="status" style={{ ...baseStyle, background: '#e6f7ec', color: '#1b6d3a' }}>
-      <span>Synced {when || '—'}</span>
+      <span>Synced {when || 'â€”'}</span>
       {syncButton}
     </div>
   );
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/EtsyStatusBanner.test.tsx`
 Expected: PASS (6 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/components/EtsyStatusBanner.tsx web.ui/frontend-react/src/components/__tests__/EtsyStatusBanner.test.tsx
@@ -877,7 +877,7 @@ git commit -m "feat(etsy): EtsyStatusBanner with sync-now + error/config diagnos
 
 The current page header has a `Sync now` button and a transient toast (lines ~246-296). The banner now owns both. Remove the inline button + toast and the `onSyncNow` handler. Banner calls `reload(filters)` via the `onSynced` callback.
 
-- [ ] **Step 1: Update the page test to expect the banner shape**
+- [x] **Step 1: Update the page test to expect the banner shape**
 
 In `web.ui/frontend-react/src/__tests__/EtsyCatalog.test.tsx`:
 
@@ -905,16 +905,16 @@ In `web.ui/frontend-react/src/__tests__/EtsyCatalog.test.tsx`:
 2. In each existing test that calls `fetchMock.mockResolvedValueOnce(mockListings(sample))`, prepend a `.mockResolvedValueOnce(mockStatusOk())` for the banner's `getStatus()` request that fires on mount.
 
 3. Update the existing sync-now test so the mock sequence is:
-   `mockStatusOk()` → `mockListings(sample)` → `mockSyncResult({inserted:1,updated:0,statusChanged:0})` → `mockStatusOk()` → `mockListings(sample)` and the button assertion targets the banner: `screen.getByRole('button', { name: /sync now/i })`.
+   `mockStatusOk()` â†’ `mockListings(sample)` â†’ `mockSyncResult({inserted:1,updated:0,statusChanged:0})` â†’ `mockStatusOk()` â†’ `mockListings(sample)` and the button assertion targets the banner: `screen.getByRole('button', { name: /sync now/i })`.
 
 (Note for the implementer: the test file imports `userEvent` already; the change is mechanical re-ordering of mock responses to match the new mount-time fetch sequence.)
 
-- [ ] **Step 2: Run the page test to verify it fails**
+- [x] **Step 2: Run the page test to verify it fails**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/__tests__/EtsyCatalog.test.tsx`
-Expected: FAIL — banner expects `/api/etsy/status` but the page hasn't mounted the banner yet.
+Expected: FAIL â€” banner expects `/api/etsy/status` but the page hasn't mounted the banner yet.
 
-- [ ] **Step 3: Modify `EtsyCatalog.tsx`**
+- [x] **Step 3: Modify `EtsyCatalog.tsx`**
 
 1. Add the import near the other component imports:
 
@@ -922,7 +922,7 @@ Expected: FAIL — banner expects `/api/etsy/status` but the page hasn't mounted
    import EtsyStatusBanner from '../components/EtsyStatusBanner';
    ```
 
-2. Remove the `syncing` and `toast` `useState` declarations and the `onSyncNow` function (lines ~118-119 and ~246-260 — they move into the banner).
+2. Remove the `syncing` and `toast` `useState` declarations and the `onSyncNow` function (lines ~118-119 and ~246-260 â€” they move into the banner).
 
 3. Remove the `syncNow` import from `../api/etsy`. Keep `listListings`, `EtsyListing`, `ListListingsParams`.
 
@@ -948,22 +948,22 @@ Expected: FAIL — banner expects `/api/etsy/status` but the page hasn't mounted
 
    (The rest of the JSX from the filter-row down stays unchanged.)
 
-- [ ] **Step 4: Run page test to verify it passes**
+- [x] **Step 4: Run page test to verify it passes**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/__tests__/EtsyCatalog.test.tsx`
 Expected: PASS.
 
-- [ ] **Step 5: Run the full frontend test suite**
+- [x] **Step 5: Run the full frontend test suite**
 
 Run: `cd web.ui/frontend-react && npm test`
 Expected: all PASS.
 
-- [ ] **Step 6: Type-check**
+- [x] **Step 6: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/pages/EtsyCatalog.tsx web.ui/frontend-react/src/__tests__/EtsyCatalog.test.tsx
@@ -972,11 +972,11 @@ git commit -m "feat(etsy): mount status banner on /etsy, drop duplicate sync but
 
 ---
 
-## Task 8: Manual smoke + bootstrap (user action — not code)
+## Task 8: Manual smoke + bootstrap (user action â€” not code)
 
 This task is for the human, not the implementer subagent. Hand it off as a checklist.
 
-- [ ] **Step 1: Populate `<repo-root>/.env.local`**
+- [x] **Step 1: Populate `<repo-root>/.env.local`**
 
 Open `projects/etsy-rooster-shop/.env.local`, copy these three values into `<repo-root>/.env.local`:
 
@@ -987,7 +987,7 @@ ETSY_SHOP_ID=<value from python project>
 ROOSTER_ETSY_TOKEN_PATH=C:\Users\marts\.etsy-rooster\token.json
 ```
 
-- [ ] **Step 2: Confirm the token file exists**
+- [x] **Step 2: Confirm the token file exists**
 
 ```
 dir C:\Users\marts\.etsy-rooster\token.json
@@ -998,7 +998,7 @@ cd projects/etsy-rooster-shop
 python scripts/etsy_oauth_setup.py
 ```
 
-- [ ] **Step 3: Restart the backend**
+- [x] **Step 3: Restart the backend**
 
 Kill the existing `node server.js` and run `npm start` in `web.ui/backend`. Expected new log line on boot (replacing the previous silent skip):
 ```
@@ -1006,13 +1006,13 @@ INFO  Publishing Ops Dashboard server running at http://127.0.0.1:5000
 ```
 And **no** `etsy worker skipped` warning (which would mean creds didn't load).
 
-- [ ] **Step 4: Open `/etsy` in the dashboard**
+- [x] **Step 4: Open `/etsy` in the dashboard**
 
 Hard-refresh. The banner should appear above the catalog. Expected sequence:
-1. "Loading Etsy status…" (briefly)
+1. "Loading Etsy statusâ€¦" (briefly)
 2. Green "Synced <n> min ago" once the worker's first tick lands, OR red "Etsy token missing" if step 2 was skipped.
 
-- [ ] **Step 5: Click Sync now**
+- [x] **Step 5: Click Sync now**
 
 The button should disable while in flight, then re-enable. The catalog table should populate with ~30 listings (the prior Etsy memory's count). The banner's "Synced <relative time>" should update.
 
@@ -1022,27 +1022,27 @@ The button should disable while in flight, then re-enable. The catalog table sho
 
 **Spec coverage check:** Re-read [`2026-05-27-etsy-dashboard-port-design.md`](../specs/2026-05-27-etsy-dashboard-port-design.md) and verify every requirement maps to a task.
 
-- §1 env wiring + `<repo-root>/.env.local` → Task 8 step 1 (user) + Task 4 (docs).
-- §1 `.env.example` four keys → Task 4 (preserves existing keys, improves comment).
-- §1 server.js warn bump with missing key list → Task 3.
-- §2 `GET /api/etsy/status` shape → Tasks 1 + 2.
-- §2 status sources (env, token file, workerStatus map) → Task 1 implementation.
-- §2 banner UX with four priority-ordered states → Task 6.
-- §2 manual sync trigger from banner → Task 6 (banner owns it).
-- §2 files touched list → Tasks 1, 2, 5, 6, 7 (matches).
-- §3 backend tests for `GET /status` → Task 2 (two cases as required: full happy-path with heartbeat populated, and error-overrides-heartbeat in Task 1).
-- §3 backend tests for `etsyConfig()` and `ensureFreshToken()` no-refresh path → **already covered** by existing `__tests__/etsy/config.test.js` (5 tests) and `__tests__/etsy/oauth.test.js`. No new tests required; spec referenced these as a non-regression check.
-- §3 frontend tests for the four banner states → Task 6 (covers all four).
-- §3 frontend test that page mounts banner + click triggers refetch → Task 7.
-- §3 manual smoke → Task 8.
-- §3 bootstrap doc → Task 4 (the comment in .env.example).
+- Â§1 env wiring + `<repo-root>/.env.local` â†’ Task 8 step 1 (user) + Task 4 (docs).
+- Â§1 `.env.example` four keys â†’ Task 4 (preserves existing keys, improves comment).
+- Â§1 server.js warn bump with missing key list â†’ Task 3.
+- Â§2 `GET /api/etsy/status` shape â†’ Tasks 1 + 2.
+- Â§2 status sources (env, token file, workerStatus map) â†’ Task 1 implementation.
+- Â§2 banner UX with four priority-ordered states â†’ Task 6.
+- Â§2 manual sync trigger from banner â†’ Task 6 (banner owns it).
+- Â§2 files touched list â†’ Tasks 1, 2, 5, 6, 7 (matches).
+- Â§3 backend tests for `GET /status` â†’ Task 2 (two cases as required: full happy-path with heartbeat populated, and error-overrides-heartbeat in Task 1).
+- Â§3 backend tests for `etsyConfig()` and `ensureFreshToken()` no-refresh path â†’ **already covered** by existing `__tests__/etsy/config.test.js` (5 tests) and `__tests__/etsy/oauth.test.js`. No new tests required; spec referenced these as a non-regression check.
+- Â§3 frontend tests for the four banner states â†’ Task 6 (covers all four).
+- Â§3 frontend test that page mounts banner + click triggers refetch â†’ Task 7.
+- Â§3 manual smoke â†’ Task 8.
+- Â§3 bootstrap doc â†’ Task 4 (the comment in .env.example).
 
 No gaps.
 
 **Placeholder scan:** no TBD/TODO/"fill in" anywhere. Tests show actual code; commands show actual paths. Done.
 
 **Type consistency:**
-- `EtsyStatus` shape — defined in Task 1 (JSDoc typedef), used by Task 2 (handler payload), Task 5 (frontend interface), Task 6 (component prop type). All seven fields match: `configured`, `missingEnv`, `tokenPresent`, `tokenExpiresAt`, `lastHeartbeatAt`, `lastError`, `lastSyncAt`. ✓
-- `MountArgs.getStatus: () => EtsyStatus` (sync function returning typed payload) — matches `getEtsyStatus(opts?)` implementation. ✓
-- `onSynced: () => void` prop on banner — matches the `() => reload(filters)` callsite in Task 7. ✓
-- Banner uses `syncNow` from existing `api/etsy.ts` (already returns `{inserted, updated, statusChanged}`) — no change needed there. ✓
+- `EtsyStatus` shape â€” defined in Task 1 (JSDoc typedef), used by Task 2 (handler payload), Task 5 (frontend interface), Task 6 (component prop type). All seven fields match: `configured`, `missingEnv`, `tokenPresent`, `tokenExpiresAt`, `lastHeartbeatAt`, `lastError`, `lastSyncAt`. âœ“
+- `MountArgs.getStatus: () => EtsyStatus` (sync function returning typed payload) â€” matches `getEtsyStatus(opts?)` implementation. âœ“
+- `onSynced: () => void` prop on banner â€” matches the `() => reload(filters)` callsite in Task 7. âœ“
+- Banner uses `syncNow` from existing `api/etsy.ts` (already returns `{inserted, updated, statusChanged}`) â€” no change needed there. âœ“

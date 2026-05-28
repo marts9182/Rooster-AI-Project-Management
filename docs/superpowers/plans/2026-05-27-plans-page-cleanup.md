@@ -1,10 +1,10 @@
-# Plans Page Completion Cleanup Implementation Plan
+﻿# Plans Page Completion Cleanup Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Stop completed plans from competing for attention with active work on `/specs & plans`, and surface the spec↔plan completion relationship by marking shipped specs.
+**Goal:** Stop completed plans from competing for attention with active work on `/specs & plans`, and surface the specâ†”plan completion relationship by marking shipped specs.
 
-**Architecture:** The backend scanner already computes `status` from checkbox counts. This plan adds two derived fields (`completedAt` from `fs.stat` mtime, `shipped` from cross-referencing plan→spec slugs) and a new sort that sinks done entries to the bottom. The frontend dims done plan cards and replaces the "open" badge with a green "shipped" chip on specs whose plan is done. A shared `relTime` helper gets extracted from `EtsyStatusBanner.tsx` so the new Plans card and the existing banner use the same fuzzy-time formatting.
+**Architecture:** The backend scanner already computes `status` from checkbox counts. This plan adds two derived fields (`completedAt` from `fs.stat` mtime, `shipped` from cross-referencing planâ†’spec slugs) and a new sort that sinks done entries to the bottom. The frontend dims done plan cards and replaces the "open" badge with a green "shipped" chip on specs whose plan is done. A shared `relTime` helper gets extracted from `EtsyStatusBanner.tsx` so the new Plans card and the existing banner use the same fuzzy-time formatting.
 
 **Tech Stack:** Node 18+ ESM + vitest (backend); React 19 + Vite + TypeScript + vitest + React Testing Library (frontend).
 
@@ -15,26 +15,26 @@
 ## File Structure
 
 **Created:**
-- `web.ui/frontend-react/src/lib/relativeTime.ts` — shared `relTime(iso, now?)` helper, extracted from `EtsyStatusBanner.tsx`.
-- `web.ui/frontend-react/src/__tests__/Plans.test.tsx` — Plans page React tests (3 cases).
+- `web.ui/frontend-react/src/lib/relativeTime.ts` â€” shared `relTime(iso, now?)` helper, extracted from `EtsyStatusBanner.tsx`.
+- `web.ui/frontend-react/src/__tests__/Plans.test.tsx` â€” Plans page React tests (3 cases).
 
 **Modified:**
-- `web.ui/backend/plans/scanner.js` — add `completedAt` + `shipped` derivation; new sort tuple.
-- `web.ui/backend/__tests__/plans/scanner.test.js` — four new test cases.
-- `web.ui/frontend-react/src/api/plans.ts` — extend `PlanEntry` interface with the two new fields.
-- `web.ui/frontend-react/src/components/EtsyStatusBanner.tsx` — replace inline `relTime` with the shared import.
-- `web.ui/frontend-react/src/pages/Plans.tsx` — done-collapsed card, shipped-spec badge, completedAt line.
-- `web.ui/frontend-react/src/styles/shell.css` — three new rules appended to the existing plans block (`plan-card--done-collapsed`, `plan-card__completed-at`, `status-badge--shipped`).
+- `web.ui/backend/plans/scanner.js` â€” add `completedAt` + `shipped` derivation; new sort tuple.
+- `web.ui/backend/__tests__/plans/scanner.test.js` â€” four new test cases.
+- `web.ui/frontend-react/src/api/plans.ts` â€” extend `PlanEntry` interface with the two new fields.
+- `web.ui/frontend-react/src/components/EtsyStatusBanner.tsx` â€” replace inline `relTime` with the shared import.
+- `web.ui/frontend-react/src/pages/Plans.tsx` â€” done-collapsed card, shipped-spec badge, completedAt line.
+- `web.ui/frontend-react/src/styles/shell.css` â€” three new rules appended to the existing plans block (`plan-card--done-collapsed`, `plan-card__completed-at`, `status-badge--shipped`).
 
 ---
 
-## Task 1: Backend scanner — `completedAt`, `shipped`, new sort
+## Task 1: Backend scanner â€” `completedAt`, `shipped`, new sort
 
 **Files:**
 - Modify: `web.ui/backend/plans/scanner.js`
 - Test: `web.ui/backend/__tests__/plans/scanner.test.js`
 
-- [ ] **Step 1: Write the failing tests (append four describe cases)**
+- [x] **Step 1: Write the failing tests (append four describe cases)**
 
 Append to `web.ui/backend/__tests__/plans/scanner.test.js`, after the existing `scanDocs` tests:
 
@@ -108,12 +108,12 @@ Append to `web.ui/backend/__tests__/plans/scanner.test.js`, after the existing `
   });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/plans/scanner.test.js`
-Expected: FAIL — the four new tests fail because `completedAt`, `shipped`, and the new sort aren't implemented yet.
+Expected: FAIL â€” the four new tests fail because `completedAt`, `shipped`, and the new sort aren't implemented yet.
 
-- [ ] **Step 3: Implement the scanner changes**
+- [x] **Step 3: Implement the scanner changes**
 
 Edit `web.ui/backend/plans/scanner.js`.
 
@@ -154,7 +154,7 @@ In `_scanDir` (currently the loop that builds `out`), populate `completedAt` fro
     });
 ```
 
-(Note: `status` is now computed once and reused, replacing the previous inline `_statusOf(progress)` call. `completedAt` is added; `shipped` is **not** set in `_scanDir` — that happens in `scanDocs` after both directories are walked.)
+(Note: `status` is now computed once and reused, replacing the previous inline `_statusOf(progress)` call. `completedAt` is added; `shipped` is **not** set in `_scanDir` â€” that happens in `scanDocs` after both directories are walked.)
 
 Replace the existing `scanDocs` function (currently at the bottom):
 
@@ -193,19 +193,19 @@ export function scanDocs(superpowersRoot) {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/plans/scanner.test.js`
-Expected: PASS — all original tests (the existing date-DESC sort test now exercises mixed-status, and a same-date all-active set, both of which still order by date then title — confirm pass) plus the four new ones.
+Expected: PASS â€” all original tests (the existing date-DESC sort test now exercises mixed-status, and a same-date all-active set, both of which still order by date then title â€” confirm pass) plus the four new ones.
 
-If the existing "sorts entries by date DESC then title ASC" test (lines ~73-88) fails because all its entries are now `status:'open'` (no checkboxes → status 'open' → grouped as 'active'), it should still pass: all three are non-done, so the new sort degenerates to date DESC, title ASC — identical to the old behavior.
+If the existing "sorts entries by date DESC then title ASC" test (lines ~73-88) fails because all its entries are now `status:'open'` (no checkboxes â†’ status 'open' â†’ grouped as 'active'), it should still pass: all three are non-done, so the new sort degenerates to date DESC, title ASC â€” identical to the old behavior.
 
-- [ ] **Step 5: Run the full backend suite to confirm no regressions**
+- [x] **Step 5: Run the full backend suite to confirm no regressions**
 
 Run: `cd web.ui/backend && npm test`
 Expected: all tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add web.ui/backend/plans/scanner.js web.ui/backend/__tests__/plans/scanner.test.js
@@ -214,7 +214,7 @@ git commit -m "feat(plans): add completedAt + shipped fields and sink-done sort"
 
 ---
 
-## Task 2: Frontend — extract shared `relTime` helper
+## Task 2: Frontend â€” extract shared `relTime` helper
 
 **Files:**
 - Create: `web.ui/frontend-react/src/lib/relativeTime.ts`
@@ -222,7 +222,7 @@ git commit -m "feat(plans): add completedAt + shipped fields and sink-done sort"
 
 Mechanical refactor. Move the existing inline `relTime` out of the banner so the new Plans card can import it without duplicating.
 
-- [ ] **Step 1: Create the shared helper**
+- [x] **Step 1: Create the shared helper**
 
 Create `web.ui/frontend-react/src/lib/relativeTime.ts`:
 
@@ -247,7 +247,7 @@ export function relTime(iso: string | null, now: Date = new Date()): string {
 }
 ```
 
-- [ ] **Step 2: Replace the inline `relTime` in EtsyStatusBanner**
+- [x] **Step 2: Replace the inline `relTime` in EtsyStatusBanner**
 
 Edit `web.ui/frontend-react/src/components/EtsyStatusBanner.tsx`.
 
@@ -257,17 +257,17 @@ Add this import next to the existing `getStatus` import (line 2):
 import { relTime } from '../lib/relativeTime';
 ```
 
-Delete the local `relTime` function (currently lines 9-18 — the function and its preceding blank line). The component's existing call sites (`relTime(status.lastHeartbeatAt)`, `relTime(status.lastSyncAt)`) work unchanged because the imported function has the same name and signature.
+Delete the local `relTime` function (currently lines 9-18 â€” the function and its preceding blank line). The component's existing call sites (`relTime(status.lastHeartbeatAt)`, `relTime(status.lastSyncAt)`) work unchanged because the imported function has the same name and signature.
 
-- [ ] **Step 3: Run banner tests + type-check**
+- [x] **Step 3: Run banner tests + type-check**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/EtsyStatusBanner.test.tsx`
-Expected: 6/6 PASS — the banner tests check behavior, not the function's location.
+Expected: 6/6 PASS â€” the banner tests check behavior, not the function's location.
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/lib/relativeTime.ts web.ui/frontend-react/src/components/EtsyStatusBanner.tsx
@@ -276,12 +276,12 @@ git commit -m "refactor(ui): extract relTime helper into lib/relativeTime.ts"
 
 ---
 
-## Task 3: Frontend — extend `PlanEntry` interface
+## Task 3: Frontend â€” extend `PlanEntry` interface
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/api/plans.ts`
 
-- [ ] **Step 1: Add the two new fields**
+- [x] **Step 1: Add the two new fields**
 
 Edit `web.ui/frontend-react/src/api/plans.ts`. Replace the existing `PlanEntry` interface (currently lines 30-38) with:
 
@@ -301,12 +301,12 @@ export interface PlanEntry {
 }
 ```
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors. `Plans.tsx` doesn't yet reference the new fields, so adding them as optional/null-allowed doesn't break anything.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/api/plans.ts
@@ -315,14 +315,14 @@ git commit -m "feat(plans): add completedAt + shipped to PlanEntry type"
 
 ---
 
-## Task 4: Frontend — Plans page tests (TDD)
+## Task 4: Frontend â€” Plans page tests (TDD)
 
 **Files:**
 - Test: `web.ui/frontend-react/src/__tests__/Plans.test.tsx`
 
 Write tests first; they'll fail because the component doesn't implement the new rendering yet (Task 5 makes them pass).
 
-- [ ] **Step 1: Write the three failing tests**
+- [x] **Step 1: Write the three failing tests**
 
 Create `web.ui/frontend-react/src/__tests__/Plans.test.tsx`:
 
@@ -408,7 +408,7 @@ describe('Plans page', () => {
     // Progress bar suppressed.
     expect(within(cardEl as HTMLElement).queryByRole('progressbar')).toBeNull();
     // CompletedAt line present.
-    expect(within(cardEl as HTMLElement).getByText(/Completed\s*—/)).toBeInTheDocument();
+    expect(within(cardEl as HTMLElement).getByText(/Completed\s*â€”/)).toBeInTheDocument();
   });
 
   it('renders a shipped spec with the green "shipped" badge instead of "open"', async () => {
@@ -440,22 +440,22 @@ describe('Plans page', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/__tests__/Plans.test.tsx`
-Expected: FAIL — at least one of the assertions fails because the page doesn't yet render the `plan-card--done-collapsed` class, the "Completed —" line, or the "shipped" badge variant.
+Expected: FAIL â€” at least one of the assertions fails because the page doesn't yet render the `plan-card--done-collapsed` class, the "Completed â€”" line, or the "shipped" badge variant.
 
-(Don't commit yet — the failing test stays in the working tree until Task 5 makes it pass.)
+(Don't commit yet â€” the failing test stays in the working tree until Task 5 makes it pass.)
 
 ---
 
-## Task 5: Frontend — Plans.tsx rendering + shell.css rules
+## Task 5: Frontend â€” Plans.tsx rendering + shell.css rules
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/pages/Plans.tsx`
 - Modify: `web.ui/frontend-react/src/styles/shell.css`
 
-- [ ] **Step 1: Update `PlanCard` to handle the three new visual states**
+- [x] **Step 1: Update `PlanCard` to handle the three new visual states**
 
 Edit `web.ui/frontend-react/src/pages/Plans.tsx`.
 
@@ -501,7 +501,7 @@ function PlanCard({ entry, onOpen }: PlanCardProps) {
         )}
         {isDonePlan && entry.completedAt && (
           <p className="plan-card__completed-at">
-            Completed — {relTime(entry.completedAt)}
+            Completed â€” {relTime(entry.completedAt)}
           </p>
         )}
       </button>
@@ -524,14 +524,14 @@ function StatusBadge({ entry }: { entry: PlanEntry }) {
 }
 ```
 
-(The signature change — from `{status}` to `{entry}` — flows through naturally since `PlanCard` is the only caller and passes the whole entry below.)
+(The signature change â€” from `{status}` to `{entry}` â€” flows through naturally since `PlanCard` is the only caller and passes the whole entry below.)
 
-- [ ] **Step 2: Add the three new CSS rules**
+- [x] **Step 2: Add the three new CSS rules**
 
 Edit `web.ui/frontend-react/src/styles/shell.css`. Append the following block right after the existing `.status-badge--done` rule (currently around line 554):
 
 ```css
-/* Plans page — completion treatment. */
+/* Plans page â€” completion treatment. */
 .plan-card--done-collapsed { opacity: 0.55; transition: opacity 0.15s ease; }
 .plan-card--done-collapsed:hover { opacity: 1; }
 .plan-card__completed-at {
@@ -546,24 +546,24 @@ Edit `web.ui/frontend-react/src/styles/shell.css`. Append the following block ri
 }
 ```
 
-(The shipped badge intentionally reuses the same green tokens as `--posted` / `--done` — they already harmonize with the rest of the theme.)
+(The shipped badge intentionally reuses the same green tokens as `--posted` / `--done` â€” they already harmonize with the rest of the theme.)
 
-- [ ] **Step 3: Run the Plans tests to verify they pass**
+- [x] **Step 3: Run the Plans tests to verify they pass**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/__tests__/Plans.test.tsx`
 Expected: PASS (3/3).
 
-- [ ] **Step 4: Run the full frontend test suite**
+- [x] **Step 4: Run the full frontend test suite**
 
 Run: `cd web.ui/frontend-react && npm test`
-Expected: all PASS — including the existing EtsyStatusBanner / EtsyCatalog / other suites.
+Expected: all PASS â€” including the existing EtsyStatusBanner / EtsyCatalog / other suites.
 
-- [ ] **Step 5: Type-check**
+- [x] **Step 5: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/pages/Plans.tsx web.ui/frontend-react/src/styles/shell.css web.ui/frontend-react/src/__tests__/Plans.test.tsx
@@ -574,25 +574,25 @@ git commit -m "feat(plans): dim done cards, shipped-spec badge, completedAt copy
 
 ## Self-Review
 
-**Spec coverage check** — every requirement maps to a task:
+**Spec coverage check** â€” every requirement maps to a task:
 
-- §1 backend `completedAt` field → Task 1.
-- §1 backend `shipped` field → Task 1.
-- §1 backend sort change (active first, then date DESC, then title ASC) → Task 1.
-- §1 backend tests (four cases) → Task 1.
-- §2 shared `relTime` helper → Task 2.
-- §2 frontend `PlanEntry` interface extension → Task 3.
-- §2 frontend done-collapsed plan card rendering → Task 5.
-- §2 frontend "shipped" badge on specs → Task 5.
-- §2 frontend tests (three cases) → Task 4.
-- §2 CSS rules → Task 5.
+- Â§1 backend `completedAt` field â†’ Task 1.
+- Â§1 backend `shipped` field â†’ Task 1.
+- Â§1 backend sort change (active first, then date DESC, then title ASC) â†’ Task 1.
+- Â§1 backend tests (four cases) â†’ Task 1.
+- Â§2 shared `relTime` helper â†’ Task 2.
+- Â§2 frontend `PlanEntry` interface extension â†’ Task 3.
+- Â§2 frontend done-collapsed plan card rendering â†’ Task 5.
+- Â§2 frontend "shipped" badge on specs â†’ Task 5.
+- Â§2 frontend tests (three cases) â†’ Task 4.
+- Â§2 CSS rules â†’ Task 5.
 
 No gaps.
 
-**Placeholder scan:** every step has actual code or actual commands. No "TBD", "etc.", or "similar to…" references.
+**Placeholder scan:** every step has actual code or actual commands. No "TBD", "etc.", or "similar toâ€¦" references.
 
 **Type consistency:**
-- `completedAt: string | null` and `shipped?: boolean` — same shape in backend JSDoc (Task 1) and frontend interface (Task 3). ✓
-- `StatusBadge` prop changes from `{status: PlanStatus}` to `{entry: PlanEntry}` in Task 5 — the only caller (`PlanCard`) is updated in the same task. ✓
-- `relTime(iso, now?)` signature is identical between the original inline (EtsyStatusBanner) and the extracted file (Task 2). ✓
-- Sort tuple is implemented exactly once (Task 1's `scanDocs`) and not duplicated in the frontend (which relies on server-side order). ✓
+- `completedAt: string | null` and `shipped?: boolean` â€” same shape in backend JSDoc (Task 1) and frontend interface (Task 3). âœ“
+- `StatusBadge` prop changes from `{status: PlanStatus}` to `{entry: PlanEntry}` in Task 5 â€” the only caller (`PlanCard`) is updated in the same task. âœ“
+- `relTime(iso, now?)` signature is identical between the original inline (EtsyStatusBanner) and the extracted file (Task 2). âœ“
+- Sort tuple is implemented exactly once (Task 1's `scanDocs`) and not duplicated in the frontend (which relies on server-side order). âœ“
