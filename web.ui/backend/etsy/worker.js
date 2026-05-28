@@ -15,8 +15,9 @@ import { EtsyClient } from './client.js';
 import { runSyncPass } from './syncer.js';
 import { setWorkerHeartbeat, setWorkerError } from '../workerStatus.js';
 
-/** Canonical worker name reported via workerStatus. */
-const WORKER_NAME = 'etsy.syncer';
+/** Canonical worker name reported via workerStatus. Exported so the
+ *  status reader and the manual-sync route can read/write the same slot. */
+export const WORKER_NAME = 'etsy.syncer';
 
 /** Default cadence: 30 minutes. */
 const DEFAULT_INTERVAL_MS = 30 * 60 * 1000;

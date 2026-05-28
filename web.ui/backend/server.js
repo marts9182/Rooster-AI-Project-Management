@@ -38,6 +38,7 @@ import { etsyConfig } from './etsy/config.js';
 import { ensureFreshToken } from './etsy/oauth.js';
 import { EtsyClient } from './etsy/client.js';
 import { getEtsyStatus } from './etsy/status.js';
+import { WORKER_NAME as ETSY_WORKER_NAME } from './etsy/worker.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
 import { createPlansRouter } from './plans/routes.js';
@@ -304,8 +305,23 @@ app.use('/api/kdp', auditRoutes);
         shopId: cfg.shopId,
         getAccessToken: () => ensureFreshToken({ cfg }),
       });
-      runEtsySync = () =>
-        runEtsySyncPass({ db: openDb(), client: etsyClient, emit: recordEvent });
+      runEtsySync = async () => {
+        try {
+          const result = await runEtsySyncPass({
+            db: openDb(),
+            client: etsyClient,
+            emit: recordEvent,
+          });
+          setWorkerHeartbeat(ETSY_WORKER_NAME);
+          return result;
+        } catch (err) {
+          setWorkerError(
+            ETSY_WORKER_NAME,
+            err instanceof Error ? err.message : String(err),
+          );
+          throw err;
+        }
+      };
     } catch (err) {
       logger.warn(
         { err: err.message },

@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { getAllStatuses } from '../workerStatus.js';
+import { WORKER_NAME } from './worker.js';
 
 /**
  * @typedef {Object} EtsyStatus
@@ -73,7 +74,7 @@ export function getEtsyStatus(opts = {}) {
     // Not present.
   }
 
-  const w = statuses['etsy'];
+  const w = statuses[WORKER_NAME];
   const lastHeartbeatAt = w?.last_success_at ?? null;
   let lastError = null;
   if (w && w.last_error_at && w.last_error_message && w._error_seq > w._success_seq) {

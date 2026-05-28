@@ -100,8 +100,8 @@ describe('getEtsyStatus', () => {
     process.env.ETSY_KEYSTRING = 'k';
     process.env.ETSY_SHARED_SECRET = 's';
     process.env.ETSY_SHOP_ID = '1';
-    setWorkerError('etsy', 'boom');
-    setWorkerHeartbeat('etsy');
+    setWorkerError('etsy.syncer','boom');
+    setWorkerHeartbeat('etsy.syncer');
     const s = getEtsyStatus();
     expect(s.lastHeartbeatAt).not.toBeNull();
     expect(s.lastSyncAt).toBe(s.lastHeartbeatAt);
@@ -112,8 +112,8 @@ describe('getEtsyStatus', () => {
     process.env.ETSY_KEYSTRING = 'k';
     process.env.ETSY_SHARED_SECRET = 's';
     process.env.ETSY_SHOP_ID = '1';
-    setWorkerHeartbeat('etsy');
-    setWorkerError('etsy', 'token refresh failed');
+    setWorkerHeartbeat('etsy.syncer');
+    setWorkerError('etsy.syncer','token refresh failed');
     const s = getEtsyStatus();
     expect(s.lastError).toBe('token refresh failed');
   });
