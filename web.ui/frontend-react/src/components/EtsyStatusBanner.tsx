@@ -1,20 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getStatus, syncNow, type EtsyStatus } from '../api/etsy';
+import { relTime } from '../lib/relativeTime';
 
 interface Props {
   /** Called after a successful sync so the parent can refetch listings. */
   onSynced: () => void;
-}
-
-function relTime(iso: string | null, now: Date = new Date()): string {
-  if (!iso) return '';
-  const t = Date.parse(iso);
-  if (!Number.isFinite(t)) return '';
-  const sec = Math.round((now.getTime() - t) / 1000);
-  if (sec < 60) return 'just now';
-  if (sec < 3600) return `${Math.round(sec / 60)} min ago`;
-  if (sec < 86400) return `${Math.round(sec / 3600)} hr ago`;
-  return `${Math.round(sec / 86400)} day(s) ago`;
 }
 
 type BannerKind = 'not-configured' | 'no-token' | 'sync-failed' | 'ok' | 'loading';
