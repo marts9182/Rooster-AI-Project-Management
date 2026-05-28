@@ -82,8 +82,10 @@ if (PORT !== 0 && process.env.ROOSTER_SKIP_KDP_SCANNER !== '1') {
 }
 
 // Start the Etsy 30-min syncer. Same gating model as the KDP scanner, plus
-// a requirement that ETSY_KEYSTRING is set (so a dev without Etsy creds
-// doesn't see noise on every tick). ROOSTER_SKIP_ETSY_WORKER=1 disables.
+// a requirement that all three Etsy env keys are set (so a dev without
+// Etsy creds doesn't see noise on every tick). When any required key is
+// missing we log one warn with the missing list rather than booting silently.
+// ROOSTER_SKIP_ETSY_WORKER=1 disables the worker entirely.
 if (
   PORT !== 0 &&
   process.env.ROOSTER_SKIP_ETSY_WORKER !== '1'
