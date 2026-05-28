@@ -24,7 +24,13 @@ const REQUIRED = ['ETSY_KEYSTRING', 'ETSY_SHARED_SECRET', 'ETSY_SHOP_ID'];
 /**
  * @param {{
  *   env?: NodeJS.ProcessEnv,
- *   statuses?: Record<string, {last_success_at: string|null, last_error_at: string|null, last_error_message: string|null}>,
+ *   statuses?: Record<string, {
+ *     last_success_at: string|null,
+ *     last_error_at: string|null,
+ *     last_error_message: string|null,
+ *     _success_seq: number,
+ *     _error_seq: number,
+ *   }>,
  *   fs?: typeof fs,
  * }} [opts]
  * @returns {EtsyStatus}
@@ -70,18 +76,8 @@ export function getEtsyStatus(opts = {}) {
   const w = statuses['etsy'];
   const lastHeartbeatAt = w?.last_success_at ?? null;
   let lastError = null;
-  if (w && w.last_error_at && w.last_error_message) {
-    // Compare monotonic write order when available (workerStatus exposes
-    // `_success_seq` / `_error_seq`). Otherwise fall back to wall-clock.
-    // The seq path is necessary because back-to-back sync writes often
-    // share a millisecond, especially on Windows.
-    if (typeof w._error_seq === 'number' && typeof w._success_seq === 'number') {
-      if (w._error_seq > w._success_seq) lastError = w.last_error_message;
-    } else {
-      const successT = w.last_success_at ? Date.parse(w.last_success_at) : 0;
-      const errorT = Date.parse(w.last_error_at);
-      if (errorT > successT) lastError = w.last_error_message;
-    }
+  if (w && w.last_error_at && w.last_error_message && w._error_seq > w._success_seq) {
+    lastError = w.last_error_message;
   }
 
   return {
