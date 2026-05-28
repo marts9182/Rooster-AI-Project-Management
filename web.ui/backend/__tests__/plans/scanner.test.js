@@ -104,4 +104,72 @@ describe('plans/scanner', () => {
     const entries = scanDocs(path.join(root, 'superpowers'));
     expect(entries[0].title).toBe('bare-file');
   });
+
+  it('scanDocs sets completedAt to file mtime on done plans only', () => {
+    const donePlan = path.join(root, 'superpowers', 'plans', '2026-05-20-finished.md');
+    fs.writeFileSync(donePlan, '# Done plan\n\n- [x] one\n- [x] two\n');
+    const fixedMtime = new Date('2026-05-22T15:30:00Z');
+    fs.utimesSync(donePlan, fixedMtime, fixedMtime);
+
+    const openPlan = path.join(root, 'superpowers', 'plans', '2026-05-21-active.md');
+    fs.writeFileSync(openPlan, '# Active\n\n- [ ] one\n- [x] two\n');
+
+    const entries = scanDocs(path.join(root, 'superpowers'));
+    const done = entries.find((e) => e.slug === 'finished');
+    const active = entries.find((e) => e.slug === 'active');
+
+    expect(done.status).toBe('done');
+    expect(done.completedAt).toBe('2026-05-22T15:30:00.000Z');
+    expect(active.status).toBe('in-flight');
+    expect(active.completedAt).toBeNull();
+  });
+
+  it('scanDocs sets shipped:true on a spec whose same-slug plan is done', () => {
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'specs', '2026-05-20-thing-design.md'),
+      '---\ntitle: Thing Design\n---\n# Thing\n',
+    );
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'plans', '2026-05-20-thing.md'),
+      '# Thing plan\n\n- [x] task\n',
+    );
+    const entries = scanDocs(path.join(root, 'superpowers'));
+    const spec = entries.find((e) => e.kind === 'spec');
+    expect(spec.shipped).toBe(true);
+  });
+
+  it('scanDocs leaves shipped undefined when matching plan is still in-flight or absent', () => {
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'specs', '2026-05-20-inflight-design.md'),
+      '---\ntitle: Inflight Design\n---\n# In flight\n',
+    );
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'plans', '2026-05-20-inflight.md'),
+      '# In-flight plan\n\n- [ ] task\n- [x] task\n',
+    );
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'specs', '2026-05-20-orphan-design.md'),
+      '---\ntitle: Orphan\n---\n# Orphan\n',
+    );
+
+    const entries = scanDocs(path.join(root, 'superpowers'));
+    const inflightSpec = entries.find((e) => e.slug === 'inflight' && e.kind === 'spec');
+    const orphanSpec = entries.find((e) => e.slug === 'orphan');
+    expect(inflightSpec.shipped).toBeUndefined();
+    expect(orphanSpec.shipped).toBeUndefined();
+  });
+
+  it('scanDocs sort puts active in-flight ahead of a more-recent done plan', () => {
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'plans', '2026-05-20-active.md'),
+      '# Active\n\n- [ ] t\n- [x] t\n',
+    );
+    fs.writeFileSync(
+      path.join(root, 'superpowers', 'plans', '2026-05-25-finished.md'),
+      '# Finished\n\n- [x] all done\n',
+    );
+    const entries = scanDocs(path.join(root, 'superpowers'));
+    const planSlugs = entries.filter((e) => e.kind === 'plan').map((e) => e.slug);
+    expect(planSlugs).toEqual(['active', 'finished']);
+  });
 });

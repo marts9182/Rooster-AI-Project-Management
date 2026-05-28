@@ -15,7 +15,9 @@ import matter from 'gray-matter';
  * @property {number} done
  * @property {number} total
  * @property {number} percent  rounded 0–100
- *
+ */
+
+/**
  * @typedef {Object} PlanEntry
  * @property {'spec'|'plan'} kind
  * @property {string} title
@@ -24,6 +26,8 @@ import matter from 'gray-matter';
  * @property {string} path          absolute path to the .md file
  * @property {string} slug
  * @property {PlanProgress} progress
+ * @property {string | null} completedAt   ISO datetime; only set when status === 'done'
+ * @property {boolean} [shipped]           true on a spec when a same-slug plan is done
  */
 
 const FILENAME_DATE = /^(\d{4}-\d{2}-\d{2})-(.+?)(-design|-implementation)?\.md$/i;
@@ -114,14 +118,20 @@ function _scanDir(dir, kind) {
     const slug = _slugFromFilename(filename);
     const date = _dateFromFilename(filename) ?? '';
     const progress = computeProgress(parsed.content);
+    const status = _statusOf(progress);
+    const completedAt =
+      status === 'done'
+        ? fs.statSync(full).mtime.toISOString()
+        : null;
     out.push({
       kind,
       title: _titleFrom(parsed, slug),
       date,
-      status: _statusOf(progress),
+      status,
       path: full,
       slug,
       progress,
+      completedAt,
     });
   }
   return out;
@@ -129,16 +139,29 @@ function _scanDir(dir, kind) {
 
 /**
  * Scan `<superpowersRoot>/specs/*.md` and `<superpowersRoot>/plans/*.md`.
- * Returns a combined array sorted by date DESC then title ASC.
+ * Returns a combined array sorted by status (active first), then date DESC,
+ * then title ASC. Specs whose same-slug plan is done get `shipped: true`.
+ *
  * @param {string} superpowersRoot  absolute path to docs/superpowers/
  * @returns {PlanEntry[]}
  */
 export function scanDocs(superpowersRoot) {
-  const specs = _scanDir(path.join(superpowersRoot, 'specs'), 'spec');
   const plans = _scanDir(path.join(superpowersRoot, 'plans'), 'plan');
+  const specs = _scanDir(path.join(superpowersRoot, 'specs'), 'spec');
+
+  const shippedSlugs = new Set(
+    plans.filter((p) => p.status === 'done').map((p) => p.slug),
+  );
+  for (const spec of specs) {
+    if (shippedSlugs.has(spec.slug)) spec.shipped = true;
+  }
+
   const all = [...specs, ...plans];
   all.sort((a, b) => {
-    if (a.date !== b.date) return a.date < b.date ? 1 : -1; // DESC by date
+    const aDone = a.status === 'done' ? 1 : 0;
+    const bDone = b.status === 'done' ? 1 : 0;
+    if (aDone !== bDone) return aDone - bDone;
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
     return a.title.localeCompare(b.title);
   });
   return all;
