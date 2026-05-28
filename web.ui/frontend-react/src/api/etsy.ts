@@ -83,4 +83,20 @@ export async function syncNow(): Promise<SyncNowResult> {
   return (await r.json()) as SyncNowResult;
 }
 
+export interface EtsyStatus {
+  configured: boolean;
+  missingEnv: string[];
+  tokenPresent: boolean;
+  tokenExpiresAt: string | null;
+  lastHeartbeatAt: string | null;
+  lastError: string | null;
+  lastSyncAt: string | null;
+}
+
+export async function getStatus(): Promise<EtsyStatus> {
+  const r = await fetch('/api/etsy/status');
+  if (!r.ok) await throwForStatus(r, 'getStatus');
+  return (await r.json()) as EtsyStatus;
+}
+
 export { ApiError };
