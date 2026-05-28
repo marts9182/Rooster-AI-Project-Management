@@ -110,3 +110,37 @@ describe('POST /api/etsy/sync-now', () => {
     expect(resp.body.error).toMatch(/etsy 401/);
   });
 });
+
+describe('GET /api/etsy/status', () => {
+  it('returns the status payload from the injected getStatus', async () => {
+    const payload = {
+      configured: false,
+      missingEnv: ['ETSY_KEYSTRING'],
+      tokenPresent: false,
+      tokenExpiresAt: null,
+      lastHeartbeatAt: null,
+      lastError: null,
+      lastSyncAt: null,
+    };
+    const getStatus = vi.fn().mockReturnValue(payload);
+    const app = express();
+    app.use(express.json());
+    mountEtsyRoutes(app, { db: freshDb(), runSyncPass: vi.fn(), getStatus });
+    const resp = await request(app).get('/api/etsy/status');
+    expect(resp.status).toBe(200);
+    expect(resp.body).toEqual(payload);
+    expect(getStatus).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns 200 with default fallback when getStatus is not injected', async () => {
+    // Backwards compat: mounting without getStatus should not 500. The
+    // route returns a degraded payload that flags configured:false so the
+    // banner stays in the not-configured state.
+    const app = express();
+    app.use(express.json());
+    mountEtsyRoutes(app, { db: freshDb(), runSyncPass: vi.fn() });
+    const resp = await request(app).get('/api/etsy/status');
+    expect(resp.status).toBe(200);
+    expect(resp.body.configured).toBe(false);
+  });
+});

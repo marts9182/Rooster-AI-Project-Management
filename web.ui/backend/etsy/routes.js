@@ -16,6 +16,7 @@ import { allListings, listingByEtsyId } from './repo.js';
  * @typedef {Object} MountArgs
  * @property {import('better-sqlite3').Database} db
  * @property {() => Promise<{inserted: number, updated: number, statusChanged: number}>} runSyncPass
+ * @property {() => import('./status.js').EtsyStatus} [getStatus]
  */
 
 /**
@@ -24,7 +25,7 @@ import { allListings, listingByEtsyId } from './repo.js';
  * @param {import('express').Express} app
  * @param {MountArgs} args
  */
-export function mountEtsyRoutes(app, { db, runSyncPass }) {
+export function mountEtsyRoutes(app, { db, runSyncPass, getStatus }) {
   app.get('/api/etsy/listings', (req, res) => {
     /** @type {Record<string, string>} */
     const filters = {};
@@ -63,5 +64,20 @@ export function mountEtsyRoutes(app, { db, runSyncPass }) {
         .status(500)
         .json({ error: err instanceof Error ? err.message : String(err) });
     }
+  });
+
+  app.get('/api/etsy/status', (_req, res) => {
+    const payload = getStatus
+      ? getStatus()
+      : {
+          configured: false,
+          missingEnv: ['ETSY_KEYSTRING', 'ETSY_SHARED_SECRET', 'ETSY_SHOP_ID'],
+          tokenPresent: false,
+          tokenExpiresAt: null,
+          lastHeartbeatAt: null,
+          lastError: null,
+          lastSyncAt: null,
+        };
+    res.json(payload);
   });
 }
