@@ -76,12 +76,18 @@ let fetchMock: ReturnType<typeof vi.fn>;
 let originalES: typeof EventSource | undefined;
 
 beforeEach(() => {
-  fetchMock = vi.fn().mockImplementation(() =>
-    Promise.resolve({
+  fetchMock = vi.fn().mockImplementation((url: string) => {
+    if (url === '/api/kdp/ingest-bookshelf/pending') {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ preview: null }),
+      });
+    }
+    return Promise.resolve({
       ok: true,
       json: async () => ({ books: sampleBooks }),
-    }),
-  );
+    });
+  });
   vi.stubGlobal('fetch', fetchMock);
   originalES = (globalThis as unknown as { EventSource?: typeof EventSource }).EventSource;
   (globalThis as unknown as { EventSource: unknown }).EventSource = FakeEventSource;
@@ -105,6 +111,10 @@ describe('KdpCatalog', () => {
     expect(screen.getByText('Book B')).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith('/api/kdp/books');
   });
+
+  function booksCallCount(): number {
+    return fetchMock.mock.calls.filter((c) => c[0] === '/api/kdp/books').length;
+  }
 
   it('renders status badges with the right CSS class', async () => {
     render(
@@ -175,7 +185,7 @@ describe('KdpCatalog', () => {
       </MemoryRouter>,
     );
     await waitFor(() => screen.getByText('Book A'));
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(booksCallCount()).toBe(1);
 
     // Now the FakeEventSource should be open. Emit a kdp:new-book.
     expect(FakeEventSource.last).not.toBeNull();
@@ -185,6 +195,37 @@ describe('KdpCatalog', () => {
         occurred_at: '2026-05-26T00:00:00Z',
       });
     });
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(booksCallCount()).toBe(2));
+  });
+
+  it('renders the pending-sync banner when /pending returns a preview', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url === '/api/kdp/ingest-bookshelf/pending') {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            preview: {
+              preview_id: 'p1',
+              created_at: new Date().toISOString(),
+              matches: [],
+              ambiguous: [],
+              orphans: [],
+              missing_from_kdp: [],
+            },
+          }),
+        });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ books: [] }),
+      });
+    });
+
+    render(
+      <MemoryRouter>
+        <KdpCatalog />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText(/Pending KDP sync/i)).toBeInTheDocument();
   });
 });

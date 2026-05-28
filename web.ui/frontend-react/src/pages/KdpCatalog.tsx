@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { listBooks, type KdpBook, type KdpStatus } from '../api/kdp';
 import { useSseEvents } from '../hooks/useSseEvents';
+import KdpPendingSyncBanner from '../components/KdpPendingSyncBanner';
 
 type SortKey = 'title' | 'status' | 'asin' | 'release_date' | 'updated_at';
 type SortDir = 'asc' | 'desc';
@@ -116,6 +117,8 @@ export default function KdpCatalog() {
           </button>
         </div>
       </div>
+
+      <KdpPendingSyncBanner onApplied={() => reload()} />
 
       {error && (
         <p role="alert" className="error-text">
