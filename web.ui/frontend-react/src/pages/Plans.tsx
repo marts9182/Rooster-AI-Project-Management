@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { listPlans, type PlanEntry } from '../api/plans';
 import { PlanDetailModal } from '../components/PlanDetailModal';
+import { relTime } from '../lib/relativeTime';
 
 /**
  * Two-column browser for `docs/superpowers/{specs,plans}/*.md`. Calls
@@ -119,13 +120,19 @@ interface PlanCardProps {
 }
 
 function PlanCard({ entry, onOpen }: PlanCardProps) {
+  const isDonePlan = entry.kind === 'plan' && entry.status === 'done';
   const hasProgress =
+    !isDonePlan &&
     entry.kind === 'plan' &&
     entry.progress != null &&
     (entry.progress.open + entry.progress.done) > 0;
 
+  const cardClass = `plan-card plan-card--${entry.status}${
+    isDonePlan ? ' plan-card--done-collapsed' : ''
+  }`;
+
   return (
-    <li className={`plan-card plan-card--${entry.status}`}>
+    <li className={cardClass}>
       <button
         type="button"
         className="plan-card__button"
@@ -138,20 +145,28 @@ function PlanCard({ entry, onOpen }: PlanCardProps) {
               {entry.date}
             </time>
           )}
-          <StatusBadge status={entry.status} />
+          <StatusBadge entry={entry} />
         </div>
         {hasProgress && entry.progress && (
           <ProgressBar progress={entry.progress} />
+        )}
+        {isDonePlan && entry.completedAt && (
+          <p className="plan-card__completed-at">
+            Completed — {relTime(entry.completedAt)}
+          </p>
         )}
       </button>
     </li>
   );
 }
 
-function StatusBadge({ status }: { status: PlanEntry['status'] }) {
-  const label = status === 'in-flight' ? 'in flight' : status;
+function StatusBadge({ entry }: { entry: PlanEntry }) {
+  if (entry.kind === 'spec' && entry.shipped) {
+    return <span className="status-badge status-badge--shipped">shipped</span>;
+  }
+  const label = entry.status === 'in-flight' ? 'in flight' : entry.status;
   return (
-    <span className={`status-badge status-badge--${status}`}>{label}</span>
+    <span className={`status-badge status-badge--${entry.status}`}>{label}</span>
   );
 }
 
