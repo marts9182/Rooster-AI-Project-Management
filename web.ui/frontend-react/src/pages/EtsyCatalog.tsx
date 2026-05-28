@@ -8,8 +8,9 @@
  *   niche (same).
  * - Sortable column headers — toggle direction on re-click, same pattern as
  *   KdpCatalog.
- * - `[Sync now]` button calls `syncNow()`, shows a spinner, then refetches
- *   the list and shows a transient toast "Synced — X inserted, Y updated".
+ * - The Sync-now control + transient status display live in
+ *   `<EtsyStatusBanner />`, mounted at the top of this page. The banner
+ *   calls `reload(filters)` via its `onSynced` prop after a successful sync.
  * - Click a row's title → navigates to `/etsy/:etsy_listing_id`.
  * - SSE wiring is intentionally NOT here — Task 14 of Plan C adds it.
  */
@@ -17,10 +18,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   listListings,
-  syncNow,
   type EtsyListing,
   type ListListingsParams,
 } from '../api/etsy';
+import EtsyStatusBanner from '../components/EtsyStatusBanner';
 import { useSseEvents } from '../hooks/useSseEvents';
 
 const ETSY_SSE_KINDS = new Set([
@@ -115,8 +116,6 @@ export default function EtsyCatalog() {
   const [error, setError] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>('listed_at');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
-  const [syncing, setSyncing] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   // Throttle SSE-triggered refetches to at most one per 2 seconds.
   const lastRefetchAt = useRef<number>(0);
@@ -151,13 +150,6 @@ export default function EtsyCatalog() {
     lastRefetchAt.current = now;
     reload(filters);
   }, [lastEvent, filters, reload]);
-
-  // Auto-dismiss toast after 4s.
-  useEffect(() => {
-    if (!toast) return;
-    const id = window.setTimeout(() => setToast(null), 4000);
-    return () => window.clearTimeout(id);
-  }, [toast]);
 
   const sectionOptions = useMemo(() => {
     const set = new Set<string>();
@@ -243,51 +235,13 @@ export default function EtsyCatalog() {
     });
   }
 
-  async function onSyncNow() {
-    setSyncing(true);
-    setError(null);
-    try {
-      const result = await syncNow();
-      setToast(
-        `Synced — ${result.inserted} inserted, ${result.updated} updated`,
-      );
-      reload(filters);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setSyncing(false);
-    }
-  }
-
   return (
     <section>
       <div className="page-header">
         <h1>Etsy catalog</h1>
-        <div className="page-header-actions">
-          <button
-            type="button"
-            onClick={() => void onSyncNow()}
-            disabled={syncing}
-          >
-            {syncing ? 'Syncing…' : 'Sync now'}
-          </button>
-        </div>
       </div>
 
-      {toast && (
-        <p
-          role="status"
-          style={{
-            background: '#e6f7ec',
-            color: '#1b6d3a',
-            padding: '6px 10px',
-            borderRadius: 4,
-            marginBottom: '0.5rem',
-          }}
-        >
-          {toast}
-        </p>
-      )}
+      <EtsyStatusBanner onSynced={() => reload(filters)} />
 
       {error && (
         <p role="alert" className="error-text">
