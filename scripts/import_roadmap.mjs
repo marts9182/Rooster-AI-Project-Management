@@ -11,10 +11,11 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import yaml from 'js-yaml';
 
 const DEFAULT_YAML = path.resolve(
-  path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')),
+  path.dirname(fileURLToPath(import.meta.url)),
   '..',
   'docs/superpowers/roadmap/2026-h2-pocket-rooster-press.yml',
 );
@@ -82,8 +83,9 @@ function nextDay(yyyyMmDd) {
   return d.toISOString().slice(0, 10);
 }
 
-// CLI entry — only when run directly.
-if (import.meta.url === `file://${process.argv[1]}`) {
+// CLI entry — only when run directly. Compare normalized file URLs so
+// the guard fires consistently across Windows / macOS / Linux.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const filePath = process.argv[2] || DEFAULT_YAML;
   const yamlStr = fs.readFileSync(filePath, 'utf8');
   const result = await importRoadmap({ yaml: yamlStr, fetchFn: fetch, baseUrl: DEFAULT_BASE });

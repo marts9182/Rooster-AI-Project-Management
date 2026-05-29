@@ -1,0 +1,10 @@
+{
+  "name": "rooster-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "One-shot scripts for the Rooster dashboard. Self-contained workspace so each script resolves its own deps via npm.",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
+}
