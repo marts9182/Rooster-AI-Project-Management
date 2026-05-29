@@ -42,6 +42,7 @@ import { WORKER_NAME as ETSY_WORKER_NAME } from './etsy/worker.js';
 import { mountCalendarRoutes } from './calendar/routes.js';
 import { mountReminderActionRoutes } from './reminders/routes.js';
 import { createPlansRouter } from './plans/routes.js';
+import { createRoadmapRouter } from './roadmap/routes.js';
 import { mountChatRoutes } from './chat/routes.js';
 import {
   installPinterestModule,
@@ -438,6 +439,9 @@ const SUPERPOWERS_ROOT = process.env.ROOSTER_DOCS_ROOT
   ? path.resolve(process.env.ROOSTER_DOCS_ROOT)
   : path.resolve(__dirname, '..', '..', 'docs', 'superpowers');
 app.use('/api/plans', createPlansRouter({ superpowersRoot: SUPERPOWERS_ROOT }));
+
+// ── /api/roadmap/* — publishing roadmap (kdp + etsy) CRUD ──────────────
+app.use('/api/roadmap', createRoadmapRouter({ db: openDb() }));
 
 // ── /api/chat/* — Claude Code chat (conversations + SSE-streamed turns) ──
 mountChatRoutes(app, { db: openDb() });
