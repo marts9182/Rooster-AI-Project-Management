@@ -11,7 +11,7 @@
    commented to explain why it bypasses the variable system. */
 
 :root {
-  --header-h: 64px;
+  --header-h: 68px;
   /* `--topbar-h` kept for backward-compat with components that read it
      (notably `.bell-popover` positions itself below the header by this var). */
   --topbar-h: var(--header-h);
@@ -274,6 +274,12 @@ h4 { font-size: var(--text-base);font-weight: var(--weight-semibold); line-heigh
 }
 
 /* ── Header (horizontal nav) ──────────────────────────────────────── */
+/* Polished 2026-05-29 (Task 7): swapped the box-shadow for a single 1px
+   border-bottom, bumped --header-h 64 → 68 for breathing room, and gave
+   the active nav link a 2px accent underline on top of the existing
+   color/background change. Icon buttons (bell, chat-blob trigger, theme
+   toggle, profile/help link) standardised to a 36×36 hit area with a
+   subtle hover fill. */
 .app-header {
   display: flex;
   align-items: center;
@@ -283,7 +289,6 @@ h4 { font-size: var(--text-base);font-weight: var(--weight-semibold); line-heigh
   height: var(--header-h);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-soft);
   position: sticky;
   top: 0;
   z-index: 30;
@@ -294,6 +299,7 @@ h4 { font-size: var(--text-base);font-weight: var(--weight-semibold); line-heigh
 .header-logo img { height: 36px; display: block; }
 .header-nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
 .header-nav-link {
+  position: relative;
   padding: 0.5rem 0.85rem;
   color: var(--muted);
   text-decoration: none;
@@ -303,36 +309,64 @@ h4 { font-size: var(--text-base);font-weight: var(--weight-semibold); line-heigh
   transition: color 0.15s, background 0.15s;
 }
 .header-nav-link:hover { color: var(--fg); background: var(--surface-hover); }
-.header-nav-link.active { color: var(--accent); background: var(--surface-hover); }
+.header-nav-link.active,
+.header-nav-link[aria-current="page"] {
+  color: var(--accent);
+  background: var(--surface-hover);
+}
+/* 2px accent underline tucked under the bottom of the header for the
+   active route. Inset by the link's horizontal padding so it lines up
+   with the visible text rather than the rounded background pill. */
+.header-nav-link.active::after,
+.header-nav-link[aria-current="page"]::after {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: -10px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 1px;
+}
 
 .sse-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .sse-dot-ok { background: var(--ok); }
 .sse-dot-down { background: var(--danger); animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-.theme-toggle {
-  background: transparent;
+/* Shared 36×36 hit area + hover fill for header icon buttons.
+   `.chat-blob-trigger` keeps its bespoke scale/brightness hover (defined
+   in chat.css) but inherits the standard size + radius here. */
+.app-header-right .theme-toggle,
+.app-header-right .bell,
+.app-header-right .chat-blob-trigger,
+.app-header-right .profile-link {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
   border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  background: transparent;
   color: var(--fg);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.15rem;
   line-height: 1;
-}
-.theme-toggle:hover { background: var(--surface-hover); }
-
-.bell {
-  position: relative;
   text-decoration: none;
-  font-size: 1.2rem;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  color: var(--fg);
+  transition: background 120ms ease, color 120ms ease;
 }
-.bell:hover { background: var(--surface-hover); border-radius: 4px; }
+.app-header-right .theme-toggle:hover,
+.app-header-right .bell:hover,
+.app-header-right .profile-link:hover {
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+/* .chat-blob-trigger keeps its transform-based hover from chat.css;
+   the override above only standardises the hit-area + corner radius. */
+.app-header-right .chat-blob-trigger { border-radius: 999px; }
+
+.bell { position: relative; }
 .bell-badge {
   position: absolute;
   top: -2px;
@@ -345,14 +379,6 @@ h4 { font-size: var(--text-base);font-weight: var(--weight-semibold); line-heigh
   min-width: 16px;
   text-align: center;
 }
-.profile-link {
-  text-decoration: none;
-  font-size: 1.2rem;
-  color: var(--fg);
-  padding: 0.25rem 0.4rem;
-  border-radius: 4px;
-}
-.profile-link:hover { background: var(--surface-hover); }
 
 .bell-overlay { position: fixed; inset: 0; z-index: 39; }
 .bell-popover {
