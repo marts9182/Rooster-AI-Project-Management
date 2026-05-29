@@ -90,7 +90,7 @@ describe('EtsyStatusBanner', () => {
     await screen.findByRole('button', { name: /sync now/i });
     await userEvent.click(screen.getByRole('button', { name: /sync now/i }));
     await waitFor(() => expect(onSynced).toHaveBeenCalled());
-    const calls = fetchSpy.mock.calls.map((c) => String(c[0]));
+    const calls = fetchSpy.mock.calls.map((c: unknown[]) => String(c[0]));
     expect(calls).toEqual([
       '/api/etsy/status',
       '/api/etsy/sync-now',

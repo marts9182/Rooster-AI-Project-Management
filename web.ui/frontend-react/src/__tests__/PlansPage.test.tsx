@@ -14,6 +14,7 @@ const sampleEntries: PlanEntry[] = [
     status: 'done',
     path: '/abs/2026-05-22-etsy-plan-2e-design.md',
     progress: { open: 0, done: 0, total: 0, percent: 0 },
+    completedAt: null,
   },
   {
     kind: 'plan',
@@ -23,6 +24,7 @@ const sampleEntries: PlanEntry[] = [
     status: 'in-flight',
     path: '/abs/2026-05-22-etsy-plan-2e-implementation.md',
     progress: { open: 3, done: 7, total: 10, percent: 70 },
+    completedAt: null,
   },
   {
     kind: 'plan',
@@ -32,6 +34,7 @@ const sampleEntries: PlanEntry[] = [
     status: 'open',
     path: '/abs/2026-05-10-kdp-day-30-implementation.md',
     progress: { open: 5, done: 0, total: 5, percent: 0 },
+    completedAt: null,
   },
 ];
 

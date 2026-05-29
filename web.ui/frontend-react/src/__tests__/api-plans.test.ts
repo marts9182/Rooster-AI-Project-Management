@@ -15,6 +15,7 @@ const sampleEntry: PlanEntry = {
   status: 'in-flight',
   path: '/abs/2026-05-22-etsy-plan-2e-implementation.md',
   progress: { open: 3, done: 7, total: 10, percent: 70 },
+  completedAt: null,
 };
 
 const sampleDetail: PlanDetail = {

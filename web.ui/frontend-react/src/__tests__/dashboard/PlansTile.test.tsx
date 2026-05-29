@@ -19,6 +19,7 @@ function plan(
     status,
     path: `/abs/${slug}.md`,
     progress: { open: 0, done: 0, total: 0, percent },
+    completedAt: null,
   };
 }
 

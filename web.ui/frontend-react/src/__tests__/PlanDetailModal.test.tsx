@@ -13,6 +13,7 @@ const sampleDetail: PlanDetail = {
   status: 'in-flight',
   path: '/abs/2026-05-22-etsy-plan-2e-implementation.md',
   progress: { open: 3, done: 7, total: 10, percent: 70 },
+  completedAt: null,
   markdown:
     '# Plan body\n\n- [ ] open step\n- [x] done step\n\n| col | val |\n| --- | --- |\n| a | b |\n',
   frontmatter: { title: 'Etsy Plan 2e Implementation' },
