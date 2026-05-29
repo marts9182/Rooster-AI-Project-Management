@@ -1,0 +1,332 @@
+# Pocket Rooster Press — H2 2026 publishing roadmap.
+# Derived from deep-research output 2026-05-29 + brand-fit decisions in
+# the spec at docs/superpowers/specs/2026-05-29-publishing-roadmap-design.md.
+# Edit by hand; re-run `node scripts/import_roadmap.mjs` to upsert.
+entries:
+  # ── June 2026 ─────────────────────────────────────────────────────────
+  - kind: kdp
+    slug: fathers-day-variety-dad
+    title: "Father's Day Variety Pack for Dad"
+    target_release_date: '2026-06-14'
+    status: planned
+    source: reuse
+    niche: holiday-fathers-day
+    rationale: "Father's Day Jun 21; file must lock today."
+  - kind: kdp
+    slug: backyard-birdwatcher
+    title: 'Backyard Birdwatcher'
+    target_release_date: '2026-06-22'
+    status: planned
+    source: reuse
+    niche: hobbyist-birds
+    rationale: 'Summer birdwatching peak.'
+  - kind: kdp
+    slug: travel-sudoku-v1
+    title: 'Travel Sudoku Vol. 1'
+    target_release_date: '2026-06-28'
+    status: planned
+    source: reuse
+    niche: travel-sudoku
+    rationale: 'July 4 weekend travel + summer road-trip gift.'
+
+  # ── July 2026 ─────────────────────────────────────────────────────────
+  - kind: kdp
+    slug: patriotic-american-word-search
+    title: 'Patriotic American Word Search'
+    target_release_date: '2026-07-04'
+    status: planned
+    source: reuse
+    niche: holiday-patriotic
+    rationale: 'Independence Day.'
+  - kind: kdp
+    slug: garden-companion
+    title: 'Garden Companion'
+    target_release_date: '2026-07-12'
+    status: planned
+    source: reuse
+    niche: hobbyist-gardening
+    rationale: 'Mid-summer garden peak.'
+  - kind: kdp
+    slug: gardeners-word-search-v2
+    title: "Gardener's Word Search Vol. 2"
+    target_release_date: '2026-07-19'
+    status: planned
+    source: reuse
+    niche: hobbyist-gardening
+    rationale: 'Same garden audience, staggered.'
+  - kind: kdp
+    slug: travel-sudoku-v2
+    title: 'Travel Sudoku Vol. 2'
+    target_release_date: '2026-07-26'
+    status: planned
+    source: reuse
+    niche: travel-sudoku
+    rationale: 'August travel window.'
+
+  # ── August 2026 ───────────────────────────────────────────────────────
+  - kind: kdp
+    slug: vintage-1950s-word-search
+    title: '1950s Vintage Nostalgia Word Search'
+    target_release_date: '2026-08-02'
+    status: planned
+    source: reuse
+    niche: senior-nostalgia
+    rationale: 'Back-to-grandparents gifting positioning.'
+  - kind: kdp
+    slug: kakuro-quiet-minds
+    title: 'Kakuro for Quiet Minds'
+    target_release_date: '2026-08-09'
+    status: planned
+    source: reuse
+    niche: senior-large-print
+    rationale: 'Late-summer relaxation; pre-Grandparents Day.'
+  - kind: kdp
+    slug: futoshiki-seniors-v1
+    title: 'Futoshiki for Seniors'
+    target_release_date: '2026-08-16'
+    status: planned
+    source: reuse
+    niche: senior-large-print
+    rationale: 'Same audience, staggered.'
+  - kind: kdp
+    slug: large-print-sudoku-grandparents
+    title: 'Large Print Sudoku for Grandparents'
+    target_release_date: '2026-08-23'
+    status: planned
+    source: reuse
+    niche: senior-large-print
+    rationale: 'Grandparents Day Sep 13; 3-week ramp.'
+  - kind: kdp
+    slug: knit-crochet-word-search
+    title: 'Knit & Crochet Word Search'
+    target_release_date: '2026-08-30'
+    status: planned
+    source: reuse
+    niche: hobbyist-knit
+    rationale: 'Fall hobbyist season opening.'
+
+  # ── September 2026 ────────────────────────────────────────────────────
+  - kind: kdp
+    slug: bold-easy-songbirds-v1
+    title: 'Bold Easy Songbirds Coloring'
+    target_release_date: '2026-09-06'
+    status: planned
+    source: reuse
+    niche: cottagecore-nature
+    rationale: 'Cottagecore evergreen + nature audience.'
+  - kind: kdp
+    slug: bold-easy-cottagecore-mushrooms-v1
+    title: 'Bold Easy Cottagecore Mushrooms Coloring'
+    target_release_date: '2026-09-13'
+    status: planned
+    source: reuse
+    niche: cottagecore-nature
+    rationale: 'Cottagecore evergreen; Sep search peak.'
+  - kind: kdp
+    slug: bold-easy-cute-cats-v1
+    title: 'Bold Easy Cute Cats Coloring'
+    target_release_date: '2026-09-20'
+    status: planned
+    source: reuse
+    niche: cozy-pets
+    rationale: 'Pre-Halloween cat aesthetic warmup.'
+  - kind: kdp
+    slug: bold-easy-cozy-halloween-v1
+    title: 'Bold Easy Cozy Halloween Coloring'
+    target_release_date: '2026-09-20'
+    status: planned
+    source: reuse
+    niche: holiday-halloween
+    rationale: 'Halloween Oct 31; 6 weeks out.'
+  - kind: kdp
+    slug: halloween-word-search
+    title: 'Halloween Word Search'
+    target_release_date: '2026-09-20'
+    status: planned
+    source: reuse
+    niche: holiday-halloween
+    rationale: 'Second Halloween SKU on the search term.'
+
+  # ── October 2026 ──────────────────────────────────────────────────────
+  - kind: kdp
+    slug: bible-verse-bold-easy-coloring
+    title: 'Bible Verse Bold Easy Coloring'
+    target_release_date: '2026-10-11'
+    status: planned
+    source: build
+    niche: faith
+    rationale: 'Durable evergreen faith niche; Advent gift positioning.'
+  - kind: kdp
+    slug: thanksgiving-word-search-seniors
+    title: 'Thanksgiving Word Search for Seniors'
+    target_release_date: '2026-10-18'
+    status: planned
+    source: reuse
+    niche: holiday-thanksgiving
+    rationale: 'Thanksgiving Nov 26; 6 weeks out.'
+  - kind: kdp
+    slug: thanksgiving-gratitude-coloring
+    title: 'Thanksgiving Gratitude Cottagecore Coloring'
+    target_release_date: '2026-10-25'
+    status: planned
+    source: build
+    niche: holiday-thanksgiving
+    rationale: 'New build — Thanksgiving cottagecore coloring gap.'
+
+  # ── November 2026 ─────────────────────────────────────────────────────
+  - kind: kdp
+    slug: christmas-word-search-seniors
+    title: 'Christmas Word Search for Seniors'
+    target_release_date: '2026-11-01'
+    status: planned
+    source: reuse
+    niche: holiday-christmas
+    rationale: 'Christmas Dec 25; 8 weeks out with Q4 backlog buffer.'
+  - kind: kdp
+    slug: bold-easy-cozy-christmas-v1
+    title: 'Bold Easy Cozy Christmas Coloring'
+    target_release_date: '2026-11-01'
+    status: planned
+    source: reuse
+    niche: holiday-christmas
+    rationale: 'Second Christmas SKU on the search term.'
+  - kind: kdp
+    slug: advent-bible-verse-coloring
+    title: 'Advent Bible Verse Coloring'
+    target_release_date: '2026-11-08'
+    status: planned
+    source: build
+    niche: faith
+    rationale: 'Advent runs Nov 29 → Dec 24; validated faith niche.'
+  - kind: kdp
+    slug: anxiety-relief-coloring-seniors
+    title: 'Anxiety Relief Coloring for Seniors'
+    target_release_date: '2026-11-15'
+    status: planned
+    source: build
+    niche: senior-wellness
+    rationale: 'Anti-anxiety niche validated 2026; brand-fit good.'
+  - kind: kdp
+    slug: christmas-cottagecore-bundle
+    title: 'Cottagecore Christmas Coloring Bundle'
+    target_release_date: '2026-11-22'
+    status: planned
+    source: build
+    niche: cottagecore-holiday
+    rationale: 'Extends cottagecore line into Christmas.'
+
+  # ── December 2026 ─────────────────────────────────────────────────────
+  - kind: kdp
+    slug: beloved-hymns-cryptograms
+    title: 'Beloved Hymns Cryptograms'
+    target_release_date: '2026-12-06'
+    status: planned
+    source: reuse
+    niche: faith
+    rationale: 'Christmas/Advent gift slot; faith audience peak.'
+  - kind: kdp
+    slug: kjv-psalms-cryptograms
+    title: 'KJV Psalms Cryptograms'
+    target_release_date: '2026-12-13'
+    status: planned
+    source: reuse
+    niche: faith
+    rationale: 'Same audience, second SKU.'
+  - kind: kdp
+    slug: new-year-fresh-start-coloring
+    title: 'New Year Fresh Start Coloring'
+    target_release_date: '2026-12-20'
+    status: planned
+    source: build
+    niche: motivational
+    rationale: 'New Year motivational peak in Jan.'
+  - kind: kdp
+    slug: 30-day-gratitude-faith-tracker
+    title: '30-Day Gratitude Faith Tracker'
+    target_release_date: '2026-12-27'
+    status: planned
+    source: build
+    niche: faith-tracker
+    rationale: 'Specific tracker (validated niche structure) for fresh-start window.'
+
+  # ── Etsy Q3-Q4 listings (target_release_date = go-live date) ─────────
+  - kind: etsy
+    slug: halloween-cottagecore-wall-art-set
+    title: 'Halloween Cottagecore Wall Art Set'
+    target_release_date: '2026-09-15'
+    status: planned
+    source: build
+    niche: etsy-halloween
+    rationale: 'Halloween wall art Sept-Oct peak.'
+  - kind: etsy
+    slug: pumpkin-harvest-botanical-print-pack
+    title: 'Pumpkin/Harvest Botanical Print Pack'
+    target_release_date: '2026-09-15'
+    status: planned
+    source: build
+    niche: etsy-halloween
+    rationale: 'Harvest aesthetic riding cottagecore + Halloween.'
+  - kind: etsy
+    slug: halloween-coloring-page-mini-pack
+    title: 'Halloween Coloring Page Mini-Pack'
+    target_release_date: '2026-10-01'
+    status: planned
+    source: build
+    niche: etsy-halloween
+    rationale: 'Halloween coloring pack; bold-easy cats + bats + cottagecore.'
+  - kind: etsy
+    slug: thanksgiving-gratitude-printable-wall-art
+    title: 'Thanksgiving Gratitude Printable Wall Art'
+    target_release_date: '2026-10-15'
+    status: planned
+    source: build
+    niche: etsy-thanksgiving
+    rationale: 'Lead-in to Christmas-gift window.'
+  - kind: etsy
+    slug: cottagecore-christmas-wall-art-bundle
+    title: 'Cottagecore Christmas Wall Art Bundle'
+    target_release_date: '2026-11-01'
+    status: planned
+    source: build
+    niche: etsy-christmas
+    rationale: 'Q4 gift window; live by Nov 1.'
+  - kind: etsy
+    slug: christmas-coloring-page-bundle
+    title: 'Christmas Coloring Page Bundle'
+    target_release_date: '2026-11-01'
+    status: planned
+    source: build
+    niche: etsy-christmas
+    rationale: 'Reskin of Advent + cottagecore + songbirds.'
+  - kind: etsy
+    slug: hanukkah-botanical-menorah-wall-art-set
+    title: 'Hanukkah Botanical/Menorah Wall Art Set'
+    target_release_date: '2026-11-01'
+    status: planned
+    source: build
+    niche: etsy-hanukkah
+    rationale: 'Q4 gift window; underserved niche.'
+  - kind: etsy
+    slug: vintage-botanical-christmas-card-printables
+    title: 'Vintage Botanical Christmas Card Printables'
+    target_release_date: '2026-11-01'
+    status: planned
+    source: build
+    niche: etsy-christmas
+    rationale: 'Card printables for last-minute gifters.'
+  - kind: etsy
+    slug: new-year-motivational-cottagecore-quote-art
+    title: 'New Year Motivational Cottagecore Quote Art'
+    target_release_date: '2026-12-26'
+    status: planned
+    source: build
+    niche: etsy-new-year
+    rationale: 'Jan motivational peak.'
+  - kind: etsy
+    slug: fresh-start-botanical-habit-tracker-printable
+    title: 'Fresh Start Botanical Habit Tracker Printable'
+    target_release_date: '2026-12-26'
+    status: planned
+    source: build
+    niche: etsy-new-year
+    rationale: 'Pairs with new-year motivational art bundle.'
