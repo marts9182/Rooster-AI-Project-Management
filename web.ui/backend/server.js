@@ -49,6 +49,7 @@ import {
   createPinterestApiClient,
 } from './pinterest/index.js';
 import { startTopupWorkerDefault } from './pinterest/topup.js';
+import { startEngagementWorkerDefault } from './pinterest/engagement.js';
 import { startScheduler as startReminderScheduler } from './reminders/scheduler.js';
 import { sendToast } from './reminders/toast.js';
 import { sendEmail } from './reminders/email.js';
@@ -136,6 +137,38 @@ if (
     startTopupWorkerDefault({ db: openDb(), emit: recordEvent });
   } catch (err) {
     logger.warn({ err: err.message }, 'pinterest topup init failed');
+  }
+}
+
+// Start the Pinterest engagement worker. Periodically polls posted pins
+// for saves/clicks/impressions. Self-disables on 401/403 (analytics
+// access is gated separately and may not be available in trial mode).
+if (
+  PORT !== 0 &&
+  process.env.ROOSTER_SKIP_PINTEREST_ENGAGEMENT !== '1' &&
+  process.env.PINTEREST_ACCESS_TOKEN
+) {
+  try {
+    startEngagementWorkerDefault({
+      db: openDb(),
+      apiClientFactory: () => {
+        const tokenStorePath = path.resolve(
+          process.env.ROOSTER_PINTEREST_TOKEN_PATH ||
+            path.resolve(__dirname, '..', '..', 'data', 'pinterest_token.json'),
+        );
+        const appId =
+          process.env.PINTEREST_CLIENT_ID ||
+          process.env.PINTEREST_APP_ID ||
+          '1572111';
+        const appSecret =
+          process.env.PINTEREST_CLIENT_SECRET ||
+          process.env.PINTEREST_APP_SECRET ||
+          '';
+        return createPinterestApiClient({ tokenStorePath, appId, appSecret });
+      },
+    });
+  } catch (err) {
+    logger.warn({ err: err.message }, 'pinterest engagement init failed');
   }
 }
 

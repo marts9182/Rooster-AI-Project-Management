@@ -200,6 +200,31 @@ export class PinterestApiClient {
   }
 
   /**
+   * Pin engagement metrics for the last 30 days.
+   * @param {string} pinId
+   * @returns {Promise<{saves: number, clicks: number, impressions: number}>}
+   */
+  async getPinAnalytics(pinId) {
+    const today = new Date().toISOString().slice(0, 10);
+    const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      .toISOString().slice(0, 10);
+    const qs = `metric_types=SAVE,PIN_CLICK,IMPRESSION&start_date=${monthAgo}&end_date=${today}`;
+    const body = await this._callApi(
+      'GET',
+      `/v5/pins/${encodeURIComponent(pinId)}/analytics?${qs}`,
+      null,
+    );
+    // The analytics response shape varies by API version; defensively
+    // pluck the three totals from the all_time bucket if present.
+    const allTime = body?.all_time ?? body?.daily_metrics?.[0] ?? body;
+    return {
+      saves: Number(allTime?.SAVE ?? 0),
+      clicks: Number(allTime?.PIN_CLICK ?? 0),
+      impressions: Number(allTime?.IMPRESSION ?? 0),
+    };
+  }
+
+  /**
    * Read the token file directly (no refresh). `connected=true` only when
    * the file exists, parses, and its expires_at is still in the future.
    *
