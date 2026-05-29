@@ -97,6 +97,7 @@ export default function Home() {
         rowHeight={50}
         onLayoutChange={handleLayoutChange}
         draggableHandle=".tile-header"
+        draggableCancel=".tile-view-all"
         margin={[16, 16]}
       >
         <div key="kdp"><KdpTile /></div>
