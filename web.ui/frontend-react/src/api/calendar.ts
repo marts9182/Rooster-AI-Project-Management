@@ -13,7 +13,9 @@ export type CalendarEventKind =
   | 'kdp.release'
   | 'etsy.listed'
   | 'pinterest.post'
-  | 'reminder';
+  | 'reminder'
+  | 'roadmap.release'
+  | 'roadmap.lock';
 
 export interface CalendarEvent {
   /** ISO yyyy-mm-dd */

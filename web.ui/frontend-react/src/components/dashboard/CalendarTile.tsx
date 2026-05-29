@@ -17,6 +17,8 @@ const KIND_EMOJI: Record<CalendarEventKind, string> = {
   'etsy.listed': '🛒',
   'pinterest.post': '📌',
   reminder: '⏰',
+  'roadmap.release': '🗓️',
+  'roadmap.lock': '🔒',
 };
 
 function fmtIso(d: Date): string {
