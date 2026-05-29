@@ -10,6 +10,7 @@ import {
 } from '../api/pinterest';
 import PinterestQueueTable from '../components/PinterestQueueTable';
 import PinterestHistoryTable from '../components/PinterestHistoryTable';
+import PinterestHistoryTabs from '../components/PinterestHistoryTabs';
 import PinterestSettings from '../components/PinterestSettings';
 import PinPreviewModal from '../components/PinPreviewModal';
 import PinterestViewToggle, { type PinViewMode } from '../components/PinterestViewToggle';
@@ -152,7 +153,9 @@ export default function Pinterest() {
       )}
 
       <h2>History</h2>
-      <PinterestHistoryTable rows={history} />
+      <PinterestHistoryTabs
+        recentChildren={<PinterestHistoryTable rows={history} />}
+      />
 
       <PinPreviewModal
         row={preview}
