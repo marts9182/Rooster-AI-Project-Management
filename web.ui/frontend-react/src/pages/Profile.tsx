@@ -169,28 +169,26 @@ export default function Profile() {
         />
       </label>
 
-      <fieldset style={{ marginBottom: '12px', border: '1px solid #ddd', padding: '8px 12px' }}>
+      <fieldset className="mb-3" style={{ border: '1px solid #ddd', padding: '8px 12px' }}>
         <legend>Pen names</legend>
         <ul
+          className="row gap-2 mb-2"
           style={{
             listStyle: 'none',
             padding: 0,
-            margin: '0 0 8px',
-            display: 'flex',
+            marginTop: 0,
             flexWrap: 'wrap',
-            gap: '6px',
           }}
         >
           {p.pen_names.map((n, i) => (
             <li
               key={`${n}-${i}`}
+              className="row gap-2"
               style={{
                 background: '#eef2f7',
                 borderRadius: '14px',
                 padding: '2px 10px',
                 display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
               }}
             >
               <span>{n}</span>
@@ -206,7 +204,7 @@ export default function Profile() {
             </li>
           ))}
         </ul>
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div className="row gap-2">
           <input
             type="text"
             placeholder="Add pen name and press Enter"
@@ -273,17 +271,16 @@ export default function Profile() {
         />
       </label>
 
-      <fieldset style={{ marginBottom: '12px', border: '1px solid #ddd', padding: '8px 12px' }}>
+      <fieldset className="mb-3" style={{ border: '1px solid #ddd', padding: '8px 12px' }}>
         <legend>Brand palette</legend>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="row gap-2" style={{ flexWrap: 'wrap' }}>
           {swatches.map((hex, i) => (
             <label
               key={i}
+              className="stack text-xs"
               style={{
                 display: 'inline-flex',
-                flexDirection: 'column',
                 alignItems: 'center',
-                fontSize: '0.75rem',
               }}
             >
               <input
@@ -300,7 +297,7 @@ export default function Profile() {
                   cursor: 'pointer',
                 }}
               />
-              <code style={{ marginTop: '2px' }}>{hex}</code>
+              <code className="mt-1">{hex}</code>
             </label>
           ))}
         </div>
@@ -317,7 +314,7 @@ export default function Profile() {
         />
       </label>
 
-      <div style={{ marginTop: '16px' }}>
+      <div className="mt-4">
         <button type="button" className="btn btn--primary" onClick={handleSave} disabled={busy}>
           {busy ? 'Saving…' : 'Save'}
         </button>

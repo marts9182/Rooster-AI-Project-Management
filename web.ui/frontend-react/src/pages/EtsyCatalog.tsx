@@ -250,11 +250,9 @@ export default function EtsyCatalog() {
       )}
 
       <div
+        className="row gap-2"
         style={{
-          display: 'flex',
-          gap: 8,
           flexWrap: 'wrap',
-          alignItems: 'center',
           margin: '0.5rem 0 1rem',
         }}
       >
