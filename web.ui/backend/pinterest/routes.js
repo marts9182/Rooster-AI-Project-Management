@@ -24,6 +24,7 @@
 import express from 'express';
 import { openDb } from '../db.js';
 import { recordEvent } from '../events.js';
+import { getAllStatuses } from '../workerStatus.js';
 import {
   listQueue,
   listHistory,
@@ -189,6 +190,20 @@ export function buildRouter(opts = {}) {
     const limit = Math.min(Math.max(Number(req.query.limit ?? 50) || 50, 1), 200);
     const db = openDb();
     res.json(engagementRows(db, { limit }));
+  });
+
+  router.get('/topup-status', (_req, res) => {
+    const runway = Number(process.env.PINTEREST_TOPUP_DAYS_RUNWAY ?? 30);
+    const status = getAllStatuses()['pinterest.topup'];
+    const lastRun = status?.last_success_at ?? null;
+    const nextRun = lastRun
+      ? new Date(new Date(lastRun).getTime() + 6 * 60 * 60 * 1000).toISOString()
+      : null;
+    res.json({
+      topup_days_runway: runway,
+      topup_last_run: lastRun,
+      topup_next_run: nextRun,
+    });
   });
 
   return router;

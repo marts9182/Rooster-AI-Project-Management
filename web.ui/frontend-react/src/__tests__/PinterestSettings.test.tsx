@@ -71,6 +71,11 @@ beforeEach(() => {
   resumeQueueSpy = vi
     .spyOn(pinterestApi, 'resumeQueue')
     .mockResolvedValue({ resumed: 6 });
+  vi.spyOn(pinterestApi, 'getTopupStatus').mockResolvedValue({
+    topup_days_runway: 30,
+    topup_last_run: null,
+    topup_next_run: null,
+  });
 });
 
 afterEach(() => {

@@ -224,4 +224,16 @@ export async function getEngagement(limit = 50): Promise<EngagementResponse> {
   return (await r.json()) as EngagementResponse;
 }
 
+export interface PinterestTopupStatus {
+  topup_days_runway: number;
+  topup_last_run: string | null;
+  topup_next_run: string | null;
+}
+
+export async function getTopupStatus(): Promise<PinterestTopupStatus> {
+  const r = await fetch('/api/pinterest/topup-status');
+  if (!r.ok) await throwForStatus(r, 'getTopupStatus');
+  return (await r.json()) as PinterestTopupStatus;
+}
+
 export { ApiError };

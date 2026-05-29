@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   getTokenStatus,
+  getTopupStatus,
   getWhoami,
   listBoards,
   listQueue,
@@ -10,6 +11,7 @@ import {
   type PinterestUser,
   type PinterestBoard,
   type PinterestTokenStatus,
+  type PinterestTopupStatus,
 } from '../api/pinterest';
 
 /**
@@ -43,6 +45,15 @@ export default function PinterestSettings() {
   const [error, setError] = useState<string | null>(null);
   const [queueIsPaused, setQueueIsPaused] = useState(false);
   const [isPauseToggling, setIsPauseToggling] = useState(false);
+  const [topupStatus, setTopupStatus] = useState<PinterestTopupStatus | null>(
+    null,
+  );
+
+  useEffect(() => {
+    void getTopupStatus()
+      .then(setTopupStatus)
+      .catch(() => setTopupStatus(null));
+  }, []);
 
   // Derive queue-pause state from the row statuses (backend POST /pause sets
   // all 'pending' rows to 'paused'; POST /resume reverses it).
@@ -236,6 +247,38 @@ export default function PinterestSettings() {
           </select>
         </div>
       )}
+
+      <section
+        style={{
+          marginTop: 16,
+          padding: '8px 12px',
+          border: '1px solid var(--border)',
+          borderRadius: 4,
+        }}
+      >
+        <h3 style={{ margin: '0 0 8px' }}>Auto-generate fresh pins</h3>
+        <dl
+          style={{
+            margin: 0,
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gap: '4px 12px',
+          }}
+        >
+          <dt>Target runway:</dt>
+          <dd style={{ margin: 0 }}>
+            {topupStatus?.topup_days_runway ?? '—'} days
+          </dd>
+          <dt>Last run:</dt>
+          <dd style={{ margin: 0 }}>{topupStatus?.topup_last_run ?? '—'}</dd>
+          <dt>Next run:</dt>
+          <dd style={{ margin: 0 }}>{topupStatus?.topup_next_run ?? '—'}</dd>
+        </dl>
+        <p style={{ marginTop: 8, fontSize: '0.85rem', color: 'var(--muted)' }}>
+          To change runway: edit <code>PINTEREST_TOPUP_DAYS_RUNWAY</code> in{' '}
+          <code>&lt;repo-root&gt;/.env.local</code> and restart the backend.
+        </p>
+      </section>
     </section>
   );
 }
