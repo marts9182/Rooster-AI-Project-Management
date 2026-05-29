@@ -182,19 +182,22 @@ describe('runSyncPass', () => {
   });
 
   it('runSyncPass advances roadmap row to published when listing first goes active', async () => {
-    // Ensure publishing_roadmap exists.
+    // Ensure publishing_roadmap exists with the same FKs as production
+    // (etsy_listing_id REFERENCES etsy_listings(id)), then turn FK
+    // enforcement ON so a wrong PK would be a hard failure here too.
     db.exec(`
       CREATE TABLE IF NOT EXISTS publishing_roadmap (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         kind TEXT NOT NULL, slug TEXT NOT NULL, title TEXT NOT NULL,
         target_release_date TEXT NOT NULL, status TEXT NOT NULL, source TEXT NOT NULL,
         niche TEXT, rationale TEXT, file_lock_date TEXT,
-        kdp_book_id INTEGER, etsy_listing_id INTEGER, notes TEXT,
+        kdp_book_id INTEGER, etsy_listing_id INTEGER REFERENCES etsy_listings(id), notes TEXT,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now')),
         UNIQUE(kind, slug, target_release_date)
       );
     `);
+    db.pragma('foreign_keys = ON');
     db.prepare(
       `INSERT INTO publishing_roadmap
          (kind, slug, title, target_release_date, status, source, file_lock_date)
@@ -216,6 +219,11 @@ describe('runSyncPass', () => {
       `SELECT status, etsy_listing_id FROM publishing_roadmap WHERE slug='cottagecore-halloween-pack'`,
     ).get();
     expect(row.status).toBe('published');
-    expect(row.etsy_listing_id).toBe(99001);
+    // The roadmap's etsy_listing_id column FK-references etsy_listings.id
+    // (local PK), not the external Etsy listing_id. Assert the LOCAL PK.
+    const local = db.prepare(
+      'SELECT id FROM etsy_listings WHERE etsy_listing_id = ?',
+    ).get(99001);
+    expect(row.etsy_listing_id).toBe(local.id);
   });
 });

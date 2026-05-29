@@ -129,7 +129,7 @@ export async function runSyncPass({ db, client, emit, now = () => new Date() }) 
               kind: 'etsy',
               slug: row.sku_id,
               toStatus: 'published',
-              linkId: row.etsy_listing_id,
+              linkId: result.localId,
             });
           } catch (err) {
             // eslint-disable-next-line no-console
@@ -152,7 +152,7 @@ export async function runSyncPass({ db, client, emit, now = () => new Date() }) 
                 kind: 'etsy',
                 slug: row.sku_id,
                 toStatus: 'published',
-                linkId: row.etsy_listing_id,
+                linkId: result.localId,
               });
             } catch (err) {
               // eslint-disable-next-line no-console

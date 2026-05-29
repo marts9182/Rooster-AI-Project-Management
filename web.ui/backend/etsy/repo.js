@@ -17,6 +17,7 @@
  * @typedef {Object} UpsertResult
  * @property {boolean} inserted   true if this was an insert; false if update
  * @property {Record<string, {from: unknown, to: unknown}>} diffs   keys whose value changed
+ * @property {number} localId     the local `etsy_listings.id` PK of the row
  */
 
 const TRACKED_FIELDS = /** @type {const} */ ([
@@ -59,7 +60,7 @@ export function upsertListing(db, row) {
       }
     }
   }
-  db.prepare(
+  const runResult = db.prepare(
     `INSERT INTO etsy_listings
        (etsy_listing_id, sku_id, title, status, section, niche, price_usd,
         favorites, views, listed_at, listing_url, last_synced_at)
@@ -91,7 +92,20 @@ export function upsertListing(db, row) {
     listing_url: row.listing_url ?? null,
   });
 
-  return { inserted: !existing, diffs };
+  // Resolve the local PK. On INSERT we can use lastInsertRowid; on UPSERT
+  // (UPDATE branch) lastInsertRowid is 0 so we follow up with a SELECT.
+  const inserted = !existing;
+  let localId;
+  if (inserted) {
+    localId = Number(runResult.lastInsertRowid);
+  } else {
+    const pkRow = /** @type {{id: number} | undefined} */ (
+      db.prepare('SELECT id FROM etsy_listings WHERE etsy_listing_id = ?').get(row.etsy_listing_id)
+    );
+    localId = pkRow ? pkRow.id : 0;
+  }
+
+  return { inserted, diffs, localId };
 }
 
 /**
