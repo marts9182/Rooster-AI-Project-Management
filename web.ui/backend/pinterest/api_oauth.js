@@ -127,13 +127,29 @@ export async function _forceRefresh(args) {
  * @returns {StoredToken}
  */
 function loadOrBootstrap(tokenStorePath) {
+  const envAccess = process.env.PINTEREST_ACCESS_TOKEN || '';
   if (fs.existsSync(tokenStorePath)) {
-    return /** @type {StoredToken} */ (
-      JSON.parse(fs.readFileSync(tokenStorePath, 'utf8'))
-    );
+    /** @type {StoredToken} */
+    const stored = JSON.parse(fs.readFileSync(tokenStorePath, 'utf8'));
+    // If the env has a non-empty access token AND it differs from the
+    // stored one, treat env as the new source of truth — the user has
+    // rotated the token. Refresh token stays from disk (env normally
+    // only has the access token).
+    if (envAccess && envAccess !== stored.access_token) {
+      const overridden = {
+        ...stored,
+        access_token: envAccess,
+        expires_at:
+          process.env.PINTEREST_TOKEN_EXPIRES_AT ||
+          new Date(Date.now() + DEFAULT_BOOTSTRAP_TTL_MS).toISOString(),
+      };
+      fs.writeFileSync(tokenStorePath, JSON.stringify(overridden), 'utf8');
+      return overridden;
+    }
+    return stored;
   }
-  const access = process.env.PINTEREST_ACCESS_TOKEN;
-  if (!access) {
+  // No file on disk — original bootstrap path.
+  if (!envAccess) {
     throw new Error(
       `Pinterest token file not found at ${tokenStorePath}. ` +
         'Set PINTEREST_ACCESS_TOKEN in .env.local for first-run bootstrap ' +
@@ -150,7 +166,7 @@ function loadOrBootstrap(tokenStorePath) {
     new Date(Date.now() + DEFAULT_BOOTSTRAP_TTL_MS).toISOString();
   /** @type {StoredToken} */
   const seed = {
-    access_token: access,
+    access_token: envAccess,
     refresh_token: refresh,
     expires_at: expiresAt,
   };

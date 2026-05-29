@@ -177,3 +177,74 @@ describe('ensureFreshToken', () => {
     }
   });
 });
+
+describe('loadOrBootstrap env-override', () => {
+  let envTmpDir;
+  let envTokenPath;
+  let snap;
+
+  beforeEach(() => {
+    envTmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pin-oauth-'));
+    envTokenPath = path.join(envTmpDir, 'token.json');
+    snap = {
+      PINTEREST_ACCESS_TOKEN: process.env.PINTEREST_ACCESS_TOKEN,
+      PINTEREST_TOKEN_EXPIRES_AT: process.env.PINTEREST_TOKEN_EXPIRES_AT,
+    };
+  });
+  afterEach(() => {
+    fs.rmSync(envTmpDir, { recursive: true, force: true });
+    for (const k of Object.keys(snap)) {
+      if (snap[k] === undefined) delete process.env[k];
+      else process.env[k] = snap[k];
+    }
+  });
+
+  it('overrides stored access_token when env differs and is non-empty', async () => {
+    // Pre-seed a stored token file with an OLD value.
+    fs.writeFileSync(envTokenPath, JSON.stringify({
+      access_token: 'old-token',
+      refresh_token: 'r',
+      expires_at: new Date(Date.now() + 86400_000).toISOString(),
+    }));
+    // Now env has a NEW value.
+    process.env.PINTEREST_ACCESS_TOKEN = 'new-token';
+
+    const got = await ensureFreshToken({
+      tokenStorePath: envTokenPath,
+      appId: 'x', appSecret: 'y',
+    });
+    expect(got).toBe('new-token');
+    const onDisk = JSON.parse(fs.readFileSync(envTokenPath, 'utf8'));
+    expect(onDisk.access_token).toBe('new-token');
+    // Refresh token stays.
+    expect(onDisk.refresh_token).toBe('r');
+  });
+
+  it('keeps stored access_token when env is empty', async () => {
+    fs.writeFileSync(envTokenPath, JSON.stringify({
+      access_token: 'stored',
+      refresh_token: 'r',
+      expires_at: new Date(Date.now() + 86400_000).toISOString(),
+    }));
+    delete process.env.PINTEREST_ACCESS_TOKEN;
+    const got = await ensureFreshToken({
+      tokenStorePath: envTokenPath,
+      appId: 'x', appSecret: 'y',
+    });
+    expect(got).toBe('stored');
+  });
+
+  it('keeps stored access_token when env matches', async () => {
+    fs.writeFileSync(envTokenPath, JSON.stringify({
+      access_token: 'same',
+      refresh_token: 'r',
+      expires_at: new Date(Date.now() + 86400_000).toISOString(),
+    }));
+    process.env.PINTEREST_ACCESS_TOKEN = 'same';
+    const got = await ensureFreshToken({
+      tokenStorePath: envTokenPath,
+      appId: 'x', appSecret: 'y',
+    });
+    expect(got).toBe('same');
+  });
+});
