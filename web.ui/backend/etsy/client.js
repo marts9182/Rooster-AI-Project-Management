@@ -3,6 +3,7 @@
  * @property {number} listing_id
  * @property {string} title
  * @property {string} state
+ * @property {string} [sku_id]
  * @property {{amount: number, divisor: number, currency_code: string}} [price]
  * @property {string} [url]
  * @property {string|number} [shop_section_id]

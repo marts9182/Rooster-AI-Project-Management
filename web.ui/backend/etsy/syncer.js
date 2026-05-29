@@ -10,6 +10,7 @@
  */
 
 import { upsertListing, listingByEtsyId } from './repo.js';
+import { advanceRoadmapBySlug } from '../roadmap/repo.js';
 
 /**
  * @typedef {import('./client.js').EtsyListing} EtsyListing
@@ -41,6 +42,7 @@ function toRow(l) {
     etsy_listing_id: l.listing_id,
     title: l.title,
     status: l.state,
+    sku_id: typeof l.sku_id === 'string' && l.sku_id ? l.sku_id : undefined,
     section: l.shop_section_id != null ? String(l.shop_section_id) : undefined,
     price_usd: priceUsd,
     favorites: l.num_favorers ?? 0,
@@ -118,6 +120,22 @@ export async function runSyncPass({ db, client, emit, now = () => new Date() }) 
             listedAtIso: row.listed_at,
           });
         }
+        // Advance any matching publishing_roadmap row when this new
+        // listing is already active. sku_id (when present on the row)
+        // is the canonical slug we match by.
+        if (row.status === 'active' && row.sku_id) {
+          try {
+            advanceRoadmapBySlug(db, {
+              kind: 'etsy',
+              slug: row.sku_id,
+              toStatus: 'published',
+              linkId: row.etsy_listing_id,
+            });
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.warn('advanceRoadmapBySlug failed:', err?.message ?? err);
+          }
+        }
       } else {
         updated += 1;
         if (result.diffs.status) {
@@ -128,6 +146,19 @@ export async function runSyncPass({ db, client, emit, now = () => new Date() }) 
             from: result.diffs.status.from,
             to: result.diffs.status.to,
           });
+          if (result.diffs.status.to === 'active' && row.sku_id) {
+            try {
+              advanceRoadmapBySlug(db, {
+                kind: 'etsy',
+                slug: row.sku_id,
+                toStatus: 'published',
+                linkId: row.etsy_listing_id,
+              });
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.warn('advanceRoadmapBySlug failed:', err?.message ?? err);
+            }
+          }
         }
         // If a listing was previously non-active and is now active for the
         // first time, also emit gate reminders (idempotent — checks first

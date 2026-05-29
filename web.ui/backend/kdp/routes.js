@@ -16,6 +16,7 @@ import express from 'express';
 import { openDb } from '../db.js';
 import { recordEvent } from '../events.js';
 import { enqueuePinsForBook } from '../pinterest/queue.js';
+import { advanceRoadmapBySlug } from '../roadmap/repo.js';
 import { renderPreviewsForBook } from './preview_renderer.js';
 import { computeIngestPreview, applyIngestCommit } from './ingest.js';
 import {
@@ -220,6 +221,20 @@ export function createKdpRouter(opts = {}) {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn(`enqueuePinsForBook(${updated.id}) failed: ${err?.message || err}`);
+    }
+
+    // Advance any matching publishing_roadmap row.
+    try {
+      advanceRoadmapBySlug(db, {
+        kind: 'kdp',
+        slug: updated.slug,
+        toStatus: 'published',
+        linkId: updated.id,
+      });
+    } catch (err) {
+      // Defensive: never fail the publish call if roadmap advance fails.
+      // eslint-disable-next-line no-console
+      console.warn('advanceRoadmapBySlug failed:', err?.message ?? err);
     }
 
     recordEvent('kdp:published', {

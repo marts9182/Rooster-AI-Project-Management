@@ -180,4 +180,42 @@ describe('runSyncPass', () => {
     });
     expect(result).toEqual({ inserted: 0, updated: 0, statusChanged: 0 });
   });
+
+  it('runSyncPass advances roadmap row to published when listing first goes active', async () => {
+    // Ensure publishing_roadmap exists.
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS publishing_roadmap (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kind TEXT NOT NULL, slug TEXT NOT NULL, title TEXT NOT NULL,
+        target_release_date TEXT NOT NULL, status TEXT NOT NULL, source TEXT NOT NULL,
+        niche TEXT, rationale TEXT, file_lock_date TEXT,
+        kdp_book_id INTEGER, etsy_listing_id INTEGER, notes TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        UNIQUE(kind, slug, target_release_date)
+      );
+    `);
+    db.prepare(
+      `INSERT INTO publishing_roadmap
+         (kind, slug, title, target_release_date, status, source, file_lock_date)
+       VALUES ('etsy', 'cottagecore-halloween-pack', 'Halloween Pack', '2026-09-15', 'scheduled', 'build', '2026-08-31')`,
+    ).run();
+
+    const client = {
+      listAllListings: async () => [{
+        listing_id: 99001,
+        title: 'Halloween Pack',
+        state: 'active',
+        sku_id: 'cottagecore-halloween-pack',
+        original_creation_timestamp: 1758937600,
+      }],
+    };
+    await runSyncPass({ db, client, emit: () => {} });
+
+    const row = db.prepare(
+      `SELECT status, etsy_listing_id FROM publishing_roadmap WHERE slug='cottagecore-halloween-pack'`,
+    ).get();
+    expect(row.status).toBe('published');
+    expect(row.etsy_listing_id).toBe(99001);
+  });
 });

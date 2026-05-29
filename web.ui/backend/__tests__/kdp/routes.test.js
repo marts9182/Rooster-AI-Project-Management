@@ -254,6 +254,49 @@ describe('POST /api/kdp/books/:slug/mark-published', () => {
       .send({ asin: 'B0NEWBOOK1', release_date: '2026-05-26' });
     expect(res.status).toBe(404);
   });
+
+  it('mark-published advances any matching roadmap row to published', async () => {
+    const db = openDb();
+    // Ensure the publishing_roadmap table exists in the test DB.
+    // (Migration 0007 should have run when openDb() was first called; if
+    // your test rebuilds schema by hand, add it here.)
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS publishing_roadmap (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kind TEXT NOT NULL, slug TEXT NOT NULL, title TEXT NOT NULL,
+        target_release_date TEXT NOT NULL, status TEXT NOT NULL, source TEXT NOT NULL,
+        niche TEXT, rationale TEXT, file_lock_date TEXT,
+        kdp_book_id INTEGER, etsy_listing_id INTEGER, notes TEXT,
+        created_at TEXT DEFAULT (datetime('now')),
+        updated_at TEXT DEFAULT (datetime('now')),
+        UNIQUE(kind, slug, target_release_date)
+      );
+    `);
+
+    // Seed a kdp_books row + a roadmap row with the same slug.
+    db.prepare(
+      `INSERT INTO kdp_books (slug, title, status, output_dir)
+       VALUES ('roadmap-foo', 'Roadmap Foo', 'built', ?)`,
+    ).run(tmpRoot);
+    db.prepare(
+      `INSERT INTO publishing_roadmap
+         (kind, slug, title, target_release_date, status, source, file_lock_date)
+       VALUES ('kdp', 'roadmap-foo', 'Roadmap Foo', '2026-09-15', 'scheduled', 'reuse', '2026-08-31')`,
+    ).run();
+
+    await request(app)
+      .post('/api/kdp/books/roadmap-foo/mark-published')
+      .send({ asin: 'B0CROAD000', release_date: '2026-09-15' });
+
+    const row = db.prepare(
+      `SELECT status, kdp_book_id FROM publishing_roadmap WHERE slug='roadmap-foo'`,
+    ).get();
+    expect(row.status).toBe('published');
+    expect(row.kdp_book_id).toBeGreaterThan(0);
+
+    // Cleanup so subsequent tests are not affected by the seeded roadmap row.
+    db.prepare(`DELETE FROM publishing_roadmap WHERE slug='roadmap-foo'`).run();
+  });
 });
 
 describe('Ingest routes', () => {
