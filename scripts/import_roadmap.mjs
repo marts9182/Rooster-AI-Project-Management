@@ -31,12 +31,54 @@ export async function importRoadmap({ yaml: yamlStr, fetchFn, baseUrl }) {
   let created = 0, updated = 0;
   /** @type {string[]} */
   const errors = [];
+
+  // Bootstrap reconciliation: fetch all currently-active Etsy listings once
+  // so we can match them against entries by sku_id without an N+1 explosion.
+  // KDP lookups happen per-entry below (no bulk endpoint).
+  /** @type {Set<string>} */
+  const activeEtsySkus = new Set();
+  const hasEtsy = entries.some((e) => e?.kind === 'etsy');
+  if (hasEtsy) {
+    try {
+      const r = await fetchFn(`${baseUrl}/api/etsy/listings?status=active`);
+      if (r.ok) {
+        const data = await r.json();
+        for (const l of (data.listings ?? [])) {
+          if (l?.sku_id) activeEtsySkus.add(l.sku_id);
+        }
+      }
+    } catch { /* tolerated — leave set empty, fall through to planned */ }
+  }
+
   for (const e of entries) {
     try {
+      // Per-entry live-state check. If the matching KDP book is already
+      // published or the matching Etsy listing is already active, override
+      // the entry's status to 'published' before POSTing.
+      let effectiveStatus = e.status;
+      if (e.kind === 'kdp') {
+        try {
+          const liveResp = await fetchFn(
+            `${baseUrl}/api/kdp/books/${encodeURIComponent(e.slug)}`,
+          );
+          if (liveResp.ok) {
+            const liveData = await liveResp.json();
+            const liveBook = liveData?.book ?? liveData;
+            if (liveBook && liveBook.status === 'published') {
+              effectiveStatus = 'published';
+            }
+          }
+          // 404 is fine — the book isn't built/published yet.
+        } catch { /* silent — treat as no override */ }
+      } else if (e.kind === 'etsy' && activeEtsySkus.has(e.slug)) {
+        effectiveStatus = 'published';
+      }
+      const payload = effectiveStatus !== e.status ? { ...e, status: effectiveStatus } : e;
+
       const postResp = await fetchFn(`${baseUrl}/api/roadmap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(e),
+        body: JSON.stringify(payload),
       });
       if (postResp.status === 201) {
         created += 1;
