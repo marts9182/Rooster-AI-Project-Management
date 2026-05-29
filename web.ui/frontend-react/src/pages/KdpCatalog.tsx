@@ -112,7 +112,7 @@ export default function KdpCatalog() {
       <div className="page-header">
         <h1>KDP catalog</h1>
         <div className="page-header-actions">
-          <button type="button" onClick={handleAddManually}>
+          <button type="button" className="btn btn--secondary" onClick={handleAddManually}>
             + Add manually
           </button>
         </div>

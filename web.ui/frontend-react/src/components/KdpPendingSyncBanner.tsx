@@ -49,6 +49,7 @@ export default function KdpPendingSyncBanner({ onApplied }: Props) {
         </span>
         <button
           type="button"
+          className="btn btn--primary"
           onClick={() => setModalOpen(true)}
           style={{ marginLeft: 'auto' }}
         >

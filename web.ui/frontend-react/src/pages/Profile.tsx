@@ -196,16 +196,10 @@ export default function Profile() {
               <span>{n}</span>
               <button
                 type="button"
+                className="btn btn--ghost btn--sm"
                 onClick={() => removePenName(i)}
                 aria-label={`Remove ${n}`}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '1rem',
-                  lineHeight: 1,
-                  padding: 0,
-                }}
+                style={{ lineHeight: 1 }}
               >
                 ×
               </button>
@@ -221,7 +215,7 @@ export default function Profile() {
             onKeyDown={handlePenKeyDown}
             aria-label="Add pen name"
           />
-          <button type="button" onClick={addPenName}>
+          <button type="button" className="btn btn--secondary" onClick={addPenName}>
             Add
           </button>
         </div>
@@ -324,7 +318,7 @@ export default function Profile() {
       </label>
 
       <div style={{ marginTop: '16px' }}>
-        <button type="button" onClick={handleSave} disabled={busy}>
+        <button type="button" className="btn btn--primary" onClick={handleSave} disabled={busy}>
           {busy ? 'Saving…' : 'Save'}
         </button>
         {saved && (

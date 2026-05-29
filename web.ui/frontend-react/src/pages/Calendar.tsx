@@ -363,16 +363,16 @@ export default function Calendar() {
               )}
               {selected.kind === 'reminder' && (
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  <button type="button" onClick={() => void onSnooze(1)}>
+                  <button type="button" className="btn btn--secondary btn--sm" onClick={() => void onSnooze(1)}>
                     Snooze 1h
                   </button>
-                  <button type="button" onClick={() => void onSnooze(24)}>
+                  <button type="button" className="btn btn--secondary btn--sm" onClick={() => void onSnooze(24)}>
                     Snooze 24h
                   </button>
-                  <button type="button" onClick={() => void onSnooze(24 * 7)}>
+                  <button type="button" className="btn btn--secondary btn--sm" onClick={() => void onSnooze(24 * 7)}>
                     Snooze 1w
                   </button>
-                  <button type="button" onClick={() => void onDismiss()}>
+                  <button type="button" className="btn btn--primary btn--sm" onClick={() => void onDismiss()}>
                     Dismiss
                   </button>
                 </div>

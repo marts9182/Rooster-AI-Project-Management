@@ -190,10 +190,10 @@ export default function EtsyDetail() {
         }}
       >
         <a href={publicUrl} target="_blank" rel="noreferrer">
-          <button type="button">Open public listing</button>
+          <button type="button" className="btn btn--primary">Open public listing</button>
         </a>
         <a href={sellerDashboardUrl} target="_blank" rel="noreferrer">
-          <button type="button">Edit on Etsy</button>
+          <button type="button" className="btn btn--secondary">Edit on Etsy</button>
         </a>
       </nav>
 

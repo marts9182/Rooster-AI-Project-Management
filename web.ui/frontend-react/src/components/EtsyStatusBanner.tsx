@@ -51,6 +51,7 @@ export default function EtsyStatusBanner({ onSynced }: Props) {
   const syncButton = (
     <button
       type="button"
+      className="btn btn--primary"
       onClick={() => void handleSync()}
       disabled={syncing || !status?.configured || !status?.tokenPresent}
       style={{ marginLeft: 'auto' }}

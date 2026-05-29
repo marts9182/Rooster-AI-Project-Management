@@ -195,6 +195,7 @@ export default function PinterestSettings() {
       <div className="settings-actions">
         <button
           type="button"
+          className="btn btn--secondary"
           onClick={handleTestConnection}
           disabled={isTesting}
         >
@@ -202,6 +203,7 @@ export default function PinterestSettings() {
         </button>
         <button
           type="button"
+          className="btn btn--secondary"
           onClick={handleRefresh}
           disabled={isRefreshing}
         >
@@ -209,6 +211,7 @@ export default function PinterestSettings() {
         </button>
         <button
           type="button"
+          className="btn btn--secondary"
           onClick={handlePauseToggle}
           disabled={isPauseToggling}
           aria-pressed={queueIsPaused}

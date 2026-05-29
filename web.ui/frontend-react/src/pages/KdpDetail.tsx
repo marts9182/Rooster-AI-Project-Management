@@ -240,20 +240,20 @@ export default function KdpDetail() {
                 target="_blank"
                 rel="noreferrer"
               >
-                <button type="button">Open on Amazon</button>
+                <button type="button" className="btn btn--secondary">Open on Amazon</button>
               </a>
             )}
             {book.status === 'built' && (
-              <button type="button" onClick={handleMarkInReview}>
+              <button type="button" className="btn btn--secondary" onClick={handleMarkInReview}>
                 Mark in-review
               </button>
             )}
             {(book.status === 'built' || book.status === 'in_review') && (
-              <button type="button" onClick={() => setModalOpen(true)}>
+              <button type="button" className="btn btn--primary" onClick={() => setModalOpen(true)}>
                 Mark live
               </button>
             )}
-            <button type="button" onClick={handleSetReleaseDate}>
+            <button type="button" className="btn btn--secondary" onClick={handleSetReleaseDate}>
               Set release date
             </button>
           </div>

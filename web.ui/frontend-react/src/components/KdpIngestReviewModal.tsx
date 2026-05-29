@@ -156,11 +156,12 @@ export default function KdpIngestReviewModal({ preview, onClose, onApplied }: Pr
         {success && <p role="status">{success}</p>}
 
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button type="button" onClick={onClose} disabled={submitting}>
+          <button type="button" className="btn btn--secondary" onClick={onClose} disabled={submitting}>
             Cancel
           </button>
           <button
             type="button"
+            className="btn btn--primary"
             onClick={() => void handleApply()}
             disabled={!allAmbiguousResolved || submitting}
           >

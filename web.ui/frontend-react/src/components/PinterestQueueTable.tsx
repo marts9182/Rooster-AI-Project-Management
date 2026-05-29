@@ -221,11 +221,12 @@ export default function PinterestQueueTable({
               <td className="actions">
                 {isEditing ? (
                   <>
-                    <button type="button" onClick={() => commitEdit(row)}>
+                    <button type="button" className="btn btn--primary btn--sm" onClick={() => commitEdit(row)}>
                       Save
                     </button>
                     <button
                       type="button"
+                      className="btn btn--secondary btn--sm"
                       onClick={() => setEditingId(null)}
                     >
                       Discard
@@ -234,13 +235,14 @@ export default function PinterestQueueTable({
                 ) : (
                   <>
                     {canEdit && (
-                      <button type="button" onClick={() => beginEdit(row)}>
+                      <button type="button" className="btn btn--secondary btn--sm" onClick={() => beginEdit(row)}>
                         Edit
                       </button>
                     )}
                     {canCancel && (
                       <button
                         type="button"
+                        className="btn btn--danger btn--sm"
                         onClick={() => handleCancelClick(row)}
                       >
                         Cancel

@@ -134,7 +134,7 @@ export default function RoadmapDetailModal({ id, onClose, onChanged }: Props) {
             )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
-              <button type="button" onClick={onClose}>Close</button>
+              <button type="button" className="btn btn--secondary" onClick={onClose}>Close</button>
             </div>
           </>
         ) : error ? (
