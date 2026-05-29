@@ -263,15 +263,9 @@ export default function EtsyCatalog() {
           <button
             key={opt.value}
             type="button"
+            className={`filter-chip${filters.status === opt.value ? ' filter-chip--selected' : ''}`}
             aria-pressed={filters.status === opt.value}
             onClick={() => toggleStatusChip(opt.value)}
-            style={{
-              padding: '4px 10px',
-              borderRadius: 12,
-              border: '1px solid #ccc',
-              background: filters.status === opt.value ? '#cfe4ff' : '#fff',
-              cursor: 'pointer',
-            }}
           >
             {opt.label}
           </button>

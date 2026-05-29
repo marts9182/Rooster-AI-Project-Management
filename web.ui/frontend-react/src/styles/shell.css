@@ -216,6 +216,49 @@ h4 { font-size: var(--text-base);font-weight: var(--weight-semibold); line-heigh
 .btn--lg { padding: 0.65rem 1.2rem; font-size: var(--text-base); }
 .btn--block { width: 100%; }
 
+/* ── Filter chips ──────────────────────────────────────────────────── */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.filter-chip:hover {
+  background: color-mix(in srgb, var(--surface) 80%, var(--fg) 8%);
+}
+
+.filter-chip:focus-visible {
+  outline: 2px solid var(--accent, #4f8ef7);
+  outline-offset: 2px;
+}
+
+.filter-chip--selected {
+  background: color-mix(in srgb, var(--accent, #4f8ef7) 18%, var(--surface));
+  border-color: color-mix(in srgb, var(--accent, #4f8ef7) 40%, var(--border));
+  color: var(--fg);
+}
+
+.filter-chip--selected:hover {
+  background: color-mix(in srgb, var(--accent, #4f8ef7) 28%, var(--surface));
+}
+
+.filter-chip__count {
+  opacity: 0.7;
+  font-weight: var(--weight-regular);
+  font-size: var(--text-xs);
+}
+
 /* ── App shell: header on top, scrollable main below ──────────────── */
 .app-shell {
   display: flex;
