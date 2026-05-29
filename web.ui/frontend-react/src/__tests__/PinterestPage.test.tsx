@@ -81,6 +81,10 @@ let fetchMock: ReturnType<typeof vi.fn>;
 let originalES: typeof EventSource | undefined;
 
 beforeEach(() => {
+  // Default to the list view so the queue table is rendered for these
+  // assertions. The week/month calendar is exercised by its own tests.
+  window.localStorage.setItem('pinterest_view_mode', 'list');
+
   originalES = (globalThis as unknown as { EventSource?: typeof EventSource })
     .EventSource;
   (globalThis as unknown as { EventSource: unknown }).EventSource =
@@ -133,6 +137,7 @@ afterEach(() => {
   FakeEventSource.last = null;
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
+  window.localStorage.clear();
 });
 
 describe('<Pinterest />', () => {
@@ -150,7 +155,7 @@ describe('<Pinterest />', () => {
       screen.getByRole('heading', { name: /Pinterest Connection/i, level: 2 }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /^Queue$/i, level: 2 }),
+      screen.getByRole('heading', { name: /^Upcoming$/i, level: 2 }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: /^History$/i, level: 2 }),

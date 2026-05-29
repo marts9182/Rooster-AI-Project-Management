@@ -12,6 +12,8 @@ import PinterestQueueTable from '../components/PinterestQueueTable';
 import PinterestHistoryTable from '../components/PinterestHistoryTable';
 import PinterestSettings from '../components/PinterestSettings';
 import PinPreviewModal from '../components/PinPreviewModal';
+import PinterestViewToggle, { type PinViewMode } from '../components/PinterestViewToggle';
+import PinterestCalendar from '../components/PinterestCalendar';
 import { useSseEvents } from '../hooks/useSseEvents';
 
 /** Minimum gap between SSE-triggered refetches (ms). */
@@ -35,6 +37,13 @@ export default function Pinterest() {
   const [history, setHistory] = useState<PinterestHistoryRow[]>([]);
   const [preview, setPreview] = useState<PinterestQueueRow | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<PinViewMode>(() => {
+    try { return (localStorage.getItem('pinterest_view_mode') as PinViewMode) ?? 'week'; }
+    catch { return 'week'; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem('pinterest_view_mode', viewMode); } catch { /* ignore */ }
+  }, [viewMode]);
   const lastRefreshRef = useRef<number>(0);
   const pendingRefreshRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { lastEvent } = useSseEvents();
@@ -120,13 +129,27 @@ export default function Pinterest() {
 
       <PinterestSettings />
 
-      <h2>Queue</h2>
-      <PinterestQueueTable
-        rows={queue}
-        onEdit={handleEdit}
-        onCancel={handleCancel}
-        onPreview={setPreview}
-      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+        <h2 style={{ margin: 0 }}>Upcoming</h2>
+        <PinterestViewToggle mode={viewMode} onChange={setViewMode} />
+      </div>
+
+      {viewMode === 'list' && (
+        <PinterestQueueTable
+          rows={queue}
+          onEdit={handleEdit}
+          onCancel={handleCancel}
+          onPreview={setPreview}
+        />
+      )}
+
+      {(viewMode === 'week' || viewMode === 'month') && (
+        <PinterestCalendar
+          rows={queue}
+          start={new Date()}
+          onChipClick={setPreview}
+        />
+      )}
 
       <h2>History</h2>
       <PinterestHistoryTable rows={history} />
