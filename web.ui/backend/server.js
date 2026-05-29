@@ -48,6 +48,7 @@ import {
   startPosterWorker,
   createPinterestApiClient,
 } from './pinterest/index.js';
+import { startTopupWorkerDefault } from './pinterest/topup.js';
 import { startScheduler as startReminderScheduler } from './reminders/scheduler.js';
 import { sendToast } from './reminders/toast.js';
 import { sendEmail } from './reminders/email.js';
@@ -121,6 +122,20 @@ if (
     startPosterWorker({ db: openDb() });
   } catch (err) {
     logger.warn({ err: err.message }, 'pinterest poster init failed');
+  }
+}
+
+// Start the Pinterest topup worker. Refills the queue with new pin
+// variants for published books so the schedule never empties.
+if (
+  PORT !== 0 &&
+  process.env.ROOSTER_SKIP_PINTEREST_TOPUP !== '1' &&
+  process.env.PINTEREST_ACCESS_TOKEN
+) {
+  try {
+    startTopupWorkerDefault({ db: openDb(), emit: recordEvent });
+  } catch (err) {
+    logger.warn({ err: err.message }, 'pinterest topup init failed');
   }
 }
 
