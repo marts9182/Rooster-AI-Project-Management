@@ -174,6 +174,29 @@ describe('listQueue + listHistory', () => {
     expect(q.map((r) => r.title).sort()).toEqual(['A', 'C']);
   });
 
+  it('listQueue joins kdp_books and exposes book_slug on each row', async () => {
+    const db = openDb();
+    const t = new Date().toISOString();
+    const bookInfo = db
+      .prepare(`
+        INSERT INTO kdp_books (slug, title, status, output_dir, asin)
+        VALUES ('quiet-minds-vol1', 'Quiet Minds Vol 1', 'published', '/tmp/qmv1', 'B0SLUGTEST')
+      `)
+      .run();
+    const bookId = Number(bookInfo.lastInsertRowid);
+    db.prepare(`
+      INSERT INTO pinterest_queue (kdp_book_id, pin_type, image_path, title, description, link_url, status, scheduled_for)
+      VALUES (?, 'cover_hero', '/x.png', 'WithSlug', 'D', 'http://x', 'pending', ?),
+             (NULL, 'cover_hero', '/x.png', 'NoBook', 'D', 'http://x', 'pending', ?)
+    `).run(bookId, t, t);
+    const q = listQueue();
+    const withSlug = q.find((r) => r.title === 'WithSlug');
+    const noBook = q.find((r) => r.title === 'NoBook');
+    expect(withSlug.book_slug).toBe('quiet-minds-vol1');
+    // Rows without a kdp_book_id still come back (LEFT JOIN) with null slug.
+    expect(noBook.book_slug).toBeNull();
+  });
+
   it('listHistory returns last 100 rows with success/fail decoded', async () => {
     const db = openDb();
     const t = new Date().toISOString();

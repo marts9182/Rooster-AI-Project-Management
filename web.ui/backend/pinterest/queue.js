@@ -293,11 +293,13 @@ export function resumeQueue() {
  */
 export function listQueue() {
   const db = openDb();
-  return db.prepare(`
-    SELECT * FROM pinterest_queue
-     WHERE status IN ('pending','posting','paused')
-     ORDER BY scheduled_for ASC
-  `).all();
+  return db.prepare(
+    `SELECT q.*, b.slug AS book_slug
+       FROM pinterest_queue q
+       LEFT JOIN kdp_books b ON b.id = q.kdp_book_id
+      WHERE q.status IN ('pending', 'posting', 'paused')
+      ORDER BY q.scheduled_for ASC`,
+  ).all();
 }
 
 /**
