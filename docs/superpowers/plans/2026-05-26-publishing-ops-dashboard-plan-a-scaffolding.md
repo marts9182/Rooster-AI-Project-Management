@@ -1,4 +1,4 @@
-# Publishing Ops Dashboard — Plan A: Migration + Scaffolding
+﻿# Publishing Ops Dashboard â€” Plan A: Migration + Scaffolding
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -8,18 +8,18 @@
 
 **Tech Stack:** Node 18+, Express, React 19 + Vite + TypeScript, better-sqlite3, systray2, node-notifier, nodemailer, node-cron, pino, react-router-dom v6, @fullcalendar/react, Vitest, Playwright.
 
-**Scope boundary (read this before starting):** This plan creates infrastructure only. KDP scanning, Etsy syncing, reminders rule engine, Pinterest poster, calendar event aggregation, and plans-folder browser are Plans B–E. Empty route components rendering a static placeholder are correct for this plan.
+**Scope boundary (read this before starting):** This plan creates infrastructure only. KDP scanning, Etsy syncing, reminders rule engine, Pinterest poster, calendar event aggregation, and plans-folder browser are Plans Bâ€“E. Empty route components rendering a static placeholder are correct for this plan.
 
 ---
 
-## Commit 1 — Archive Kanban
+## Commit 1 â€” Archive Kanban
 
 ### Task 1: Create archive directory and verify branch state
 
 **Files:**
 - Create: `web.ui/.archive-kanban/README.md`
 
-- [ ] **Step 1: Verify clean working tree on a feature branch**
+- [x] **Step 1: Verify clean working tree on a feature branch**
 
 ```bash
 git status
@@ -38,7 +38,7 @@ If on `main`, create a branch:
 git checkout -b feat/publishing-ops-dashboard
 ```
 
-- [ ] **Step 2: Create the archive directory with a README**
+- [x] **Step 2: Create the archive directory with a README**
 
 Create `web.ui/.archive-kanban/README.md`:
 
@@ -56,7 +56,7 @@ app. See `docs/superpowers/specs/2026-05-26-publishing-ops-dashboard-design.md`
 for the replacement architecture.
 ```
 
-- [ ] **Step 3: Verify directory exists**
+- [x] **Step 3: Verify directory exists**
 
 ```powershell
 Test-Path "web.ui/.archive-kanban/README.md"
@@ -69,10 +69,10 @@ Expected: `True`
 ### Task 2: Archive backend agents directory
 
 **Files:**
-- Move: `web.ui/backend/agents/` → `web.ui/.archive-kanban/backend/agents/`
-- Move: `web.ui/backend/__tests__/{anthropicAdapter,approvalGates,baseAgent,taskAnalyzer}.test.js` → `web.ui/.archive-kanban/backend/__tests__/`
+- Move: `web.ui/backend/agents/` â†’ `web.ui/.archive-kanban/backend/agents/`
+- Move: `web.ui/backend/__tests__/{anthropicAdapter,approvalGates,baseAgent,taskAnalyzer}.test.js` â†’ `web.ui/.archive-kanban/backend/__tests__/`
 
-- [ ] **Step 1: Move the agents directory wholesale via git mv**
+- [x] **Step 1: Move the agents directory wholesale via git mv**
 
 ```bash
 git mv web.ui/backend/agents web.ui/.archive-kanban/backend/agents
@@ -80,7 +80,7 @@ git mv web.ui/backend/agents web.ui/.archive-kanban/backend/agents
 
 Expected: no output, exit code 0.
 
-- [ ] **Step 2: Move the agent-related backend tests**
+- [x] **Step 2: Move the agent-related backend tests**
 
 ```bash
 mkdir -p web.ui/.archive-kanban/backend/__tests__
@@ -90,9 +90,9 @@ git mv web.ui/backend/__tests__/baseAgent.test.js       web.ui/.archive-kanban/b
 git mv web.ui/backend/__tests__/taskAnalyzer.test.js    web.ui/.archive-kanban/backend/__tests__/
 ```
 
-Note: keep `imageGenerationService.test.js`, `persistence.test.js`, `validateTransition.test.js`, and `workflow.test.js` in place — image generation survives, persistence/workflow tests will be deleted by later tasks but not via archive.
+Note: keep `imageGenerationService.test.js`, `persistence.test.js`, `validateTransition.test.js`, and `workflow.test.js` in place â€” image generation survives, persistence/workflow tests will be deleted by later tasks but not via archive.
 
-- [ ] **Step 3: Verify the move**
+- [x] **Step 3: Verify the move**
 
 ```powershell
 Test-Path "web.ui/backend/agents"
@@ -112,15 +112,15 @@ Expected: `False` then `True`.
 - Delete: `web.ui/backend/persistence.js`
 - Delete: `web.ui/shared/agentIds.mjs`, `web.ui/shared/agentIds.d.mts`, `web.ui/shared/workflow.mjs`, `web.ui/shared/workflow.d.mts`
 
-- [ ] **Step 1: Confirm `persistence.test.js`, `workflow.test.js`, and `validateTransition.test.js` have only agent/Kanban-relevant assertions**
+- [x] **Step 1: Confirm `persistence.test.js`, `workflow.test.js`, and `validateTransition.test.js` have only agent/Kanban-relevant assertions**
 
 ```bash
 git grep -l "AgentRuntime\|sprints.json\|tasks.json\|messages.json" web.ui/backend/__tests__/persistence.test.js web.ui/backend/__tests__/workflow.test.js web.ui/backend/__tests__/validateTransition.test.js
 ```
 
-Expected: all three filenames listed. (If any test references something we keep — image generation, env loading — pause and re-evaluate.)
+Expected: all three filenames listed. (If any test references something we keep â€” image generation, env loading â€” pause and re-evaluate.)
 
-- [ ] **Step 2: Move (don't delete) so we can resurrect anything we miss**
+- [x] **Step 2: Move (don't delete) so we can resurrect anything we miss**
 
 ```bash
 git mv web.ui/backend/__tests__/persistence.test.js       web.ui/.archive-kanban/backend/__tests__/
@@ -130,7 +130,7 @@ git mv web.ui/backend/persistence.js                      web.ui/.archive-kanban
 git mv web.ui/shared                                       web.ui/.archive-kanban/shared
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 ```powershell
 Test-Path "web.ui/backend/persistence.js"
@@ -146,14 +146,14 @@ Expected: `False`, `False`, `True`, `True`.
 ### Task 4: Archive frontend Kanban components and hooks
 
 **Files:**
-- Move: `web.ui/frontend-react/src/components/{Board,Lane,Card,TaskModal,SprintSelector,SprintRetroModal}.tsx` → `web.ui/.archive-kanban/frontend/components/`
-- Move: `web.ui/frontend-react/src/hooks/{useTaskPoller,useAgentEvents,useAgentWorkflow}.ts` → `web.ui/.archive-kanban/frontend/hooks/`
-- Move: `web.ui/frontend-react/src/constants/` (whole dir, contains `lanes.ts`) → `web.ui/.archive-kanban/frontend/constants/`
-- Move: `web.ui/frontend-react/src/types/` (whole dir if entries are Kanban-only) → `web.ui/.archive-kanban/frontend/types/`
-- Move: `web.ui/frontend-react/src/services/api.ts` → `web.ui/.archive-kanban/frontend/services/api.ts`
+- Move: `web.ui/frontend-react/src/components/{Board,Lane,Card,TaskModal,SprintSelector,SprintRetroModal}.tsx` â†’ `web.ui/.archive-kanban/frontend/components/`
+- Move: `web.ui/frontend-react/src/hooks/{useTaskPoller,useAgentEvents,useAgentWorkflow}.ts` â†’ `web.ui/.archive-kanban/frontend/hooks/`
+- Move: `web.ui/frontend-react/src/constants/` (whole dir, contains `lanes.ts`) â†’ `web.ui/.archive-kanban/frontend/constants/`
+- Move: `web.ui/frontend-react/src/types/` (whole dir if entries are Kanban-only) â†’ `web.ui/.archive-kanban/frontend/types/`
+- Move: `web.ui/frontend-react/src/services/api.ts` â†’ `web.ui/.archive-kanban/frontend/services/api.ts`
 - Keep: `ErrorBanner.tsx`, `ImageGenPanel.tsx` (general-purpose; may be reused)
 
-- [ ] **Step 1: Move the Kanban-specific components**
+- [x] **Step 1: Move the Kanban-specific components**
 
 ```bash
 mkdir -p web.ui/.archive-kanban/frontend/components
@@ -165,7 +165,7 @@ git mv web.ui/frontend-react/src/components/SprintSelector.tsx   web.ui/.archive
 git mv web.ui/frontend-react/src/components/SprintRetroModal.tsx web.ui/.archive-kanban/frontend/components/
 ```
 
-- [ ] **Step 2: Move the Kanban-specific hooks**
+- [x] **Step 2: Move the Kanban-specific hooks**
 
 ```bash
 mkdir -p web.ui/.archive-kanban/frontend/hooks
@@ -174,7 +174,7 @@ git mv web.ui/frontend-react/src/hooks/useAgentEvents.ts   web.ui/.archive-kanba
 git mv web.ui/frontend-react/src/hooks/useAgentWorkflow.ts web.ui/.archive-kanban/frontend/hooks/
 ```
 
-- [ ] **Step 3: Move Kanban-only support modules (constants, types, services)**
+- [x] **Step 3: Move Kanban-only support modules (constants, types, services)**
 
 ```bash
 git mv web.ui/frontend-react/src/constants web.ui/.archive-kanban/frontend/constants
@@ -183,7 +183,7 @@ mkdir -p web.ui/.archive-kanban/frontend/services
 git mv web.ui/frontend-react/src/services/api.ts web.ui/.archive-kanban/frontend/services/api.ts
 ```
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 ```powershell
 Test-Path "web.ui/frontend-react/src/components/Board.tsx"
@@ -199,9 +199,9 @@ Expected: `False`, `True`, `True`, `True`.
 ### Task 5: Archive `data/*.json` Kanban payloads
 
 **Files:**
-- Move: `data/agents.json`, `data/projects.json`, `data/sprints.json`, `data/tasks.json`, `data/messages.json` → `web.ui/.archive-kanban/data/`
+- Move: `data/agents.json`, `data/projects.json`, `data/sprints.json`, `data/tasks.json`, `data/messages.json` â†’ `web.ui/.archive-kanban/data/`
 
-- [ ] **Step 1: Move the JSON payloads**
+- [x] **Step 1: Move the JSON payloads**
 
 ```bash
 mkdir -p web.ui/.archive-kanban/data
@@ -212,7 +212,7 @@ git mv data/tasks.json    web.ui/.archive-kanban/data/
 git mv data/messages.json web.ui/.archive-kanban/data/
 ```
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 ```powershell
 Test-Path "data/tasks.json"
@@ -225,12 +225,12 @@ The repo-root `data/` directory continues to exist (it's where the new `dashboar
 
 ---
 
-### Task 6: Replace `server.js` — drop agents, keep image-gen, leave room for SQLite
+### Task 6: Replace `server.js` â€” drop agents, keep image-gen, leave room for SQLite
 
 **Files:**
-- Modify: `web.ui/backend/server.js` (full rewrite — show full file below)
+- Modify: `web.ui/backend/server.js` (full rewrite â€” show full file below)
 
-- [ ] **Step 1: Write a failing smoke test that asserts server boots without AgentRuntime**
+- [x] **Step 1: Write a failing smoke test that asserts server boots without AgentRuntime**
 
 Create `web.ui/backend/__tests__/server_smoke.test.js`:
 
@@ -264,28 +264,28 @@ describe('server smoke', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test, confirm failure**
+- [x] **Step 2: Run the test, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- server_smoke.test.js
 ```
 
-Expected: failure — current `server.js` imports `./agents/index.js`.
+Expected: failure â€” current `server.js` imports `./agents/index.js`.
 
-- [ ] **Step 3: Rewrite `server.js`**
+- [x] **Step 3: Rewrite `server.js`**
 
 Replace the entire contents of `web.ui/backend/server.js` with:
 
 ```javascript
 /**
- * Express server — serves the React build and the image-generation API.
+ * Express server â€” serves the React build and the image-generation API.
  *
  * Commit 1 (this file): Kanban + 7-agent runtime removed. Only the
  *   minimum-viable HTTP surface remains so the app boots into an empty shell.
  *
  * Commit 2 will add:
  *   - SQLite (db.js)
- *   - SSE channel (events.js → /api/events)
+ *   - SSE channel (events.js â†’ /api/events)
  *   - /api/status (workerStatus map)
  *   - /api/help/:field
  *   - systray2, autostart, logging, backup cron
@@ -309,7 +309,7 @@ const PORT = Number(process.env.PORT) || 5000;
 const app = express();
 app.use(express.json({ limit: '25mb' }));
 
-// ── Image generation (Nano Banana Pro) — retained from previous app ────────
+// â”€â”€ Image generation (Nano Banana Pro) â€” retained from previous app â”€â”€â”€â”€â”€â”€â”€â”€
 let imageService = null;
 if (process.env.GEMINI_API_KEY) {
   try {
@@ -319,13 +319,13 @@ if (process.env.GEMINI_API_KEY) {
       outputDir: IMAGES_DIR,
     });
     console.log(
-      `🎨 Image generation enabled (${process.env.IMAGE_MODEL || 'gemini-3-pro-image-preview'})`,
+      `ðŸŽ¨ Image generation enabled (${process.env.IMAGE_MODEL || 'gemini-3-pro-image-preview'})`,
     );
   } catch (err) {
     console.warn('Image service init failed:', err.message);
   }
 } else {
-  console.log('🎨 Image generation disabled (set GEMINI_API_KEY to enable)');
+  console.log('ðŸŽ¨ Image generation disabled (set GEMINI_API_KEY to enable)');
 }
 
 app.use('/images', express.static(IMAGES_DIR));
@@ -359,7 +359,7 @@ app.post('/api/generate-image', async (req, res) => {
   }
 });
 
-// ── Serve React build ────────────────────────────────────────────────────
+// â”€â”€ Serve React build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
   app.get('*', (_req, res) => {
@@ -371,7 +371,7 @@ if (fs.existsSync(DIST_DIR)) {
   });
 }
 
-// ── Start ────────────────────────────────────────────────────────────────
+// â”€â”€ Start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const server = PORT === 0
   ? null
   : app.listen(PORT, '127.0.0.1', () => {
@@ -381,7 +381,7 @@ const server = PORT === 0
 export { app, server };
 ```
 
-- [ ] **Step 4: Relocate `ImageGenerationService.js`**
+- [x] **Step 4: Relocate `ImageGenerationService.js`**
 
 The image service used to live under `agents/`. Move it up one level:
 
@@ -397,7 +397,7 @@ git grep -l "agents/ImageGenerationService" web.ui/backend/__tests__/
 
 If the test references `../agents/ImageGenerationService.js`, edit it to `../ImageGenerationService.js`.
 
-- [ ] **Step 5: Re-run smoke test, confirm pass**
+- [x] **Step 5: Re-run smoke test, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- server_smoke.test.js imageGenerationService.test.js
@@ -405,7 +405,7 @@ cd web.ui/backend && npm test -- server_smoke.test.js imageGenerationService.tes
 
 Expected: all passing (both test files green).
 
-- [ ] **Step 6: Boot the server manually as a sanity check**
+- [x] **Step 6: Boot the server manually as a sanity check**
 
 ```bash
 cd web.ui/backend && node server.js
@@ -413,7 +413,7 @@ cd web.ui/backend && node server.js
 
 Expected stdout (then Ctrl+C):
 ```
-🎨 Image generation disabled (set GEMINI_API_KEY to enable)
+ðŸŽ¨ Image generation disabled (set GEMINI_API_KEY to enable)
 Publishing Ops Dashboard server running at http://127.0.0.1:5000
 ```
 
@@ -425,32 +425,32 @@ Publishing Ops Dashboard server running at http://127.0.0.1:5000
 - Modify: `web.ui/frontend-react/src/App.tsx`
 - Delete: `web.ui/frontend-react/src/App.css` references that no longer apply (leave file; we'll trim in Task 17)
 
-- [ ] **Step 1: Replace `App.tsx`**
+- [x] **Step 1: Replace `App.tsx`**
 
 ```typescript
 import './App.css';
 
 /**
- * Commit 1 placeholder — Kanban removed, router not yet installed.
+ * Commit 1 placeholder â€” Kanban removed, router not yet installed.
  * Commit 2 (Task 17) replaces this with React Router + the global shell.
  */
 export default function App() {
   return (
     <main style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>🐓 Publishing Ops Dashboard</h1>
+      <h1>ðŸ“ Publishing Ops Dashboard</h1>
       <p>Migration in progress. The full dashboard arrives in Commit 2.</p>
     </main>
   );
 }
 ```
 
-- [ ] **Step 2: Build to verify TypeScript is happy**
+- [x] **Step 2: Build to verify TypeScript is happy**
 
 ```bash
 cd web.ui/frontend-react && npm run build
 ```
 
-Expected: build succeeds with no TS errors. Any errors here mean an archived hook is still referenced — find and archive it.
+Expected: build succeeds with no TS errors. Any errors here mean an archived hook is still referenced â€” find and archive it.
 
 ---
 
@@ -458,14 +458,14 @@ Expected: build succeeds with no TS errors. Any errors here mean an archived hoo
 
 **Files:** all of the above
 
-- [ ] **Step 1: Stage and review**
+- [x] **Step 1: Stage and review**
 
 ```bash
 git status
 git diff --stat HEAD
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add web.ui/.archive-kanban \
@@ -500,7 +500,7 @@ git add -u web.ui/backend/agents web.ui/backend/persistence.js \
 git commit -m "chore(archive): move Kanban board + 7-agent runtime to .archive-kanban/"
 ```
 
-- [ ] **Step 3: Verify commit landed cleanly**
+- [x] **Step 3: Verify commit landed cleanly**
 
 ```bash
 git log -1 --stat
@@ -510,7 +510,7 @@ Expected: single commit titled `chore(archive): ...` showing ~30+ renames and th
 
 ---
 
-## Commit 2 — Scaffolding
+## Commit 2 â€” Scaffolding
 
 ### Task 9: Install backend dependencies
 
@@ -518,7 +518,7 @@ Expected: single commit titled `chore(archive): ...` showing ~30+ renames and th
 - Modify: `web.ui/backend/package.json`
 - Modify: `web.ui/backend/package-lock.json`
 
-- [ ] **Step 1: Install runtime deps**
+- [x] **Step 1: Install runtime deps**
 
 ```bash
 cd web.ui/backend && npm install --save \
@@ -533,7 +533,7 @@ cd web.ui/backend && npm install --save \
 
 Expected: package.json updated, no peer-dep warnings beyond benign ones.
 
-- [ ] **Step 2: Install dev deps for testing**
+- [x] **Step 2: Install dev deps for testing**
 
 ```bash
 cd web.ui/backend && npm install --save-dev \
@@ -542,13 +542,13 @@ cd web.ui/backend && npm install --save-dev \
   @types/nodemailer@^6.4.16
 ```
 
-- [ ] **Step 3: Verify `package.json` reflects the additions**
+- [x] **Step 3: Verify `package.json` reflects the additions**
 
 ```bash
 git diff web.ui/backend/package.json
 ```
 
-Expected: new dependencies listed. The `type: "module"` line is unchanged — every new file in this plan must be ESM.
+Expected: new dependencies listed. The `type: "module"` line is unchanged â€” every new file in this plan must be ESM.
 
 ---
 
@@ -559,7 +559,7 @@ Expected: new dependencies listed. The `type: "module"` line is unchanged — ev
 - Create: `web.ui/backend/migrations/0001_init.sql`
 - Create: `web.ui/backend/__tests__/db.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/db.test.js`:
 
@@ -628,7 +628,7 @@ describe('db.js', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure (module does not exist)**
+- [x] **Step 2: Run, confirm failure (module does not exist)**
 
 ```bash
 cd web.ui/backend && npm test -- db.test.js
@@ -636,13 +636,13 @@ cd web.ui/backend && npm test -- db.test.js
 
 Expected: `Cannot find module '../db.js'` or similar.
 
-- [ ] **Step 3: Create the migration SQL**
+- [x] **Step 3: Create the migration SQL**
 
-Create `web.ui/backend/migrations/0001_init.sql` with the exact schema from spec §4 (the entire SQL block):
+Create `web.ui/backend/migrations/0001_init.sql` with the exact schema from spec Â§4 (the entire SQL block):
 
 ```sql
--- Migration 0001 — initial schema for the Publishing Ops Dashboard.
--- Source of truth: docs/superpowers/specs/2026-05-26-publishing-ops-dashboard-design.md §4
+-- Migration 0001 â€” initial schema for the Publishing Ops Dashboard.
+-- Source of truth: docs/superpowers/specs/2026-05-26-publishing-ops-dashboard-design.md Â§4
 
 CREATE TABLE IF NOT EXISTS kdp_books (
   id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -744,7 +744,7 @@ CREATE TABLE IF NOT EXISTS profile (
 INSERT OR IGNORE INTO profile(id) VALUES (1);
 ```
 
-- [ ] **Step 4: Create `db.js`**
+- [x] **Step 4: Create `db.js`**
 
 Create `web.ui/backend/db.js`:
 
@@ -838,16 +838,16 @@ export function openDb() {
   return db;
 }
 
-/** For tests — resets the cached handle so a new path takes effect. */
+/** For tests â€” resets the cached handle so a new path takes effect. */
 export function _resetForTests() {
   if (cached) cached.close();
   cached = null;
 }
 ```
 
-- [ ] **Step 5: Patch test to use `_resetForTests` (avoid Vitest module-cache quirks)**
+- [x] **Step 5: Patch test to use `_resetForTests` (avoid Vitest module-cache quirks)**
 
-Edit `web.ui/backend/__tests__/db.test.js` — replace the `beforeEach`/`afterEach`:
+Edit `web.ui/backend/__tests__/db.test.js` â€” replace the `beforeEach`/`afterEach`:
 
 ```javascript
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -873,7 +873,7 @@ afterEach(() => {
 
 (The four `it()` blocks stay as written in Step 1.)
 
-- [ ] **Step 6: Run, confirm pass**
+- [x] **Step 6: Run, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- db.test.js
@@ -889,7 +889,7 @@ Expected: all 4 tests pass.
 - Create: `web.ui/backend/events.js`
 - Create: `web.ui/backend/__tests__/events.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/events.test.js`:
 
@@ -946,7 +946,7 @@ describe('events.js', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure**
+- [x] **Step 2: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- events.test.js
@@ -954,7 +954,7 @@ cd web.ui/backend && npm test -- events.test.js
 
 Expected: `Cannot find module '../events.js'`.
 
-- [ ] **Step 3: Implement `events.js`**
+- [x] **Step 3: Implement `events.js`**
 
 Create `web.ui/backend/events.js`:
 
@@ -1042,7 +1042,7 @@ export function _resetSubscribersForTests() {
 }
 ```
 
-- [ ] **Step 4: Run, confirm pass**
+- [x] **Step 4: Run, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- events.test.js
@@ -1059,7 +1059,7 @@ Expected: all 3 tests pass.
 - Modify: `web.ui/backend/server.js`
 - Create: `web.ui/backend/__tests__/status_api.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/status_api.test.js`:
 
@@ -1130,7 +1130,7 @@ describe('/api/events SSE', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure**
+- [x] **Step 2: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- status_api.test.js
@@ -1138,7 +1138,7 @@ cd web.ui/backend && npm test -- status_api.test.js
 
 Expected: module-not-found error for `workerStatus.js`.
 
-- [ ] **Step 3: Create `workerStatus.js`**
+- [x] **Step 3: Create `workerStatus.js`**
 
 Create `web.ui/backend/workerStatus.js`:
 
@@ -1212,13 +1212,13 @@ export function _resetWorkerStatus() {
 }
 ```
 
-- [ ] **Step 4: Add `/api/status` + `/api/events` to `server.js`**
+- [x] **Step 4: Add `/api/status` + `/api/events` to `server.js`**
 
 Replace the entire contents of `web.ui/backend/server.js`:
 
 ```javascript
 /**
- * Express server — Publishing Ops Dashboard.
+ * Express server â€” Publishing Ops Dashboard.
  *
  * Scaffolding only at Commit 2. Per-domain logic (KDP scanner, Etsy syncer,
  * reminders, Pinterest poster, calendar aggregation) ships in Plans B-E.
@@ -1251,7 +1251,7 @@ app.use(express.json({ limit: '25mb' }));
 // Open DB eagerly so migrations run before any request hits the API.
 openDb();
 
-// ── Image generation (Nano Banana Pro) — retained ──────────────────────────
+// â”€â”€ Image generation (Nano Banana Pro) â€” retained â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let imageService = null;
 if (process.env.GEMINI_API_KEY) {
   try {
@@ -1300,12 +1300,12 @@ app.post('/api/generate-image', async (req, res) => {
   }
 });
 
-// ── /api/status — worker health (read-only) ────────────────────────────────
+// â”€â”€ /api/status â€” worker health (read-only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 app.get('/api/status', (_req, res) => {
   res.json(getAllStatuses());
 });
 
-// ── /api/events — SSE channel (consumed by frontend, written by Plans B-E) ─
+// â”€â”€ /api/events â€” SSE channel (consumed by frontend, written by Plans B-E) â”€
 app.get('/api/events', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -1346,7 +1346,7 @@ app.get('/api/events', (req, res) => {
   });
 });
 
-// ── /api/help/:field — per-field help markdown (one example file in Task 18) ──
+// â”€â”€ /api/help/:field â€” per-field help markdown (one example file in Task 18) â”€â”€
 app.get('/api/help/:field', (req, res) => {
   const safe = req.params.field.replace(/[^a-zA-Z0-9_-]/g, '');
   const file = path.join(HELP_DIR, `${safe}.md`);
@@ -1356,7 +1356,7 @@ app.get('/api/help/:field', (req, res) => {
   res.type('text/markdown').send(fs.readFileSync(file, 'utf8'));
 });
 
-// ── Serve React build ────────────────────────────────────────────────────
+// â”€â”€ Serve React build â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if (fs.existsSync(DIST_DIR)) {
   app.use(express.static(DIST_DIR));
   app.get('*', (_req, res) => {
@@ -1368,7 +1368,7 @@ if (fs.existsSync(DIST_DIR)) {
   });
 }
 
-// ── Start ────────────────────────────────────────────────────────────────
+// â”€â”€ Start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const server = PORT === 0
   ? null
   : app.listen(PORT, '127.0.0.1', () => {
@@ -1378,9 +1378,9 @@ const server = PORT === 0
 export { app, server };
 ```
 
-(Note: `logger` is created in Task 14 — server tests in this task will fail until Task 14 lands. Acceptable: we'll re-run them at the end of Task 14.)
+(Note: `logger` is created in Task 14 â€” server tests in this task will fail until Task 14 lands. Acceptable: we'll re-run them at the end of Task 14.)
 
-- [ ] **Step 5: Defer status_api test pass until Task 14**
+- [x] **Step 5: Defer status_api test pass until Task 14**
 
 Don't run `npm test` yet. Move on to Task 13 (frontend deps) then Task 14 (logger), then circle back.
 
@@ -1392,7 +1392,7 @@ Don't run `npm test` yet. Move on to Task 13 (frontend deps) then Task 14 (logge
 - Modify: `web.ui/frontend-react/package.json`
 - Modify: `web.ui/frontend-react/package-lock.json`
 
-- [ ] **Step 1: Install runtime deps**
+- [x] **Step 1: Install runtime deps**
 
 ```bash
 cd web.ui/frontend-react && npm install --save \
@@ -1403,7 +1403,7 @@ cd web.ui/frontend-react && npm install --save \
   @fullcalendar/interaction@^6.1.15
 ```
 
-- [ ] **Step 2: Verify Playwright is installable as a dev dep (E2E)**
+- [x] **Step 2: Verify Playwright is installable as a dev dep (E2E)**
 
 Check `web.ui/frontend-react/package.json` for `@playwright/test`. If absent, install:
 
@@ -1419,7 +1419,7 @@ cd web.ui/frontend-react && npx playwright install chromium
 
 Expected: `chromium` downloaded once; subsequent runs are no-op.
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 ```bash
 git diff --stat web.ui/frontend-react/package.json
@@ -1435,7 +1435,7 @@ Expected: deps + devDeps updated.
 - Create: `web.ui/backend/logger.js`
 - Create: `web.ui/backend/__tests__/logger.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/logger.test.js`:
 
@@ -1480,13 +1480,13 @@ describe('logger.js', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure**
+- [x] **Step 2: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- logger.test.js
 ```
 
-- [ ] **Step 3: Implement `logger.js`**
+- [x] **Step 3: Implement `logger.js`**
 
 Create `web.ui/backend/logger.js`:
 
@@ -1560,7 +1560,7 @@ export function pruneOldLogs(keepDays = 30) {
 }
 ```
 
-- [ ] **Step 4: Run logger tests + status_api tests, confirm pass**
+- [x] **Step 4: Run logger tests + status_api tests, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- logger.test.js status_api.test.js
@@ -1574,13 +1574,13 @@ Expected: both test files pass. (The `status_api.test.js` SSE test pulls in `ser
 
 **Files:**
 - Create: `web.ui/backend/tray.js`
-- Create: `web.ui/backend/assets/tray-green.png`, `tray-yellow.png`, `tray-red.png` (16×16 PNGs)
+- Create: `web.ui/backend/assets/tray-green.png`, `tray-yellow.png`, `tray-red.png` (16Ã—16 PNGs)
 - Modify: `web.ui/backend/server.js` (call `startTray()` after `app.listen`)
 - Create: `web.ui/backend/__tests__/tray.test.js`
 
-- [ ] **Step 1: Create the icon PNGs**
+- [x] **Step 1: Create the icon PNGs**
 
-Use Node to write three 16×16 solid PNGs. Run this throwaway script once:
+Use Node to write three 16Ã—16 solid PNGs. Run this throwaway script once:
 
 ```bash
 cd web.ui/backend && node -e "
@@ -1626,7 +1626,7 @@ Expected: `Wrote 3 tray icons to .../web.ui/backend/assets`.
 
 (If `zlib.crc32` is unavailable on your Node, swap the CRC line for the standard PNG CRC table. A 12-line implementation is acceptable here.)
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Create `web.ui/backend/__tests__/tray.test.js`:
 
@@ -1645,7 +1645,7 @@ vi.mock('systray2', () => {
 });
 
 describe('tray.js', () => {
-  it('starts a SysTray with the 5 menu items from spec §3.1', async () => {
+  it('starts a SysTray with the 5 menu items from spec Â§3.1', async () => {
     const { startTray } = await import(`../tray.js?cachebust=${Date.now()}`);
     const tray = await startTray();
     expect(tray).toBeTruthy();
@@ -1669,13 +1669,13 @@ describe('tray.js', () => {
 });
 ```
 
-- [ ] **Step 3: Run, confirm failure**
+- [x] **Step 3: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- tray.test.js
 ```
 
-- [ ] **Step 4: Implement `tray.js`**
+- [x] **Step 4: Implement `tray.js`**
 
 Create `web.ui/backend/tray.js`:
 
@@ -1781,7 +1781,7 @@ function openDashboardInBrowser() {
 }
 ```
 
-- [ ] **Step 5: Wire `startTray()` into `server.js`**
+- [x] **Step 5: Wire `startTray()` into `server.js`**
 
 Edit `web.ui/backend/server.js`. Find the `app.listen` block at the bottom and replace with:
 
@@ -1804,7 +1804,7 @@ const server = PORT === 0
 
 The `import { startTray }` line goes near the top with the other imports.
 
-- [ ] **Step 6: Run tests, confirm pass**
+- [x] **Step 6: Run tests, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- tray.test.js
@@ -1812,13 +1812,13 @@ cd web.ui/backend && npm test -- tray.test.js
 
 Expected: both tray tests pass.
 
-- [ ] **Step 7: Smoke-test the tray manually**
+- [x] **Step 7: Smoke-test the tray manually**
 
 ```bash
 cd web.ui/backend && node server.js
 ```
 
-Expected: green tray icon appears in the Windows system tray. Right-click → see 5 menu items. Click "Quit" to exit.
+Expected: green tray icon appears in the Windows system tray. Right-click â†’ see 5 menu items. Click "Quit" to exit.
 
 ---
 
@@ -1829,7 +1829,7 @@ Expected: green tray icon appears in the Windows system tray. Right-click → se
 - Create: `web.ui/backend/__tests__/backupCron.test.js`
 - Modify: `web.ui/backend/server.js` (call `startBackupCron()`)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/backupCron.test.js`:
 
@@ -1881,13 +1881,13 @@ describe('backupCron', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure**
+- [x] **Step 2: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- backupCron.test.js
 ```
 
-- [ ] **Step 3: Implement `backupCron.js`**
+- [x] **Step 3: Implement `backupCron.js`**
 
 Create `web.ui/backend/backupCron.js`:
 
@@ -1965,7 +1965,7 @@ export function startBackupCron() {
 }
 ```
 
-- [ ] **Step 4: Wire into `server.js`**
+- [x] **Step 4: Wire into `server.js`**
 
 In `web.ui/backend/server.js`, near other imports add:
 
@@ -1981,7 +1981,7 @@ if (process.env.ROOSTER_SKIP_CRON !== '1') {
 }
 ```
 
-- [ ] **Step 5: Run tests, confirm pass**
+- [x] **Step 5: Run tests, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- backupCron.test.js
@@ -1991,7 +1991,7 @@ Expected: both backup tests pass.
 
 ---
 
-### Task 17: React Router shell — empty pages for all 10 routes
+### Task 17: React Router shell â€” empty pages for all 10 routes
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/App.tsx`
@@ -2011,7 +2011,7 @@ Expected: both backup tests pass.
 - Create: `web.ui/frontend-react/src/hooks/useSseEvents.ts`
 - Create: `web.ui/frontend-react/src/styles/shell.css`
 
-- [ ] **Step 1: Create the SSE hook**
+- [x] **Step 1: Create the SSE hook**
 
 Create `web.ui/frontend-react/src/hooks/useSseEvents.ts`:
 
@@ -2079,7 +2079,7 @@ export function useSseEvents(): SseState {
 }
 ```
 
-- [ ] **Step 2: Create the global-shell components**
+- [x] **Step 2: Create the global-shell components**
 
 Create `web.ui/frontend-react/src/components/Sidebar.tsx`:
 
@@ -2088,20 +2088,20 @@ import { NavLink } from 'react-router-dom';
 import './../styles/shell.css';
 
 const LINKS: Array<{ to: string; label: string; icon: string }> = [
-  { to: '/',          label: 'Home',      icon: '🏠' },
-  { to: '/kdp',       label: 'KDP',       icon: '📚' },
-  { to: '/etsy',      label: 'Etsy',      icon: '🛍️' },
-  { to: '/plans',     label: 'Plans',     icon: '🗺️' },
-  { to: '/calendar',  label: 'Calendar',  icon: '📅' },
-  { to: '/pinterest', label: 'Pinterest', icon: '📌' },
-  { to: '/profile',   label: 'Profile',   icon: '👤' },
-  { to: '/help',      label: 'Help',      icon: '❓' },
+  { to: '/',          label: 'Home',      icon: 'ðŸ ' },
+  { to: '/kdp',       label: 'KDP',       icon: 'ðŸ“š' },
+  { to: '/etsy',      label: 'Etsy',      icon: 'ðŸ›ï¸' },
+  { to: '/plans',     label: 'Plans',     icon: 'ðŸ—ºï¸' },
+  { to: '/calendar',  label: 'Calendar',  icon: 'ðŸ“…' },
+  { to: '/pinterest', label: 'Pinterest', icon: 'ðŸ“Œ' },
+  { to: '/profile',   label: 'Profile',   icon: 'ðŸ‘¤' },
+  { to: '/help',      label: 'Help',      icon: 'â“' },
 ];
 
 export default function Sidebar() {
   return (
     <nav className="sidebar" aria-label="Main navigation">
-      <div className="sidebar-logo">🐓 Rooster</div>
+      <div className="sidebar-logo">ðŸ“ Rooster</div>
       <ul>
         {LINKS.map((l) => (
           <li key={l.to}>
@@ -2143,16 +2143,16 @@ export default function TopBar({ pendingRemindersCount = 0 }: Props) {
       <div className="topbar-spacer" />
       <span
         className={`sse-dot ${connected ? 'sse-dot-ok' : 'sse-dot-down'}`}
-        title={connected ? 'Live updates connected' : 'Reconnecting…'}
+        title={connected ? 'Live updates connected' : 'Reconnectingâ€¦'}
         aria-label={connected ? 'connected' : 'disconnected'}
       />
       <a className="bell" href="/" aria-label={`${pendingRemindersCount} pending reminders`}>
-        🔔
+        ðŸ””
         {pendingRemindersCount > 0 && (
           <span className="bell-badge">{pendingRemindersCount}</span>
         )}
       </a>
-      <a className="profile-link" href="/profile">👤</a>
+      <a className="profile-link" href="/profile">ðŸ‘¤</a>
     </header>
   );
 }
@@ -2193,7 +2193,7 @@ export default function HelpDrawer({ field, onClose }: Props) {
   if (!field) return null;
   return (
     <aside className="help-drawer" role="dialog" aria-label="Help">
-      <button className="help-close" onClick={onClose} aria-label="Close help">×</button>
+      <button className="help-close" onClick={onClose} aria-label="Close help">Ã—</button>
       <h2>{field.replace(/_/g, ' ')}</h2>
       {err && <p className="help-error">{err}</p>}
       <pre className="help-body">{body}</pre>
@@ -2202,7 +2202,7 @@ export default function HelpDrawer({ field, onClose }: Props) {
 }
 ```
 
-- [ ] **Step 3: Create the 10 empty page components**
+- [x] **Step 3: Create the 10 empty page components**
 
 Create `web.ui/frontend-react/src/pages/Home.tsx`:
 
@@ -2340,12 +2340,12 @@ export default function Help() {
 }
 ```
 
-- [ ] **Step 4: Create `shell.css`**
+- [x] **Step 4: Create `shell.css`**
 
 Create `web.ui/frontend-react/src/styles/shell.css`:
 
 ```css
-/* Global shell styles — sidebar + topbar + drawer.
+/* Global shell styles â€” sidebar + topbar + drawer.
    Plans B-E may add component CSS; this file defines only the chrome. */
 
 :root {
@@ -2392,7 +2392,7 @@ body { margin: 0; font-family: system-ui, -apple-system, sans-serif; color: var(
 .help-body { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 0.85rem; }
 ```
 
-- [ ] **Step 5: Rewrite `App.tsx` with the router**
+- [x] **Step 5: Rewrite `App.tsx` with the router**
 
 Replace `web.ui/frontend-react/src/App.tsx`:
 
@@ -2439,21 +2439,21 @@ export default function App() {
 }
 ```
 
-- [ ] **Step 6: Delete the now-obsolete `App.css` (we use `shell.css`)**
+- [x] **Step 6: Delete the now-obsolete `App.css` (we use `shell.css`)**
 
 ```bash
 git rm web.ui/frontend-react/src/App.css
 ```
 
-- [ ] **Step 7: Build to verify**
+- [x] **Step 7: Build to verify**
 
 ```bash
 cd web.ui/frontend-react && npm run build
 ```
 
-Expected: build succeeds. Any TS error here means a stale import — find and fix.
+Expected: build succeeds. Any TS error here means a stale import â€” find and fix.
 
-- [ ] **Step 8: Smoke-test in the dev server**
+- [x] **Step 8: Smoke-test in the dev server**
 
 ```bash
 cd web.ui/frontend-react && npm run dev
@@ -2470,7 +2470,7 @@ Open http://localhost:5173, click every sidebar link. Each route should render i
 - Create: `web.ui/backend/help/screenshots/.gitkeep`
 - Create: `web.ui/backend/__tests__/help_api.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/help_api.test.js`:
 
@@ -2520,7 +2520,7 @@ describe('/api/help/:field', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure**
+- [x] **Step 2: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- help_api.test.js
@@ -2528,7 +2528,7 @@ cd web.ui/backend && npm test -- help_api.test.js
 
 Expected: 404 for `gmail_app_password` (the file doesn't exist yet).
 
-- [ ] **Step 3: Create the markdown file**
+- [x] **Step 3: Create the markdown file**
 
 Create `web.ui/backend/help/gmail_app_password.md`:
 
@@ -2536,7 +2536,7 @@ Create `web.ui/backend/help/gmail_app_password.md`:
 # Gmail App Password
 
 The dashboard uses Gmail SMTP to send reminder emails. Because two-factor
-auth is on, you can't use your regular password — you need an **App
+auth is on, you can't use your regular password â€” you need an **App
 Password**.
 
 ## Steps
@@ -2552,21 +2552,21 @@ Password**.
 
 ## If you ever rotate the password
 
-Re-run steps 3–7 and update `.env`. The dashboard reads the env on boot.
+Re-run steps 3â€“7 and update `.env`. The dashboard reads the env on boot.
 
 ## Troubleshooting
 
-- **535-5.7.8 Username and Password not accepted** → the app password is
+- **535-5.7.8 Username and Password not accepted** â†’ the app password is
   wrong or stale. Generate a new one.
-- **No email arriving** → check the toast still fires. If toast works but
-  email doesn't, the SMTP credentials are bad — start at step 3.
+- **No email arriving** â†’ check the toast still fires. If toast works but
+  email doesn't, the SMTP credentials are bad â€” start at step 3.
 ```
 
-- [ ] **Step 4: Create the screenshots directory placeholder**
+- [x] **Step 4: Create the screenshots directory placeholder**
 
 Create `web.ui/backend/help/screenshots/.gitkeep` (empty file).
 
-- [ ] **Step 5: Run tests, confirm pass**
+- [x] **Step 5: Run tests, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- help_api.test.js
@@ -2583,7 +2583,7 @@ Expected: all 3 tests pass.
 - Create: `scripts/uninstall-autostart.ps1`
 - Create: `web.ui/backend/__tests__/autostart.test.js` (file-content test only; we don't invoke schtasks from CI)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/autostart.test.js`:
 
@@ -2621,13 +2621,13 @@ describe('autostart scripts', () => {
 });
 ```
 
-- [ ] **Step 2: Run, confirm failure**
+- [x] **Step 2: Run, confirm failure**
 
 ```bash
 cd web.ui/backend && npm test -- autostart.test.js
 ```
 
-- [ ] **Step 3: Create `install-autostart.ps1`**
+- [x] **Step 3: Create `install-autostart.ps1`**
 
 Create `scripts/install-autostart.ps1`:
 
@@ -2692,7 +2692,7 @@ Write-Host "  server:   $serverJs"
 Write-Host "  workdir:  $workDir"
 ```
 
-- [ ] **Step 4: Create `uninstall-autostart.ps1`**
+- [x] **Step 4: Create `uninstall-autostart.ps1`**
 
 Create `scripts/uninstall-autostart.ps1`:
 
@@ -2716,7 +2716,7 @@ if (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue) {
 }
 ```
 
-- [ ] **Step 5: Run tests, confirm pass**
+- [x] **Step 5: Run tests, confirm pass**
 
 ```bash
 cd web.ui/backend && npm test -- autostart.test.js
@@ -2724,7 +2724,7 @@ cd web.ui/backend && npm test -- autostart.test.js
 
 Expected: 3 tests pass.
 
-- [ ] **Step 6: Verify scripts run interactively (optional sanity check)**
+- [x] **Step 6: Verify scripts run interactively (optional sanity check)**
 
 ```powershell
 .\scripts\install-autostart.ps1
@@ -2736,12 +2736,12 @@ Expected: task appears between the two scripts, then is gone.
 
 ---
 
-### Task 20: Update CI workflow — drop agent tests
+### Task 20: Update CI workflow â€” drop agent tests
 
 **Files:**
 - Modify: `.github/workflows/web-ui-ci.yml`
 
-- [ ] **Step 1: Replace the workflow file**
+- [x] **Step 1: Replace the workflow file**
 
 Replace the entire contents of `.github/workflows/web-ui-ci.yml`:
 
@@ -2781,7 +2781,7 @@ jobs:
       - name: Type-check
         run: npm run typecheck
       - name: Test
-        # Skip tray test on Linux runner — systray2 needs a display.
+        # Skip tray test on Linux runner â€” systray2 needs a display.
         # Skip cron real-time / autostart tests by env flags.
         env:
           ROOSTER_SKIP_TRAY: '1'
@@ -2811,17 +2811,17 @@ jobs:
       # e2e specs. Plan A intentionally has no e2e tests to run yet.
 ```
 
-- [ ] **Step 2: Verify the YAML is valid**
+- [x] **Step 2: Verify the YAML is valid**
 
 ```bash
 cd web.ui/backend && node -e "const yaml = require('yaml'); console.log(yaml.parse(require('fs').readFileSync('../../.github/workflows/web-ui-ci.yml', 'utf8')).name)"
 ```
 
-If `yaml` isn't installed locally, skip — GitHub will tell us if it's malformed on push.
+If `yaml` isn't installed locally, skip â€” GitHub will tell us if it's malformed on push.
 
-- [ ] **Step 3: Confirm tray-test env flag is honored**
+- [x] **Step 3: Confirm tray-test env flag is honored**
 
-Re-run the tray test under the skip flag — it should still pass (the mock bypasses the platform check):
+Re-run the tray test under the skip flag â€” it should still pass (the mock bypasses the platform check):
 
 ```bash
 cd web.ui/backend && ROOSTER_SKIP_TRAY=1 npm test -- tray.test.js
@@ -2837,7 +2837,7 @@ Expected: pass.
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Backend full suite**
+- [x] **Step 1: Backend full suite**
 
 ```bash
 cd web.ui/backend && npm run lint && npm run typecheck && npm test
@@ -2856,7 +2856,7 @@ Expected: lint clean, typecheck clean, all tests pass. Tests in scope at this po
 - `__tests__/help_api.test.js`
 - `__tests__/autostart.test.js`
 
-- [ ] **Step 2: Frontend full suite**
+- [x] **Step 2: Frontend full suite**
 
 ```bash
 cd web.ui/frontend-react && npm run lint && npm run build
@@ -2864,7 +2864,7 @@ cd web.ui/frontend-react && npm run lint && npm run build
 
 Expected: clean.
 
-- [ ] **Step 3: End-to-end smoke**
+- [x] **Step 3: End-to-end smoke**
 
 ```bash
 cd web.ui/backend && node server.js
@@ -2872,22 +2872,22 @@ cd web.ui/backend && node server.js
 
 Expected: server boots, green tray icon appears, log line `dashboard server listening` appears, navigating to http://localhost:5000 in a browser shows the Sidebar + TopBar + Home placeholder. Ctrl+C to stop.
 
-If a `dist/` doesn't exist yet, `node server.js` says "React build not found" — run `cd web.ui/frontend-react && npm run build` first, then re-test.
+If a `dist/` doesn't exist yet, `node server.js` says "React build not found" â€” run `cd web.ui/frontend-react && npm run build` first, then re-test.
 
 ---
 
 ### Task 22: Commit 2
 
-**Files:** all of Tasks 9–21
+**Files:** all of Tasks 9â€“21
 
-- [ ] **Step 1: Review staged changes**
+- [x] **Step 1: Review staged changes**
 
 ```bash
 git status
 git diff --stat HEAD
 ```
 
-- [ ] **Step 2: Stage and commit**
+- [x] **Step 2: Stage and commit**
 
 ```bash
 git add web.ui/backend/db.js \
@@ -2924,26 +2924,26 @@ git add web.ui/backend/db.js \
         .github/workflows/web-ui-ci.yml
 git add -u web.ui/frontend-react/src/App.css
 
-git commit -m "feat(dashboard): scaffolding — SQLite + SSE + tray + autostart + router shell"
+git commit -m "feat(dashboard): scaffolding â€” SQLite + SSE + tray + autostart + router shell"
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 ```bash
 git log -2 --stat
 ```
 
-Expected: two commits — `chore(archive): ...` and `feat(dashboard): scaffolding ...`. The dashboard app boots into a working empty shell ready for Plans B–E to build on top of.
+Expected: two commits â€” `chore(archive): ...` and `feat(dashboard): scaffolding ...`. The dashboard app boots into a working empty shell ready for Plans Bâ€“E to build on top of.
 
 ---
 
 ## Done criteria for Plan A
 
-- [ ] Both commits land.
-- [ ] `cd web.ui/backend && npm test` is green (10 test files).
-- [ ] `cd web.ui/frontend-react && npm run build` is green.
-- [ ] `node web.ui/backend/server.js` boots; tray icon appears; all 10 routes return 200; `/api/events` streams a heartbeat; `/api/status` returns `{}`; `/api/help/gmail_app_password` returns markdown.
-- [ ] `scripts/install-autostart.ps1` and `scripts/uninstall-autostart.ps1` are idempotent.
-- [ ] Nothing under `web.ui/.archive-kanban/` is imported by live code (`git grep -r 'archive-kanban' web.ui/backend web.ui/frontend-react/src` returns empty).
+- [x] Both commits land.
+- [x] `cd web.ui/backend && npm test` is green (10 test files).
+- [x] `cd web.ui/frontend-react && npm run build` is green.
+- [x] `node web.ui/backend/server.js` boots; tray icon appears; all 10 routes return 200; `/api/events` streams a heartbeat; `/api/status` returns `{}`; `/api/help/gmail_app_password` returns markdown.
+- [x] `scripts/install-autostart.ps1` and `scripts/uninstall-autostart.ps1` are idempotent.
+- [x] Nothing under `web.ui/.archive-kanban/` is imported by live code (`git grep -r 'archive-kanban' web.ui/backend web.ui/frontend-react/src` returns empty).
 
-Plans B–E begin from this state.
+Plans Bâ€“E begin from this state.

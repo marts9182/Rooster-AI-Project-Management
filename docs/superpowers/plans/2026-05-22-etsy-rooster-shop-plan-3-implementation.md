@@ -1,4 +1,4 @@
-# Etsy Rooster Shop — Plan 3 Implementation Plan
+﻿# Etsy Rooster Shop â€” Plan 3 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -30,15 +30,15 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 Run `python -m pytest tests/ -q --no-cov` and confirm 231 passed + 6 deselected.
 
 **Existing infrastructure this plan reuses unchanged:**
-- `etsy_rooster.catalog_db.CatalogDB` — `niche` column accepts any string; new `coloring-pack`, `wall-art-set`, `svg-bundle` niches require no schema change.
-- `etsy_rooster.listing_authoring.author.LLMListingAuthor` — loads `<prompts_dir>/<niche>-prompt.md` by filename; new niches just need new prompt files.
-- `etsy_rooster.publish.orchestrator.PublishOrchestrator` — already handles any niche by reading `_taxonomy_for_niche` via CLI; we extend that mapping.
-- `etsy_rooster.video.builder.build_and_upload_video` — dispatches by `niche` via `_TREATMENT_BY_NICHE`; new niches need new treatment functions added there.
+- `etsy_rooster.catalog_db.CatalogDB` â€” `niche` column accepts any string; new `coloring-pack`, `wall-art-set`, `svg-bundle` niches require no schema change.
+- `etsy_rooster.listing_authoring.author.LLMListingAuthor` â€” loads `<prompts_dir>/<niche>-prompt.md` by filename; new niches just need new prompt files.
+- `etsy_rooster.publish.orchestrator.PublishOrchestrator` â€” already handles any niche by reading `_taxonomy_for_niche` via CLI; we extend that mapping.
+- `etsy_rooster.video.builder.build_and_upload_video` â€” dispatches by `niche` via `_TREATMENT_BY_NICHE`; new niches need new treatment functions added there.
 
 **KDP source assets used:**
-- `<kdp>/assets/processed/coloring/bold-easy-cottagecore-mushrooms-v1/page_NN.png` — 45 pages
-- `<kdp>/assets/processed/coloring/bold-easy-songbirds-v1/page_NN.png` — 40 pages
-- `<kdp>/assets/processed/coloring/bold-easy-cute-cats-v1/page_NN.png` — count TBD (Task 8 verifies)
+- `<kdp>/assets/processed/coloring/bold-easy-cottagecore-mushrooms-v1/page_NN.png` â€” 45 pages
+- `<kdp>/assets/processed/coloring/bold-easy-songbirds-v1/page_NN.png` â€” 40 pages
+- `<kdp>/assets/processed/coloring/bold-easy-cute-cats-v1/page_NN.png` â€” count TBD (Task 8 verifies)
 
 `KDP_ASSETS_DIR` is set in `.env.local` to `C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/kdp-puzzle-press`.
 
@@ -47,17 +47,17 @@ Run `python -m pytest tests/ -q --no-cov` and confirm 231 passed + 6 deselected.
 ## File structure
 
 **New source files:**
-- `src/etsy_rooster/coloring/page_extractor.py` — `extract_page_subset` (pypdf)
-- `src/etsy_rooster/coloring/pack_niche.py` — `ColoringPackNiche` dataclass
-- `src/etsy_rooster/posters/set_niche.py` — `PosterSetNiche` dataclass
-- `src/etsy_rooster/posters/set_builder.py` — `build_set_zip` (multi-print bundle)
-- `src/etsy_rooster/posters/set_kdp_importer.py` — `load_poster_set_niche`
-- `src/etsy_rooster/svg_render/svg_bundler.py` — `build_svg_bundle` (zip + tiled preview)
-- `src/etsy_rooster/svg_render/bundle_niche.py` — `SvgBundleNiche` dataclass
+- `src/etsy_rooster/coloring/page_extractor.py` â€” `extract_page_subset` (pypdf)
+- `src/etsy_rooster/coloring/pack_niche.py` â€” `ColoringPackNiche` dataclass
+- `src/etsy_rooster/posters/set_niche.py` â€” `PosterSetNiche` dataclass
+- `src/etsy_rooster/posters/set_builder.py` â€” `build_set_zip` (multi-print bundle)
+- `src/etsy_rooster/posters/set_kdp_importer.py` â€” `load_poster_set_niche`
+- `src/etsy_rooster/svg_render/svg_bundler.py` â€” `build_svg_bundle` (zip + tiled preview)
+- `src/etsy_rooster/svg_render/bundle_niche.py` â€” `SvgBundleNiche` dataclass
 - `src/etsy_rooster/listing_authoring/prompts/coloring-pack-prompt.md`
 - `src/etsy_rooster/listing_authoring/prompts/wall-art-set-prompt.md`
 - `src/etsy_rooster/listing_authoring/prompts/svg-bundle-prompt.md`
-- `web.ui/backend/scripts/generate_poster_sets.mjs` — Node generator for N prints/set
+- `web.ui/backend/scripts/generate_poster_sets.mjs` â€” Node generator for N prints/set
 
 **New test files:**
 - `tests/test_coloring_page_extractor.py`
@@ -71,13 +71,13 @@ Run `python -m pytest tests/ -q --no-cov` and confirm 231 passed + 6 deselected.
 - `tests/test_taxonomy_mapping.py`
 
 **Modified files:**
-- `src/etsy_rooster/cli.py` — three new subcommands + extend `_TAXONOMY_BY_NICHE`
-- `src/etsy_rooster/video/treatments.py` — three new treatment functions
-- `src/etsy_rooster/video/builder.py` — three new entries in `_TREATMENT_BY_NICHE`
+- `src/etsy_rooster/cli.py` â€” three new subcommands + extend `_TAXONOMY_BY_NICHE`
+- `src/etsy_rooster/video/treatments.py` â€” three new treatment functions
+- `src/etsy_rooster/video/builder.py` â€” three new entries in `_TREATMENT_BY_NICHE`
 
 ---
 
-## Task 0: Niche routing — taxonomy + 3 prompt files
+## Task 0: Niche routing â€” taxonomy + 3 prompt files
 
 **Files:**
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/cli.py` (extend `_TAXONOMY_BY_NICHE`)
@@ -86,7 +86,7 @@ Run `python -m pytest tests/ -q --no-cov` and confirm 231 passed + 6 deselected.
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/svg-bundle-prompt.md`
 - Create: `projects/etsy-rooster-shop/tests/test_taxonomy_mapping.py`
 
-- [ ] **Step 1: Write failing test for taxonomy routing**
+- [x] **Step 1: Write failing test for taxonomy routing**
 
 Create `projects/etsy-rooster-shop/tests/test_taxonomy_mapping.py`:
 
@@ -119,14 +119,14 @@ def test_unknown_niche_raises():
         _taxonomy_for_niche("nonexistent-niche")
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && python -m pytest tests/test_taxonomy_mapping.py -v --no-cov
 ```
 Expected: `test_new_plan_3_niches_route_correctly` FAILS (KeyError raised via ClickException for the new niches). Other tests pass.
 
-- [ ] **Step 3: Extend the taxonomy mapping**
+- [x] **Step 3: Extend the taxonomy mapping**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, find the existing `_TAXONOMY_BY_NICHE` dict (around line 26) and extend it:
 
@@ -134,10 +134,10 @@ In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, find the existing `_TAX
 _TAXONOMY_BY_NICHE: dict[str, int] = {
     # Craft Supplies & Tools > Patterns & How To > Patterns & Blueprints
     "mandala": 6343,
-    # Same leaf as mandala — confirmed via live taxonomy walk; no more
+    # Same leaf as mandala â€” confirmed via live taxonomy walk; no more
     # specific coloring/printables leaf exists in Etsy's current taxonomy.
     "coloring": 6343,
-    # Art & Collectibles > Prints > Digital Prints — distinct leaf for posters.
+    # Art & Collectibles > Prints > Digital Prints â€” distinct leaf for posters.
     "poster": 2078,
     # Plan 3 new niches:
     "coloring-pack": 6343,   # mini-pack of coloring pages, same leaf as coloring
@@ -146,14 +146,14 @@ _TAXONOMY_BY_NICHE: dict[str, int] = {
 }
 ```
 
-- [ ] **Step 4: Run tests, verify pass**
+- [x] **Step 4: Run tests, verify pass**
 
 ```bash
 python -m pytest tests/test_taxonomy_mapping.py -v --no-cov
 ```
 Expected: 3 passed.
 
-- [ ] **Step 5: Create the coloring-pack prompt file**
+- [x] **Step 5: Create the coloring-pack prompt file**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/coloring-pack-prompt.md`:
 
@@ -162,9 +162,9 @@ Create `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/co
 
 You write Etsy listings for printable mini-pack coloring PDFs published by
 Pocket Rooster Press. The shop sells digital downloads (PDF) for at-home
-printing. Mini-packs are themed subsets of larger books — 5 to 10 pages,
+printing. Mini-packs are themed subsets of larger books â€” 5 to 10 pages,
 priced lower than full books for impulse purchase. Voice: warm, cozy,
-hobby-craft tone. Never invent details — the artifact summary lists exactly
+hobby-craft tone. Never invent details â€” the artifact summary lists exactly
 what's included.
 
 Return a single JSON object with these exact keys:
@@ -190,7 +190,7 @@ Niche: {niche}
 Artifact summary: {artifact_summary_json}
 ```
 
-- [ ] **Step 6: Create the wall-art-set prompt file**
+- [x] **Step 6: Create the wall-art-set prompt file**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/wall-art-set-prompt.md`:
 
@@ -226,7 +226,7 @@ Niche: {niche}
 Artifact summary: {artifact_summary_json}
 ```
 
-- [ ] **Step 7: Create the svg-bundle prompt file**
+- [x] **Step 7: Create the svg-bundle prompt file**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/svg-bundle-prompt.md`:
 
@@ -260,7 +260,7 @@ Return a single JSON object with these exact keys:
 ```
 
 (Note: this svg-bundle prompt does NOT have a trailing `# User` section
-because there are no per-instance template variables — actually it does
+because there are no per-instance template variables â€” actually it does
 need one. Fix by appending the User section.)
 
 Append to the file:
@@ -273,14 +273,14 @@ Niche: {niche}
 Artifact summary: {artifact_summary_json}
 ```
 
-- [ ] **Step 8: Run full suite to verify nothing regressed**
+- [x] **Step 8: Run full suite to verify nothing regressed**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 234 passed, 6 deselected (231 prior + 3 new tests for taxonomy mapping). Note: the new prompt files are not directly exercised by tests yet; they'll be used in Tasks 2/5/6 CLI commands.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/cli.py src/etsy_rooster/listing_authoring/prompts/coloring-pack-prompt.md src/etsy_rooster/listing_authoring/prompts/wall-art-set-prompt.md src/etsy_rooster/listing_authoring/prompts/svg-bundle-prompt.md tests/test_taxonomy_mapping.py
@@ -295,7 +295,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/coloring/page_extractor.py`
 - Create: `projects/etsy-rooster-shop/tests/test_coloring_page_extractor.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_coloring_page_extractor.py`:
 
@@ -393,14 +393,14 @@ def test_extract_creates_parent_dir(tmp_path: Path) -> None:
     assert out.is_file()
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && python -m pytest tests/test_coloring_page_extractor.py -v --no-cov
 ```
 Expected: 5 errors (module not found).
 
-- [ ] **Step 3: Implement the extractor**
+- [x] **Step 3: Implement the extractor**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/coloring/page_extractor.py`:
 
@@ -489,21 +489,21 @@ def _build_cover_page(*, title: str, subtitle: str) -> bytes:
     return buf.getvalue()
 ```
 
-- [ ] **Step 4: Run tests, verify pass**
+- [x] **Step 4: Run tests, verify pass**
 
 ```bash
 python -m pytest tests/test_coloring_page_extractor.py -v --no-cov
 ```
 Expected: 5 passed.
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 239 passed, 6 deselected (234 prior + 5 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/coloring/page_extractor.py tests/test_coloring_page_extractor.py
@@ -520,7 +520,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Create: `projects/etsy-rooster-shop/tests/test_coloring_pack_niche.py`
 - Create: `projects/etsy-rooster-shop/tests/test_coloring_pack_cli.py`
 
-- [ ] **Step 1: Write failing test for the ColoringPackNiche dataclass**
+- [x] **Step 1: Write failing test for the ColoringPackNiche dataclass**
 
 Create `projects/etsy-rooster-shop/tests/test_coloring_pack_niche.py`:
 
@@ -608,19 +608,19 @@ def test_design_count_matches_page_indices(tmp_path: Path) -> None:
     assert n.design_count == 3
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_coloring_pack_niche.py -v --no-cov
 ```
 Expected: 5 errors (module not found).
 
-- [ ] **Step 3: Implement ColoringPackNiche**
+- [x] **Step 3: Implement ColoringPackNiche**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/coloring/pack_niche.py`:
 
 ```python
-"""ColoringPackNiche — data Plan 3's coloring-pack pipeline needs."""
+"""ColoringPackNiche â€” data Plan 3's coloring-pack pipeline needs."""
 
 from __future__ import annotations
 
@@ -668,14 +668,14 @@ class ColoringPackNiche:
         return len(self.page_indices)
 ```
 
-- [ ] **Step 4: Run niche tests, verify pass**
+- [x] **Step 4: Run niche tests, verify pass**
 
 ```bash
 python -m pytest tests/test_coloring_pack_niche.py -v --no-cov
 ```
 Expected: 5 passed.
 
-- [ ] **Step 5: Write failing CLI test**
+- [x] **Step 5: Write failing CLI test**
 
 Create `projects/etsy-rooster-shop/tests/test_coloring_pack_cli.py`:
 
@@ -745,14 +745,14 @@ def test_generate_coloring_pack_creates_sku_and_pdf(
     assert params["page_indices"] == [1, 3, 5, 7, 9]
 ```
 
-- [ ] **Step 6: Run CLI test to confirm failure**
+- [x] **Step 6: Run CLI test to confirm failure**
 
 ```bash
 python -m pytest tests/test_coloring_pack_cli.py -v --no-cov
 ```
 Expected: FAIL (no `coloring-pack` subcommand).
 
-- [ ] **Step 7: Add the CLI subcommand**
+- [x] **Step 7: Add the CLI subcommand**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, find the existing `generate_themed_mandala` function. Add the new `generate_coloring_pack` subcommand right after `generate_coloring` (before `generate_poster` to keep coloring commands grouped):
 
@@ -818,21 +818,21 @@ def generate_coloring_pack(
     click.echo(f"sku_id={sku_id} pack={pack_id} pdf={out_pdf}")
 ```
 
-- [ ] **Step 8: Run CLI test, verify pass**
+- [x] **Step 8: Run CLI test, verify pass**
 
 ```bash
 python -m pytest tests/test_coloring_pack_cli.py -v --no-cov
 ```
 Expected: 1 passed.
 
-- [ ] **Step 9: Full suite**
+- [x] **Step 9: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 245 passed, 6 deselected (239 prior + 5 niche + 1 CLI).
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/coloring/pack_niche.py src/etsy_rooster/cli.py tests/test_coloring_pack_niche.py tests/test_coloring_pack_cli.py
@@ -850,7 +850,7 @@ This task is **Node code, not Python.** It generates N prints for a wall art set
 
 No new Python tests. Smoke-test the script with `--dry-run` instead.
 
-- [ ] **Step 1: Create the Node generator**
+- [x] **Step 1: Create the Node generator**
 
 Create `web.ui/backend/scripts/generate_poster_sets.mjs`:
 
@@ -956,7 +956,7 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true });
 
   const bank = loadSetBank(setId);
-  console.log(`🎨 Generating ${bank.prints.length} prints for set "${setId}"`);
+  console.log(`ðŸŽ¨ Generating ${bank.prints.length} prints for set "${setId}"`);
 
   const svc = new ImageGenerationService({
     apiKey: process.env.GEMINI_API_KEY,
@@ -969,7 +969,7 @@ async function main() {
   for (const print of bank.prints) {
     const outPath = path.join(outDir, `${print.slug}.png`);
     if (skipExisting && fs.existsSync(outPath)) {
-      console.log(`   ⏭️  ${print.slug}.png exists, skipping`);
+      console.log(`   â­ï¸  ${print.slug}.png exists, skipping`);
       skipped += 1;
       continue;
     }
@@ -984,11 +984,11 @@ async function main() {
     fs.renameSync(path.join(outDir, result.filename), outPath);
     const ms = Date.now() - t0;
     const kb = Math.round(result.bytes / 1024);
-    console.log(`   ✅ ${print.slug} (${kb} KB in ${(ms / 1000).toFixed(1)}s)`);
+    console.log(`   âœ… ${print.slug} (${kb} KB in ${(ms / 1000).toFixed(1)}s)`);
     generated += 1;
   }
 
-  console.log(`Done: ${generated} generated, ${skipped} skipped → ${path.relative(REPO_ROOT, outDir)}`);
+  console.log(`Done: ${generated} generated, ${skipped} skipped â†’ ${path.relative(REPO_ROOT, outDir)}`);
 }
 
 main().catch((err) => {
@@ -997,14 +997,14 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Step 2: Smoke-test the Node script with a missing set ID**
+- [x] **Step 2: Smoke-test the Node script with a missing set ID**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend && node scripts/generate_poster_sets.mjs nonexistent-set-v1 2>&1 | head -5
 ```
 Expected: errors out with "No set prompt bank found" message (the script's input validation works).
 
-- [ ] **Step 3: Create the prompt-bank schema directory in the KDP repo**
+- [x] **Step 3: Create the prompt-bank schema directory in the KDP repo**
 
 ```bash
 mkdir -p C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/kdp-puzzle-press/data/poster_set_prompts
@@ -1012,13 +1012,13 @@ mkdir -p C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/k
 
 (The directory will be populated with one JSON per set during Task 9 runbook. No code changes here.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management && git add web.ui/backend/scripts/generate_poster_sets.mjs && git commit -m "feat(plan3): Nano Banana Pro multi-print set generator script"
 ```
 
-(Outer-repo commit — separate from the etsy-rooster-shop nested repo. Use `git -C` if needed.)
+(Outer-repo commit â€” separate from the etsy-rooster-shop nested repo. Use `git -C` if needed.)
 
 ---
 
@@ -1031,7 +1031,7 @@ cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management && git add web.u
 - Create: `projects/etsy-rooster-shop/tests/test_poster_set_niche.py`
 - Create: `projects/etsy-rooster-shop/tests/test_poster_set_builder.py`
 
-- [ ] **Step 1: Write failing tests for `PosterSetNiche`**
+- [x] **Step 1: Write failing tests for `PosterSetNiche`**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_set_niche.py`:
 
@@ -1106,19 +1106,19 @@ def test_missing_set_dir_rejected(tmp_path: Path) -> None:
         )
 ```
 
-- [ ] **Step 2: Run niche tests to confirm failure**
+- [x] **Step 2: Run niche tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_poster_set_niche.py -v --no-cov
 ```
 Expected: 4 errors (module not found).
 
-- [ ] **Step 3: Implement `PosterSetNiche`**
+- [x] **Step 3: Implement `PosterSetNiche`**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/set_niche.py`:
 
 ```python
-"""PosterSetNiche — data Plan 3's wall-art-set pipeline needs about one bundle."""
+"""PosterSetNiche â€” data Plan 3's wall-art-set pipeline needs about one bundle."""
 
 from __future__ import annotations
 
@@ -1161,14 +1161,14 @@ class PosterSetNiche:
         return len(self.print_png_paths)
 ```
 
-- [ ] **Step 4: Run niche tests, verify pass**
+- [x] **Step 4: Run niche tests, verify pass**
 
 ```bash
 python -m pytest tests/test_poster_set_niche.py -v --no-cov
 ```
 Expected: 4 passed.
 
-- [ ] **Step 5: Write failing tests for `build_set_zip`**
+- [x] **Step 5: Write failing tests for `build_set_zip`**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_set_builder.py`:
 
@@ -1212,7 +1212,7 @@ def test_build_set_zip_contains_all_sizes_for_all_prints(tmp_path: Path) -> None
 
     with zipfile.ZipFile(zip_path) as zf:
         names = set(zf.namelist())
-    # 3 prints × 3 sizes = 9 JPGs + 1 instructions PDF
+    # 3 prints Ã— 3 sizes = 9 JPGs + 1 instructions PDF
     assert len(names) == 10
     # Spot-check naming convention
     assert "print_01_8x10.jpg" in names
@@ -1242,19 +1242,19 @@ def test_build_set_zip_outputs_jpg_with_300_dpi(tmp_path: Path) -> None:
             assert im.size == (2400, 3000)  # 8x10 at 300 DPI
 ```
 
-- [ ] **Step 6: Run builder tests to confirm failure**
+- [x] **Step 6: Run builder tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_poster_set_builder.py -v --no-cov
 ```
 Expected: 2 errors (module not found).
 
-- [ ] **Step 7: Implement `build_set_zip`**
+- [x] **Step 7: Implement `build_set_zip`**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/set_builder.py`:
 
 ```python
-"""Build the buyer-facing ZIP for a wall-art SET: N prints × 3 sizes."""
+"""Build the buyer-facing ZIP for a wall-art SET: N prints Ã— 3 sizes."""
 
 from __future__ import annotations
 
@@ -1270,7 +1270,7 @@ from reportlab.pdfgen.canvas import Canvas
 from etsy_rooster.posters.set_niche import PosterSetNiche
 
 # Three print sizes for the set bundle (smaller selection than single posters
-# so the ZIP doesn't explode — sets are 6+ images at 5 sizes each = too large).
+# so the ZIP doesn't explode â€” sets are 6+ images at 5 sizes each = too large).
 SET_SIZES: dict[str, tuple[int, int]] = {
     "8x10":  (2400, 3000),
     "11x14": (3300, 4200),
@@ -1310,7 +1310,7 @@ def _render_instructions_pdf(niche: PosterSetNiche) -> bytes:
     cy = height - margin
 
     c.setFont("Helvetica-Bold", 18)
-    c.drawString(margin, cy, "Thank you for your purchase — Pocket Rooster Press")
+    c.drawString(margin, cy, "Thank you for your purchase â€” Pocket Rooster Press")
     cy -= 28
 
     c.setFont("Helvetica", 11)
@@ -1334,7 +1334,7 @@ def _render_instructions_pdf(niche: PosterSetNiche) -> bytes:
 
 
 def build_set_zip(niche: PosterSetNiche, output_dir: Path) -> Path:
-    """Bundle N prints × 3 sizes + 1 instructions PDF into <output_dir>/<set_id>.zip."""
+    """Bundle N prints Ã— 3 sizes + 1 instructions PDF into <output_dir>/<set_id>.zip."""
     output_dir.mkdir(parents=True, exist_ok=True)
     zip_path = output_dir / f"{niche.set_id}.zip"
 
@@ -1353,14 +1353,14 @@ def build_set_zip(niche: PosterSetNiche, output_dir: Path) -> Path:
     return zip_path
 ```
 
-- [ ] **Step 8: Run builder tests, verify pass**
+- [x] **Step 8: Run builder tests, verify pass**
 
 ```bash
 python -m pytest tests/test_poster_set_builder.py -v --no-cov
 ```
 Expected: 2 passed.
 
-- [ ] **Step 9: Implement the importer (no test — trivial passthrough)**
+- [x] **Step 9: Implement the importer (no test â€” trivial passthrough)**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/set_kdp_importer.py`:
 
@@ -1424,14 +1424,14 @@ def load_poster_set_niche(*, kdp_root: Path, set_id: str) -> PosterSetNiche:
     )
 ```
 
-- [ ] **Step 10: Full suite**
+- [x] **Step 10: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 251 passed, 6 deselected (245 prior + 4 niche + 2 builder).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/posters/set_niche.py src/etsy_rooster/posters/set_builder.py src/etsy_rooster/posters/set_kdp_importer.py tests/test_poster_set_niche.py tests/test_poster_set_builder.py
@@ -1446,7 +1446,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/cli.py` (add `generate poster-set` subcommand)
 - Create: `projects/etsy-rooster-shop/tests/test_poster_set_cli.py`
 
-- [ ] **Step 1: Write failing CLI test**
+- [x] **Step 1: Write failing CLI test**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_set_cli.py`:
 
@@ -1516,14 +1516,14 @@ def test_generate_poster_set_creates_sku_and_zip(
     assert params["print_count"] == 3
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 python -m pytest tests/test_poster_set_cli.py -v --no-cov
 ```
 Expected: FAIL (no `poster-set` subcommand).
 
-- [ ] **Step 3: Add the CLI subcommand**
+- [x] **Step 3: Add the CLI subcommand**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, add the new subcommand right after `generate_poster`:
 
@@ -1566,21 +1566,21 @@ def generate_poster_set(set_id: str) -> None:
     click.echo(f"sku_id={sku_id} set={set_id} zip={zip_path}")
 ```
 
-- [ ] **Step 4: Run CLI test, verify pass**
+- [x] **Step 4: Run CLI test, verify pass**
 
 ```bash
 python -m pytest tests/test_poster_set_cli.py -v --no-cov
 ```
 Expected: 1 passed.
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 252 passed, 6 deselected (251 prior + 1 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/cli.py tests/test_poster_set_cli.py
@@ -1598,7 +1598,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Create: `projects/etsy-rooster-shop/tests/test_svg_bundler.py`
 - Create: `projects/etsy-rooster-shop/tests/test_svg_bundle_cli.py`
 
-- [ ] **Step 1: Write failing tests for `build_svg_bundle`**
+- [x] **Step 1: Write failing tests for `build_svg_bundle`**
 
 Create `projects/etsy-rooster-shop/tests/test_svg_bundler.py`:
 
@@ -1683,19 +1683,19 @@ def test_missing_svg_file_rejected(tmp_path: Path) -> None:
         )
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_svg_bundler.py -v --no-cov
 ```
 Expected: 4 errors (module not found).
 
-- [ ] **Step 3: Implement `SvgBundleNiche`**
+- [x] **Step 3: Implement `SvgBundleNiche`**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/svg_render/bundle_niche.py`:
 
 ```python
-"""SvgBundleNiche — data Plan 3's svg-bundle pipeline needs about one bundle."""
+"""SvgBundleNiche â€” data Plan 3's svg-bundle pipeline needs about one bundle."""
 
 from __future__ import annotations
 
@@ -1734,7 +1734,7 @@ class SvgBundleNiche:
         return len(self.svg_paths)
 ```
 
-- [ ] **Step 4: Implement `build_svg_bundle`**
+- [x] **Step 4: Implement `build_svg_bundle`**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/svg_render/svg_bundler.py`:
 
@@ -1803,14 +1803,14 @@ def _render_tiled_preview(svg_paths: list[Path], output_path: Path) -> None:
     canvas.save(output_path, format="PNG")
 ```
 
-- [ ] **Step 5: Run bundler tests, verify pass**
+- [x] **Step 5: Run bundler tests, verify pass**
 
 ```bash
 python -m pytest tests/test_svg_bundler.py -v --no-cov
 ```
 Expected: 4 passed.
 
-- [ ] **Step 6: Write failing CLI test**
+- [x] **Step 6: Write failing CLI test**
 
 Create `projects/etsy-rooster-shop/tests/test_svg_bundle_cli.py`:
 
@@ -1878,14 +1878,14 @@ def test_generate_svg_bundle_creates_sku_zip_preview(
     assert params["design_count"] == 3
 ```
 
-- [ ] **Step 7: Run CLI test to confirm failure**
+- [x] **Step 7: Run CLI test to confirm failure**
 
 ```bash
 python -m pytest tests/test_svg_bundle_cli.py -v --no-cov
 ```
 Expected: FAIL (no `svg-bundle` subcommand).
 
-- [ ] **Step 8: Add the CLI subcommand**
+- [x] **Step 8: Add the CLI subcommand**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, add right after `generate_mandala`:
 
@@ -1940,21 +1940,21 @@ def generate_svg_bundle(
 
 Also ensure `from pathlib import Path` is imported at the top of `cli.py` (it should be from prior tasks; verify).
 
-- [ ] **Step 9: Run CLI test, verify pass**
+- [x] **Step 9: Run CLI test, verify pass**
 
 ```bash
 python -m pytest tests/test_svg_bundle_cli.py -v --no-cov
 ```
 Expected: 1 passed.
 
-- [ ] **Step 10: Full suite**
+- [x] **Step 10: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 257 passed, 6 deselected (252 prior + 4 bundler + 1 CLI).
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/svg_render/bundle_niche.py src/etsy_rooster/svg_render/svg_bundler.py src/etsy_rooster/cli.py tests/test_svg_bundler.py tests/test_svg_bundle_cli.py
@@ -1970,7 +1970,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/video/builder.py`
 - Modify: `projects/etsy-rooster-shop/tests/test_video_treatments.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Append to `projects/etsy-rooster-shop/tests/test_video_treatments.py`:
 
@@ -2064,14 +2064,14 @@ def test_svg_bundle_static_uses_tiled_preview(tmp_path: Path) -> None:
     assert t.zoom is None
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_video_treatments.py -v --no-cov
 ```
 Expected: 3 errors (cannot import new treatment functions).
 
-- [ ] **Step 3: Add the new treatment functions**
+- [x] **Step 3: Add the new treatment functions**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/video/treatments.py`, append:
 
@@ -2101,7 +2101,7 @@ def coloring_pack_page_flip(db: CatalogDB, sku_id: int) -> VideoTreatment:
 def wall_art_set_zoom(db: CatalogDB, sku_id: int) -> VideoTreatment:
     """Slow Ken Burns zoom on the FIRST print of a wall-art-set.
 
-    A multi-print video would be ideal but takes 6× ffmpeg time per video.
+    A multi-print video would be ideal but takes 6Ã— ffmpeg time per video.
     For v1 we zoom on the lead image and let the preview mosaic show variety.
     """
     files = db.list_artifact_files(sku_id)
@@ -2120,7 +2120,7 @@ def wall_art_set_zoom(db: CatalogDB, sku_id: int) -> VideoTreatment:
 def svg_bundle_static(db: CatalogDB, sku_id: int) -> VideoTreatment:
     """Static hold on the tiled preview PNG for SVG bundles.
 
-    No zoom — the value prop is "see all the designs at once", so a static
+    No zoom â€” the value prop is "see all the designs at once", so a static
     hold lets buyers scan the grid for 5 seconds.
     """
     files = db.list_artifact_files(sku_id)
@@ -2136,7 +2136,7 @@ def svg_bundle_static(db: CatalogDB, sku_id: int) -> VideoTreatment:
     )
 ```
 
-- [ ] **Step 4: Wire new treatments into the dispatcher**
+- [x] **Step 4: Wire new treatments into the dispatcher**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/video/builder.py`, find `_TREATMENT_BY_NICHE` and extend it:
 
@@ -2152,21 +2152,21 @@ _TREATMENT_BY_NICHE = {
 }
 ```
 
-- [ ] **Step 5: Run tests, verify pass**
+- [x] **Step 5: Run tests, verify pass**
 
 ```bash
 python -m pytest tests/test_video_treatments.py -v --no-cov
 ```
 Expected: 7 passed (4 existing + 3 new).
 
-- [ ] **Step 6: Full suite**
+- [x] **Step 6: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 260 passed, 6 deselected (257 prior + 3 new).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/video/treatments.py src/etsy_rooster/video/builder.py tests/test_video_treatments.py
@@ -2175,11 +2175,11 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 
 ---
 
-## Task 8: Phase 1 Runbook — Single-page coloring packs + Cute Cats full book
+## Task 8: Phase 1 Runbook â€” Single-page coloring packs + Cute Cats full book
 
-**This is operational, not code work.** No tests, no commits. Spend money: real Etsy API calls (~$0.20 each × 13 listings = ~$2.60 in publish fees + ~$0.40 in Gemini for listing copy).
+**This is operational, not code work.** No tests, no commits. Spend money: real Etsy API calls (~$0.20 each Ã— 13 listings = ~$2.60 in publish fees + ~$0.40 in Gemini for listing copy).
 
-The 13 Phase 1 listings (Weeks 1-2, May 22 – Jun 5):
+The 13 Phase 1 listings (Weeks 1-2, May 22 â€“ Jun 5):
 
 | # | Type | Source | Pack-ID / Book-ID | Pages | Title | Tags |
 |---|---|---|---|---|---|---|
@@ -2197,15 +2197,15 @@ The 13 Phase 1 listings (Weeks 1-2, May 22 – Jun 5):
 | 12 | coloring-pack | cute-cats-v1 | single-sleepy-cat | (pick one) | Single-Image: Sleepy Cat by Fireplace | cute cat,sleepy cat,coloring,single page,instant download,fireplace,calm,relaxing,cozy,bedtime,small print,decor,nature |
 | 13 | coloring (full) | cute-cats-v1 | bold-easy-cute-cats-v1 | all | Bold & Easy Cute Cats Coloring Book | cute cats,cat coloring,coloring book,bold and easy,cats,instant download,kittens,calm,relaxing,large print,seniors,nature,gift |
 
-- [ ] **Step 1: Verify cute-cats source book is ready**
+- [x] **Step 1: Verify cute-cats source book is ready**
 
 ```bash
 ls C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/kdp-puzzle-press/assets/processed/coloring/bold-easy-cute-cats-v1/page_*.png 2>&1 | wc -l
 ```
 
-Expected: ≥30 pages. If <30 or directory missing, **STOP** and either (a) drop listings 8, 9, 12, 13 from this batch and run them in Plan 4, or (b) finish the source KDP book first.
+Expected: â‰¥30 pages. If <30 or directory missing, **STOP** and either (a) drop listings 8, 9, 12, 13 from this batch and run them in Plan 4, or (b) finish the source KDP book first.
 
-- [ ] **Step 2: Ship the full Cute Cats coloring book (listing 13) first**
+- [x] **Step 2: Ship the full Cute Cats coloring book (listing 13) first**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop
@@ -2218,7 +2218,7 @@ python -c "from etsy_rooster.cli import cli; cli(['generate', 'video', '--sku-id
 
 Then via Etsy dashboard: assign section "Coloring Pages", set craft_type "Paper crafting", Publish.
 
-- [ ] **Step 3: Run the 9 multi-page coloring packs (listings 1-9)**
+- [x] **Step 3: Run the 9 multi-page coloring packs (listings 1-9)**
 
 For each row in the table above where pages are not "(curate)" (rows 1-4, 8-9), run:
 
@@ -2239,7 +2239,7 @@ cli(['generate', 'coloring-pack',
 
 Then dashboard: section "Coloring Pages", craft_type "Paper crafting", Publish.
 
-- [ ] **Step 4: Curate page assignments for songbird subsets**
+- [x] **Step 4: Curate page assignments for songbird subsets**
 
 Listings 5, 6, 7 reference "(curate)" because the songbird book's 40 pages need manual partition into themed subsets. Open `<kdp>/data/coloring_books/bold-easy-songbirds-v1.json` (or wherever the page->bird-species mapping lives) and pick:
 
@@ -2249,9 +2249,9 @@ Listings 5, 6, 7 reference "(curate)" because the songbird book's 40 pages need 
 
 Record the chosen page indices in a scratch file, then run the same `generate coloring-pack` command with the curated `--pages` values.
 
-- [ ] **Step 5: Run the 3 single-image listings (listings 10, 11, 12)**
+- [x] **Step 5: Run the 3 single-image listings (listings 10, 11, 12)**
 
-Pick the strongest single page from each book (most-detailed, most-portfolio-worthy). For listing 10, page 32 was suggested as a placeholder — pick whichever page you'd put on a wall yourself. For 11 and 12, pick one page from songbirds and cute-cats respectively.
+Pick the strongest single page from each book (most-detailed, most-portfolio-worthy). For listing 10, page 32 was suggested as a placeholder â€” pick whichever page you'd put on a wall yourself. For 11 and 12, pick one page from songbirds and cute-cats respectively.
 
 Run:
 
@@ -2270,9 +2270,9 @@ cli(['generate', 'coloring-pack',
 # Then author-metadata, publish, generate-video
 ```
 
-Update price to $1.99 manually via Etsy dashboard after publish (the LLM prompt's default is $4.99 — single-page packs need a lower price).
+Update price to $1.99 manually via Etsy dashboard after publish (the LLM prompt's default is $4.99 â€” single-page packs need a lower price).
 
-- [ ] **Step 6: Phase 1 acceptance check**
+- [x] **Step 6: Phase 1 acceptance check**
 
 After all 13 listings are published as drafts on Etsy:
 
@@ -2282,25 +2282,25 @@ python -c "from etsy_rooster.cli import cli; cli(['audit'], standalone_mode=Fals
 
 Expected: 4 existing SKUs (1 coloring + 3 mandalas from prior plans) + 13 new = 17 total. Each new SKU should be in "drafted" or "published" state.
 
-- [ ] **Step 7: Publish all Phase 1 drafts via Etsy dashboard**
+- [x] **Step 7: Publish all Phase 1 drafts via Etsy dashboard**
 
 Open https://www.etsy.com/your/shops/PocketRoosterPress/tools/listings/state:draft. For each Phase 1 draft:
 1. Verify the listing photo is correct
 2. Verify the video plays
 3. Click Publish
 
-If any listing's video looks wrong, run `generate video --sku-id=<N>` again — but flag the duplicate-video risk noted in Plan 2e deferred-debt.
+If any listing's video looks wrong, run `generate video --sku-id=<N>` again â€” but flag the duplicate-video risk noted in Plan 2e deferred-debt.
 
 ---
 
-## Task 9: Phase 2 Runbook — Wall art quote sets
+## Task 9: Phase 2 Runbook â€” Wall art quote sets
 
-**This is operational, not code work.** Real API costs: ~$0.04 × 6 prints × 10 sets = ~$2.40 in Nano Banana Pro + ~$0.40 in Gemini for listing copy + ~$2.00 in Etsy publish fees.
+**This is operational, not code work.** Real API costs: ~$0.04 Ã— 6 prints Ã— 10 sets = ~$2.40 in Nano Banana Pro + ~$0.40 in Gemini for listing copy + ~$2.00 in Etsy publish fees.
 
-The ~10 wall art quote sets to ship (Weeks 3-4, Jun 6 – Jun 19). Each set needs:
+The ~10 wall art quote sets to ship (Weeks 3-4, Jun 6 â€“ Jun 19). Each set needs:
 
 1. A prompt-bank JSON at `<kdp>/data/poster_set_prompts/<set_id>.json` (you author this)
-2. A run of `generate_poster_sets.mjs` to generate the 6 print PNGs (~3 min/set, $0.04 × 6 = $0.24)
+2. A run of `generate_poster_sets.mjs` to generate the 6 print PNGs (~3 min/set, $0.04 Ã— 6 = $0.24)
 3. A run of `etsy-rooster generate poster-set --set=<set_id>` to bundle into a SKU
 4. Author-metadata + publish + generate-video as usual
 
@@ -2354,16 +2354,16 @@ For each of the 10 sets, write a JSON file at `<kdp>/data/poster_set_prompts/<se
 6. cottagecore-bathroom-spa-set-v1 (florals, calm botanical compositions)
 7. cottagecore-bedroom-set-v1 (soft florals, dawn light, linen vignettes)
 8. cottagecore-tea-garden-set-v1 (cups, teapots, blooming herbs)
-9. cottagecore-mushroom-specialty-set-v1 (6 mushroom species — illustration-only, no text)
+9. cottagecore-mushroom-specialty-set-v1 (6 mushroom species â€” illustration-only, no text)
 10. cottagecore-apothecary-set-v1 (dried herbs, jars, hand-lettered labels)
 
-- [ ] **Step 1: Author all 10 prompt-bank JSONs**
+- [x] **Step 1: Author all 10 prompt-bank JSONs**
 
 For each set above, write the JSON file at `<kdp>/data/poster_set_prompts/<set_id>.json` following the template. Each `prints` array should have exactly 6 entries with `slug` and `subject` fields.
 
-Time budget: ~15-20 minutes per set × 10 = 2-3 hours of careful authoring (this is the most time-intensive Plan 3 activity).
+Time budget: ~15-20 minutes per set Ã— 10 = 2-3 hours of careful authoring (this is the most time-intensive Plan 3 activity).
 
-- [ ] **Step 2: Generate all 60 print PNGs (6 prints × 10 sets)**
+- [x] **Step 2: Generate all 60 print PNGs (6 prints Ã— 10 sets)**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -2374,13 +2374,13 @@ do
 done
 ```
 
-Expected: ~3-5 minutes per set × 10 sets ≈ 30-50 min wall-clock. Total spend: ~$2.40 in Nano Banana Pro.
+Expected: ~3-5 minutes per set Ã— 10 sets â‰ˆ 30-50 min wall-clock. Total spend: ~$2.40 in Nano Banana Pro.
 
-- [ ] **Step 3: Inspect the generated prints**
+- [x] **Step 3: Inspect the generated prints**
 
-Open `<kdp>/assets/generated/poster_sets/<set_id>/` for each set. Check that all 6 prints look usable. If any look wrong (cropped subject, off-style, wrong aspect), edit the prompt bank's `subject` field for that print and regenerate via `node scripts/generate_poster_sets.mjs <set_id>` (without `--skip-existing` to force a redraw of just the bad ones — actually re-generation rewrites all; either delete the bad print PNG then run with `--skip-existing` or accept the redraw cost of $0.04 × 6 = $0.24 per set).
+Open `<kdp>/assets/generated/poster_sets/<set_id>/` for each set. Check that all 6 prints look usable. If any look wrong (cropped subject, off-style, wrong aspect), edit the prompt bank's `subject` field for that print and regenerate via `node scripts/generate_poster_sets.mjs <set_id>` (without `--skip-existing` to force a redraw of just the bad ones â€” actually re-generation rewrites all; either delete the bad print PNG then run with `--skip-existing` or accept the redraw cost of $0.04 Ã— 6 = $0.24 per set).
 
-- [ ] **Step 4: Run the 10 `generate poster-set` commands**
+- [x] **Step 4: Run the 10 `generate poster-set` commands**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop
@@ -2393,7 +2393,7 @@ done
 
 This creates 10 SKUs with niche=wall-art-set. Note the sku_ids printed for each.
 
-- [ ] **Step 5: Author + publish + generate-video for each new SKU**
+- [x] **Step 5: Author + publish + generate-video for each new SKU**
 
 For each new sku_id from Step 4:
 
@@ -2405,7 +2405,7 @@ python -c "from etsy_rooster.cli import cli; cli(['generate', 'video', '--sku-id
 
 Then via Etsy dashboard: assign section "Printable Posters" (or create a "Wall Art Sets" section), set craft_type "Other" or "Painting", Publish.
 
-- [ ] **Step 6: Phase 2 acceptance check**
+- [x] **Step 6: Phase 2 acceptance check**
 
 ```bash
 python -c "from etsy_rooster.cli import cli; cli(['audit'], standalone_mode=False)"
@@ -2415,21 +2415,21 @@ Expected: 17 from Phase 1 + 10 new = 27 SKUs total. All wall-art-set SKUs in "dr
 
 ---
 
-## Task 10: Phase 3 Runbook — SVG bundles + publish remaining drafts
+## Task 10: Phase 3 Runbook â€” SVG bundles + publish remaining drafts
 
 **This is operational, not code work.** Real API costs: ~$0.60 in Etsy publish fees + ~$0.10 in Gemini for listing copy. No Nano Banana Pro spend.
 
-3 SVG bundles to ship (Weeks 5-6, Jun 20 – Jul 3):
+3 SVG bundles to ship (Weeks 5-6, Jun 20 â€“ Jul 3):
 
 | # | Bundle ID | Contents | Title |
 |---|---|---|---|
 | 1 | cottagecore-botanical-svg-bundle-v1 | 20 motifs from Plan 2d library (mushroom, fern, leaf, flower, acorn variants) | Cottagecore Botanical SVG Bundle (20 Files for Cricut) |
-| 2 | geometric-mandala-svg-bundle-v1 | 15 mandala variations (different seeds × ring counts × petal arrangements) | Geometric Mandala SVG Bundle (15 Files for Cricut) |
+| 2 | geometric-mandala-svg-bundle-v1 | 15 mandala variations (different seeds Ã— ring counts Ã— petal arrangements) | Geometric Mandala SVG Bundle (15 Files for Cricut) |
 | 3 | mixed-cottagecore-svg-bundle-v1 | 12 mandalas + 12 simple motifs = 24 SVGs | Mixed Cottagecore SVG Cut Files Bundle (24 Files) |
 
-- [ ] **Step 1: Generate the source SVGs**
+- [x] **Step 1: Generate the source SVGs**
 
-For bundle 1 (botanical motifs), use the Plan 2d motif library directly. Generate 20 individual SVG files from the motif primitives. The motifs live at `src/etsy_rooster/svg_render/motifs/cottagecore.py` — each function returns a path string. Wrap each in a minimal SVG document and save:
+For bundle 1 (botanical motifs), use the Plan 2d motif library directly. Generate 20 individual SVG files from the motif primitives. The motifs live at `src/etsy_rooster/svg_render/motifs/cottagecore.py` â€” each function returns a path string. Wrap each in a minimal SVG document and save:
 
 ```bash
 python -c "
@@ -2457,7 +2457,7 @@ print(f'Wrote {len(designs)} SVGs to {out}')
 "
 ```
 
-Adapt the motif-function signatures if they differ from `(cx, cy, r)` — read `motifs/cottagecore.py` first.
+Adapt the motif-function signatures if they differ from `(cx, cy, r)` â€” read `motifs/cottagecore.py` first.
 
 For bundles 2 + 3, use `etsy-rooster generate mandala` repeatedly with different seeds:
 
@@ -2470,7 +2470,7 @@ done
 
 This produces 15 mandala SVGs at `data/artifacts/mandala-mNN/mandala-mNN.svg`.
 
-- [ ] **Step 2: Run `generate svg-bundle` for bundle 1**
+- [x] **Step 2: Run `generate svg-bundle` for bundle 1**
 
 ```bash
 SVG_DIR=C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop/data/artifacts/cottagecore-botanical-svgs
@@ -2488,7 +2488,7 @@ cli(args, standalone_mode=False)
 "
 ```
 
-- [ ] **Step 3: Run `generate svg-bundle` for bundle 2 (mandalas)**
+- [x] **Step 3: Run `generate svg-bundle` for bundle 2 (mandalas)**
 
 ```bash
 python -c "
@@ -2504,7 +2504,7 @@ cli(args, standalone_mode=False)
 "
 ```
 
-- [ ] **Step 4: Run `generate svg-bundle` for bundle 3 (mixed 12+12)**
+- [x] **Step 4: Run `generate svg-bundle` for bundle 3 (mixed 12+12)**
 
 Combine the first 12 mandala SVGs and 12 cottagecore motif SVGs:
 
@@ -2524,7 +2524,7 @@ cli(args, standalone_mode=False)
 "
 ```
 
-- [ ] **Step 5: Author + publish + generate-video for each of the 3 new SKUs**
+- [x] **Step 5: Author + publish + generate-video for each of the 3 new SKUs**
 
 For each bundle SKU created in steps 2-4:
 
@@ -2536,7 +2536,7 @@ python -c "from etsy_rooster.cli import cli; cli(['generate', 'video', '--sku-id
 
 Then dashboard: section "SVG Cut Files", craft_type "Paper crafting", Publish.
 
-- [ ] **Step 6: Publish remaining Plan 2 drafts**
+- [x] **Step 6: Publish remaining Plan 2 drafts**
 
 There were 3 drafts from Plan 2 still in "draft" state on Etsy at the start of Plan 3:
 - `#4508770108` Bold & Easy Songbirds Coloring Book
@@ -2549,7 +2549,7 @@ All three already have product videos attached (from Plan 2e backfill). For each
 - Verify craft_type
 - Click Publish
 
-- [ ] **Step 7: Phase 3 acceptance check**
+- [x] **Step 7: Phase 3 acceptance check**
 
 ```bash
 python -c "from etsy_rooster.cli import cli; cli(['audit'], standalone_mode=False)"
@@ -2559,13 +2559,13 @@ Expected total: 27 (after Phase 2) + 3 (new SVG bundles) = 30 SKUs. All in "publ
 
 ---
 
-## Task 11: Phase 4 Runbook — Monitor, refresh, scale winners
+## Task 11: Phase 4 Runbook â€” Monitor, refresh, scale winners
 
-**Operational only — no code, no commits.** Weeks 7-12 (Jul 4 – Aug 22).
+**Operational only â€” no code, no commits.** Weeks 7-12 (Jul 4 â€“ Aug 22).
 
 ### Day 30 gate (Jun 22, 2026)
 
-- [ ] **Step 1: Pull Etsy stats**
+- [x] **Step 1: Pull Etsy stats**
 
 Open https://www.etsy.com/your/shops/PocketRoosterPress/stats. Capture:
 - Total views in last 30 days
@@ -2577,9 +2577,9 @@ Open https://www.etsy.com/your/shops/PocketRoosterPress/stats. Capture:
 
 Record in a scratch file or screenshot.
 
-- [ ] **Step 2: Evaluate the gate**
+- [x] **Step 2: Evaluate the gate**
 
-The Plan 3 spec's Day 30 success threshold: **≥3 sales OR ≥200 views.**
+The Plan 3 spec's Day 30 success threshold: **â‰¥3 sales OR â‰¥200 views.**
 
 If hit:
 - Continue Phase 4 monitoring. Mid-window check at Day 60.
@@ -2588,15 +2588,15 @@ If missed (e.g. 0 sales AND <50 views across all 30 listings):
 - **Refresh action:** Pick the 8-10 listings with the lowest views. Re-run `author-metadata` with a slightly different artifact_summary (add or rephrase 1-2 theme_tags to test SEO). Re-publish if Etsy accepts the rewrite, or update via dashboard if not.
 - **Ads action:** Pick the 1-2 listings with the most favorites (any > 0) and set $1/day Etsy Ads. Monitor whether ads convert.
 
-- [ ] **Step 3: Cull obvious flops**
+- [x] **Step 3: Cull obvious flops**
 
 Listings with 0 views after 30 days have an SEO problem. Pull them, rewrite the title (front-load a different keyword combination), and republish. Don't delete the SKU; just unpublish and revise.
 
 ### Day 60 gate (Jul 22, 2026)
 
-- [ ] **Step 4: Pull stats + identify winning themes**
+- [x] **Step 4: Pull stats + identify winning themes**
 
-The Plan 3 spec's Day 60 success threshold: **≥10 sales OR ≥800 views.**
+The Plan 3 spec's Day 60 success threshold: **â‰¥10 sales OR â‰¥800 views.**
 
 If hit:
 - **Scale winners:** Identify the top 2-3 best-selling themes (e.g. "cottagecore mushroom" or "songbird"). Ship 5 more listings in each winning theme using the existing pipelines:
@@ -2606,47 +2606,47 @@ If hit:
 
 If missed:
 - **A/B price test:** Pick 3 of the most-viewed-but-not-bought listings. Set them to $3.99, $4.99, $5.99 respectively. Watch conversion over 14 days.
-- **Reconsider niche viability:** If wall-art-set has 0 sales and coloring-pack has 5, the data says coloring-packs are working — pause the wall-art-set ramp and shift attention to packs.
+- **Reconsider niche viability:** If wall-art-set has 0 sales and coloring-pack has 5, the data says coloring-packs are working â€” pause the wall-art-set ramp and shift attention to packs.
 
 ### Day 90 gate (Aug 22, 2026)
 
-- [ ] **Step 5: Final revenue check**
+- [x] **Step 5: Final revenue check**
 
-Spec target: **≥29 sales = $200/mo revenue.** Average sale is ~$7 if mostly coloring-packs, ~$10 if mostly wall art sets — calibrate sale-count target accordingly.
+Spec target: **â‰¥29 sales = $200/mo revenue.** Average sale is ~$7 if mostly coloring-packs, ~$10 if mostly wall art sets â€” calibrate sale-count target accordingly.
 
 If hit ($200/mo achieved):
-- **Plan 4 launches:** Use the validated SKU types as the foundation. Add new types per the spec's "out of scope" list — paper packs first (Plan 4 Task 0 is the paper pack pipeline build). Add Halloween-themed coloring books in late July for the August-October Halloween wave.
+- **Plan 4 launches:** Use the validated SKU types as the foundation. Add new types per the spec's "out of scope" list â€” paper packs first (Plan 4 Task 0 is the paper pack pipeline build). Add Halloween-themed coloring books in late July for the August-October Halloween wave.
 
 If missed:
 - **Postmortem:** Which SKU type underperformed? Cut losses (unpublish the persistent-zero listings) and double down on what worked. The Plan 3 spec's stance is validate-then-scale; don't repeat the same bets if data says they failed.
 
-- [ ] **Step 6: Update checkpoint memory**
+- [x] **Step 6: Update checkpoint memory**
 
 Update `C:\Users\marts\.claude\projects\c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management\memory\etsy-rooster-shop-checkpoint.md` with the Day 90 outcome, listing counts, top performers, and decisions for Plan 4.
 
-No git commit for this task — runbook execution only.
+No git commit for this task â€” runbook execution only.
 
 ---
 
-## Acceptance — Plan 3 complete when
+## Acceptance â€” Plan 3 complete when
 
-- [ ] All 8 pipeline-extension tasks committed (Tasks 0-7)
-- [ ] `python -m pytest tests/ -q --no-cov` shows ≥260 passed, 0 failed
-- [ ] 23-26 new Etsy listings shipped across the 4 SKU types (coloring-pack, full coloring, wall-art-set, svg-bundle)
-- [ ] All 3 prior Plan-2 drafts published live
-- [ ] Day 90 revenue check completed and checkpoint memory updated
+- [x] All 8 pipeline-extension tasks committed (Tasks 0-7)
+- [x] `python -m pytest tests/ -q --no-cov` shows â‰¥260 passed, 0 failed
+- [x] 23-26 new Etsy listings shipped across the 4 SKU types (coloring-pack, full coloring, wall-art-set, svg-bundle)
+- [x] All 3 prior Plan-2 drafts published live
+- [x] Day 90 revenue check completed and checkpoint memory updated
 
 ## Deferred-debt acknowledgments
 
 Plan 3 adds new debt items on top of the running Plan 2e list:
 
-1. **`--replace` flag still missing on `generate video`** — re-running on a SKU with an existing video uploads a second one. Worth fixing if Plan 3 monitoring requires video refreshes.
-2. **Single-page coloring packs reuse the source PDF's cover even when source has been updated** — extractor reads source `.pdf` at extraction time, so if the source book is re-built later, existing pack PDFs are stale. Acceptable for v1.
-3. **Wall-art-set video only zooms on the first print, not the full set** — multi-print video would be ideal but takes 6× ffmpeg time. Deferred.
-4. **SVG bundle pricing in the prompt defaults to $7.99 regardless of design count** — the 24-design bundle should be $9.99 per spec; LLM may produce $7.99 anyway. Manual override in dashboard if needed.
-5. **No CLI for quote-draft authoring** — Phase 2 expects user-authored prompt-bank JSONs by hand. A `draft-quotes --set=<id>` command that uses LLMListingAuthor to propose 30 candidates per set is deferred.
-6. **Cute Cats source book may not be ready** — Task 8 Step 1 verifies; if it fails, 4 listings (8, 9, 12, 13) slip to Plan 4.
-7. **Themed-mandala motif legibility at mandala scale remains unsolved** — kept paused. Cricut-scale standalone use (Task 10) is the salvage.
+1. **`--replace` flag still missing on `generate video`** â€” re-running on a SKU with an existing video uploads a second one. Worth fixing if Plan 3 monitoring requires video refreshes.
+2. **Single-page coloring packs reuse the source PDF's cover even when source has been updated** â€” extractor reads source `.pdf` at extraction time, so if the source book is re-built later, existing pack PDFs are stale. Acceptable for v1.
+3. **Wall-art-set video only zooms on the first print, not the full set** â€” multi-print video would be ideal but takes 6Ã— ffmpeg time. Deferred.
+4. **SVG bundle pricing in the prompt defaults to $7.99 regardless of design count** â€” the 24-design bundle should be $9.99 per spec; LLM may produce $7.99 anyway. Manual override in dashboard if needed.
+5. **No CLI for quote-draft authoring** â€” Phase 2 expects user-authored prompt-bank JSONs by hand. A `draft-quotes --set=<id>` command that uses LLMListingAuthor to propose 30 candidates per set is deferred.
+6. **Cute Cats source book may not be ready** â€” Task 8 Step 1 verifies; if it fails, 4 listings (8, 9, 12, 13) slip to Plan 4.
+7. **Themed-mandala motif legibility at mandala scale remains unsolved** â€” kept paused. Cricut-scale standalone use (Task 10) is the salvage.
 
 ---
 
@@ -2655,19 +2655,19 @@ Plan 3 adds new debt items on top of the running Plan 2e list:
 (Performed inline before saving this plan.)
 
 **Spec coverage:**
-- Section "Listing mix" (4 SKU types) → covered by Tasks 0-7 (pipelines) and Tasks 8-10 (production runbooks)
-- Section "SKU Type A: Single-page themed coloring packs" → Task 1 (extractor) + Task 2 (CLI) + Task 8 (12 listings shipped)
-- Section "SKU Type B: Wall art quote sets" → Tasks 3-5 (pipelines) + Task 9 (10 sets shipped)
-- Section "SKU Type C: Cricut SVG bundles" → Task 6 (pipeline) + Task 10 (3 bundles shipped)
-- Section "SKU Type D: Full Cute Cats coloring book" → Task 8 Step 2 (1 listing via existing pipeline)
-- Section "Required pipeline extensions" (~7h) → Tasks 0-7 sum to ~8-9h (slight over-estimate due to test granularity, but matches in spirit)
-- Section "Pipeline reuse map" → flow described in Task 8/9/10 runbooks
-- Section "Phasing" → Tasks 8/9/10 = Phases 1/2/3; Task 11 = Phase 4
-- Section "Success metrics + cull triggers" → Task 11 Steps 2/4/5 = Day 30/60/90 gates
-- Section "Out of scope" → preserved as deferred-debt items
-- Section "Risks + mitigations" → spec captures these; plan doesn't need to duplicate
+- Section "Listing mix" (4 SKU types) â†’ covered by Tasks 0-7 (pipelines) and Tasks 8-10 (production runbooks)
+- Section "SKU Type A: Single-page themed coloring packs" â†’ Task 1 (extractor) + Task 2 (CLI) + Task 8 (12 listings shipped)
+- Section "SKU Type B: Wall art quote sets" â†’ Tasks 3-5 (pipelines) + Task 9 (10 sets shipped)
+- Section "SKU Type C: Cricut SVG bundles" â†’ Task 6 (pipeline) + Task 10 (3 bundles shipped)
+- Section "SKU Type D: Full Cute Cats coloring book" â†’ Task 8 Step 2 (1 listing via existing pipeline)
+- Section "Required pipeline extensions" (~7h) â†’ Tasks 0-7 sum to ~8-9h (slight over-estimate due to test granularity, but matches in spirit)
+- Section "Pipeline reuse map" â†’ flow described in Task 8/9/10 runbooks
+- Section "Phasing" â†’ Tasks 8/9/10 = Phases 1/2/3; Task 11 = Phase 4
+- Section "Success metrics + cull triggers" â†’ Task 11 Steps 2/4/5 = Day 30/60/90 gates
+- Section "Out of scope" â†’ preserved as deferred-debt items
+- Section "Risks + mitigations" â†’ spec captures these; plan doesn't need to duplicate
 
-**Placeholder scan:** No TBDs, no "implement later", no "similar to task N" without code. Every task has the actual code or command to run. The few "(curate)" markers in Task 8 are explicit user-choices, not placeholders — they describe what the user has to decide.
+**Placeholder scan:** No TBDs, no "implement later", no "similar to task N" without code. Every task has the actual code or command to run. The few "(curate)" markers in Task 8 are explicit user-choices, not placeholders â€” they describe what the user has to decide.
 
 **Type consistency:**
 - `ColoringPackNiche` field names match between `pack_niche.py` (Task 2), `cli.py:generate_coloring_pack` (Task 2), `treatments.py:coloring_pack_page_flip` (Task 7)

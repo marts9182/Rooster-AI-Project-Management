@@ -1,8 +1,8 @@
-# Etsy Rooster Shop — Plan 2d Implementation Plan
+﻿# Etsy Rooster Shop â€” Plan 2d Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship one Cottagecore Mushroom Mandala SVG live on the Etsy shop while installing three motif libraries (cottagecore + holiday + sacred geometry, 16 primitives total) so the next 4–5 themed-mandala SKUs are one CLI invocation away.
+**Goal:** Ship one Cottagecore Mushroom Mandala SVG live on the Etsy shop while installing three motif libraries (cottagecore + holiday + sacred geometry, 16 primitives total) so the next 4â€“5 themed-mandala SKUs are one CLI invocation away.
 
 **Architecture:** A new `ThemedMandalaGenerator` reuses the existing parametric mandala math but substitutes plain circular petals with motif primitives drawn from one of three libraries. Each motif is a small Python function returning SVG path data in canonical (un-rotated) orientation at a given `(cx, cy, size)`; the generator wraps each path with `transform="rotate(angle cx cy)"` to align it with the ring's angular position. Reuses Plan 1's `SvgArtifact` + `validate_svg`, Plan 2a's `LLMListingAuthor` niche routing (niche stays `"mandala"`), and Plan 2a's `_taxonomy_for_niche` lookup (taxonomy 6343 = Patterns & Blueprints).
 
@@ -15,21 +15,21 @@
 ## Pre-flight context (read once)
 
 Working in two git repos:
-- **Outer repo:** `C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management` — only holds spec/plan docs for this plan.
-- **Nested repo:** `projects/etsy-rooster-shop/` — all Python implementation lands here.
+- **Outer repo:** `C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management` â€” only holds spec/plan docs for this plan.
+- **Nested repo:** `projects/etsy-rooster-shop/` â€” all Python implementation lands here.
 
 Always use absolute paths in Bash commands (CWD is unstable between calls). Use `git -C <abs-path> ...` for all git commands.
 
 **Existing pieces this plan reuses unchanged:**
-- `etsy_rooster.svg_render.artifact.SvgArtifact` — same wrapper for SVG + preview PNG outputs
-- `etsy_rooster.svg_render.validators.validate_svg` — same cut-file safety check
-- `etsy_rooster.svg_render.mandala_generator._svg_to_png` — same Pillow-based PNG preview renderer (we'll call it from the new generator)
-- `etsy_rooster.listing_authoring.author.LLMListingAuthor` — niche stays `"mandala"` so existing `mandala-prompt.md` routes correctly
-- `etsy_rooster.cli._taxonomy_for_niche("mandala") == 6343` — no taxonomy change
-- `CatalogDB`, `EtsyClient`, `PublishOrchestrator` — all unchanged
+- `etsy_rooster.svg_render.artifact.SvgArtifact` â€” same wrapper for SVG + preview PNG outputs
+- `etsy_rooster.svg_render.validators.validate_svg` â€” same cut-file safety check
+- `etsy_rooster.svg_render.mandala_generator._svg_to_png` â€” same Pillow-based PNG preview renderer (we'll call it from the new generator)
+- `etsy_rooster.listing_authoring.author.LLMListingAuthor` â€” niche stays `"mandala"` so existing `mandala-prompt.md` routes correctly
+- `etsy_rooster.cli._taxonomy_for_niche("mandala") == 6343` â€” no taxonomy change
+- `CatalogDB`, `EtsyClient`, `PublishOrchestrator` â€” all unchanged
 
 **Existing pieces this plan modifies:**
-- `etsy_rooster.cli` — add `@generate.command("themed-mandala")` subcommand. No edits to `_TAXONOMY_BY_NICHE` (niche stays `"mandala"`).
+- `etsy_rooster.cli` â€” add `@generate.command("themed-mandala")` subcommand. No edits to `_TAXONOMY_BY_NICHE` (niche stays `"mandala"`).
 
 **Run tests with:**
 ```bash
@@ -45,7 +45,7 @@ from etsy_rooster.cli import cli
 cli(['generate', 'themed-mandala', '--theme=cottagecore', '--seed=mushroom-01'], standalone_mode=False)
 ```
 
-**Baseline state:** the nested repo HEAD is wherever it sits when this plan starts executing (likely Plan 2a/2a' final commit area, ~`308470f` or later if Plan 2c also runs). The expected baseline unit test count varies — use the count after `pytest -q --no-cov` BEFORE making changes as the starting point, then track increments.
+**Baseline state:** the nested repo HEAD is wherever it sits when this plan starts executing (likely Plan 2a/2a' final commit area, ~`308470f` or later if Plan 2c also runs). The expected baseline unit test count varies â€” use the count after `pytest -q --no-cov` BEFORE making changes as the starting point, then track increments.
 
 ---
 
@@ -98,7 +98,7 @@ def test_validate_motif_path_rejects_empty_string() -> None:
 
 def test_motif_primitive_protocol_is_runtime_checkable_compatible() -> None:
     """Smoke-check that a plain function with the right signature satisfies
-    structural typing — i.e., the Protocol shape is what we documented."""
+    structural typing â€” i.e., the Protocol shape is what we documented."""
     def fake_motif(*, cx: float, cy: float, size: float) -> str:
         return f"M {cx} {cy} L {cx + size} {cy} L {cx} {cy + size} Z"
 
@@ -136,7 +136,7 @@ Every motif function in cottagecore.py, holiday.py, sacred_geometry.py
 returns SVG path data for ONE instance of the motif at (cx, cy) with the
 given size, drawn in canonical un-rotated orientation. The generator
 applies ring-tracking rotation via SVG transform attribute rather than
-mutating the path string — keeps each motif focused on its own geometry
+mutating the path string â€” keeps each motif focused on its own geometry
 and avoids float-precision drift.
 """
 
@@ -324,7 +324,7 @@ def leaf(*, cx: float, cy: float, size: float) -> str:
 
 
 def fern(*, cx: float, cy: float, size: float) -> str:
-    """Curved frond — a teardrop-like shape with one straight side and one
+    """Curved frond â€” a teardrop-like shape with one straight side and one
     curved (cubic Bezier) side. Approximates the silhouette of a fern frond.
 
     Bounding box: ~size*0.4 wide, size tall. Tip points up.
@@ -385,7 +385,7 @@ def flower(*, cx: float, cy: float, size: float) -> str:
 
 
 def acorn(*, cx: float, cy: float, size: float) -> str:
-    """Acorn — rounded cap on top, pointed body below.
+    """Acorn â€” rounded cap on top, pointed body below.
 
     The cap is a half-ellipse (~33% of total height) and the body is a
     rounded teardrop below. Bounding box: ~size*0.7 wide, size tall.
@@ -572,7 +572,7 @@ def heart(*, cx: float, cy: float, size: float) -> str:
 def bat(*, cx: float, cy: float, size: float) -> str:
     """Stylized bat silhouette: central body + two wings extending outward.
 
-    Simplified shape suitable for Cricut cut — closed polygon outline
+    Simplified shape suitable for Cricut cut â€” closed polygon outline
     with ~9 vertices describing wing scallops + body.
     Bounding box: size wide, ~size*0.6 tall.
     """
@@ -630,7 +630,7 @@ def pumpkin(*, cx: float, cy: float, size: float) -> str:
 
 
 def egg(*, cx: float, cy: float, size: float) -> str:
-    """Egg-shaped oval — slightly elongated, asymmetric top vs bottom.
+    """Egg-shaped oval â€” slightly elongated, asymmetric top vs bottom.
 
     Top is narrower (~80% width) and bottom is rounder. Drawn as two arcs
     of different sizes joined at the equator.
@@ -784,7 +784,7 @@ def circle(*, cx: float, cy: float, size: float) -> str:
 
 
 def point_rosette(*, cx: float, cy: float, size: float) -> str:
-    """Six-petal flower-of-life rosette element — six small circles around
+    """Six-petal flower-of-life rosette element â€” six small circles around
     a central point, drawn as one closed path with arc segments.
 
     Used as a center-anchor motif (single instance in the innermost ring).
@@ -1023,12 +1023,12 @@ MOTIF_LIBRARIES: dict[str, dict[str, MotifPrimitive]] = {
 }
 ```
 
-### Step 4: Create the dataclass module (params only — generator class comes in Task 6)
+### Step 4: Create the dataclass module (params only â€” generator class comes in Task 6)
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/svg_render/themed_mandala_generator.py`:
 
 ```python
-"""ThemedMandalaGenerator + ThemedMandalaParams — themed extension of mandala_generator.
+"""ThemedMandalaGenerator + ThemedMandalaParams â€” themed extension of mandala_generator.
 
 Substitutes plain circular petals with motif primitives from MOTIF_LIBRARIES.
 Each ring uses one motif (configurable via motif_per_ring). Generator
@@ -1097,7 +1097,7 @@ python -m pytest tests/test_themed_mandala_params.py -v --no-cov
 ```
 Expected: 11 passed.
 
-### Step 6: Full suite — make sure no regression
+### Step 6: Full suite â€” make sure no regression
 
 ```bash
 python -m pytest tests/ -q --no-cov
@@ -1222,7 +1222,7 @@ Expected: 5 errors (no `ThemedMandalaGenerator` class).
 Replace `projects/etsy-rooster-shop/src/etsy_rooster/svg_render/themed_mandala_generator.py` with:
 
 ```python
-"""ThemedMandalaGenerator + ThemedMandalaParams — themed extension of mandala_generator.
+"""ThemedMandalaGenerator + ThemedMandalaParams â€” themed extension of mandala_generator.
 
 Substitutes plain circular petals with motif primitives from MOTIF_LIBRARIES.
 Each ring uses one motif (configurable via motif_per_ring). The generator
@@ -1370,15 +1370,15 @@ class ThemedMandalaGenerator:
         )
 ```
 
-**Note on `_svg_to_png`:** This helper from `mandala_generator.py` only handles `<circle>` elements (per the existing implementation). It won't render `<path>` elements correctly — the preview PNG will be blank or partial.
+**Note on `_svg_to_png`:** This helper from `mandala_generator.py` only handles `<circle>` elements (per the existing implementation). It won't render `<path>` elements correctly â€” the preview PNG will be blank or partial.
 
-**Trade-off:** Generating a faithful PNG preview from arbitrary SVG paths requires either (a) `cairosvg` (was dropped per the catalog memory) or (b) a more sophisticated Pillow-based renderer. For Plan 2d MVP, **accept that the preview PNG may not show the motif art accurately** — the SVG itself is the deliverable for Etsy, and Etsy generates its own thumbnails. The preview PNG is mostly used by integration tests to verify "something was rendered."
+**Trade-off:** Generating a faithful PNG preview from arbitrary SVG paths requires either (a) `cairosvg` (was dropped per the catalog memory) or (b) a more sophisticated Pillow-based renderer. For Plan 2d MVP, **accept that the preview PNG may not show the motif art accurately** â€” the SVG itself is the deliverable for Etsy, and Etsy generates its own thumbnails. The preview PNG is mostly used by integration tests to verify "something was rendered."
 
-If the test `test_artifact_has_preview_png` expects the file to exist (it does), this approach works. If subsequent test cases assert preview PNG visual content, you'd need to upgrade the renderer — out of scope here.
+If the test `test_artifact_has_preview_png` expects the file to exist (it does), this approach works. If subsequent test cases assert preview PNG visual content, you'd need to upgrade the renderer â€” out of scope here.
 
 **Alternative**: have `_svg_to_png` write a placeholder white PNG when no `<circle>` elements are found. Document this clearly. The placeholder strategy avoids confusing test failures.
 
-For the implementer: if you find `_svg_to_png` chokes on path-only SVG, modify `mandala_generator._svg_to_png` to gracefully no-op (write an empty white PNG of `size` × `size`) when no recognizable elements are present. That's a one-line fix and preserves the test contract.
+For the implementer: if you find `_svg_to_png` chokes on path-only SVG, modify `mandala_generator._svg_to_png` to gracefully no-op (write an empty white PNG of `size` Ã— `size`) when no recognizable elements are present. That's a one-line fix and preserves the test contract.
 
 ### Step 4: Run tests, verify pass
 
@@ -1603,7 +1603,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 
 ---
 
-## Task 8: Live integration test — themed mandala end-to-end
+## Task 8: Live integration test â€” themed mandala end-to-end
 
 **Files:**
 - Create: `projects/etsy-rooster-shop/tests/integration/test_e2e_themed_mandala.py`
@@ -1763,7 +1763,7 @@ Expected: all prior unit tests + 4 deselected live tests (3 prior + 1 new themed
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add tests/integration/test_e2e_themed_mandala.py
-git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop commit -m "test(live): end-to-end themed mandala → Etsy draft listing"
+git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop commit -m "test(live): end-to-end themed mandala â†’ Etsy draft listing"
 ```
 
 ---
@@ -1783,9 +1783,9 @@ Expected: 1 passed in ~20-30 seconds. The test prints the listing_id + dashboard
 ### Step 2: Eyeball the SVG before publishing
 
 Open `data/artifacts/mandala-mushroom-01/mandala-mushroom-01.svg` (created earlier by `etsy-rooster generate themed-mandala`, or via the test fixture if that's the first time) in:
-- Any SVG viewer (browser drag-and-drop) — confirms the mandala renders as concentric rings of mushrooms / leaves / ferns / flowers
-- Inkscape — confirms path continuity (no broken arcs)
-- Cricut Design Space (optional but valuable) — confirms the file imports + the cut paths look reasonable
+- Any SVG viewer (browser drag-and-drop) â€” confirms the mandala renders as concentric rings of mushrooms / leaves / ferns / flowers
+- Inkscape â€” confirms path continuity (no broken arcs)
+- Cricut Design Space (optional but valuable) â€” confirms the file imports + the cut paths look reasonable
 
 If any motif looks awkward (mushroom too cartoony, fern not curvy enough, etc.), tweak the path math in the corresponding motif file (`cottagecore.py`, etc.), re-run `etsy-rooster generate themed-mandala`, and re-eyeball. The mandala-mushroom-01 listing on Etsy can be re-uploaded or updated.
 
@@ -1800,9 +1800,9 @@ Open https://www.etsy.com/your/shops/PocketRoosterPress/tools/listings/state:dra
 
 If the preview image is blank, you can either:
 - Upload a screenshot of the SVG manually as the listing image (1 minute of dashboard work)
-- Or skip — Etsy will accept the listing without it, just less attractive
+- Or skip â€” Etsy will accept the listing without it, just less attractive
 
-No git commit for this task — runbook execution.
+No git commit for this task â€” runbook execution.
 
 ---
 
@@ -1822,7 +1822,7 @@ If "Paper crafting" isn't available, fall back to "Other" or whatever the dropdo
 
 ### Step 3: Assign to the SVG Cut Files shop section
 
-In the listing editor → Section → select `SVG Cut Files`.
+In the listing editor â†’ Section â†’ select `SVG Cut Files`.
 
 ### Step 4: Final review
 
@@ -1846,14 +1846,14 @@ Ask the controller to update `etsy-rooster-shop-checkpoint.md` to record Plan 2d
 
 ---
 
-## Acceptance — Plan 2d complete when
+## Acceptance â€” Plan 2d complete when
 
-- [ ] All 8 code tasks above have every step checked
-- [ ] `python -m pytest tests/ -q --no-cov` shows all tests passing, 4+ deselected (live tests including the new themed-mandala live)
-- [ ] Live themed-mandala integration test (Task 8) passed at least once end-to-end
-- [ ] Cottagecore Mushroom Mandala listing is **active** (published, not draft) on the Etsy shop
-- [ ] It appears in the "SVG Cut Files" section
-- [ ] All three motif libraries (cottagecore, holiday, sacred) are loaded + tested so a Halloween mandala or Flower-of-Life is one CLI invocation away
+- [x] All 8 code tasks above have every step checked
+- [x] `python -m pytest tests/ -q --no-cov` shows all tests passing, 4+ deselected (live tests including the new themed-mandala live)
+- [x] Live themed-mandala integration test (Task 8) passed at least once end-to-end
+- [x] Cottagecore Mushroom Mandala listing is **active** (published, not draft) on the Etsy shop
+- [x] It appears in the "SVG Cut Files" section
+- [x] All three motif libraries (cottagecore, holiday, sacred) are loaded + tested so a Halloween mandala or Flower-of-Life is one CLI invocation away
 
 ## Self-review against the spec
 
@@ -1862,11 +1862,11 @@ Ask the controller to update `etsy-rooster-shop-checkpoint.md` to record Plan 2d
 - **Spec coverage:** every "In scope" bullet maps to at least one task. Motif Protocol + helpers (Task 1), three libraries (Tasks 2-4), registry + dataclass (Task 5), generator (Task 6), CLI (Task 7), live test (Task 8), MVP listing live (Tasks 9-10).
 - **Placeholder scan:** no TBDs. The `_svg_to_png` fallback caveat is documented inline in Task 6 with a concrete one-line fix.
 - **Type consistency:** `MotifPrimitive` signature `(*, cx, cy, size)` consistent across all 5 cottagecore + 6 holiday + 5 sacred motifs. `ThemedMandalaParams` field names identical in Tasks 5, 6, 7, 8. `MOTIF_LIBRARIES` keys (`"cottagecore"`, `"holiday"`, `"sacred"`) used consistently.
-- **Test counts:** ~37 new unit tests across Tasks 1-7 (6+15+18+15+11+5+4) plus 1 live in Task 8. Exceeds the spec's ~15 target — appropriate for the architectural breadth of three libraries.
+- **Test counts:** ~37 new unit tests across Tasks 1-7 (6+15+18+15+11+5+4) plus 1 live in Task 8. Exceeds the spec's ~15 target â€” appropriate for the architectural breadth of three libraries.
 
 ## Deferred-debt acknowledgments
 
 - `_svg_to_png` only handles `<circle>` elements. Path-only SVG previews may be blank. Documented in Task 6 with a one-line fix recommendation; full fix is out of scope.
 - `ensure_fresh_token(store, cfg)` helper still inlined in 3+ live tests. Plan 2d adds a 4th. Extract in a future cleanup pass.
-- No `shops_w` scope added — section assignment is manual.
+- No `shops_w` scope added â€” section assignment is manual.
 - `google-generativeai` still EOL.

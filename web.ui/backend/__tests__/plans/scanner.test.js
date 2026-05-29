@@ -48,6 +48,10 @@ describe('plans/scanner', () => {
     expect(_statusOf({ open: 0, done: 0, total: 0, percent: 0 })).toBe('open');
   });
 
+  it('_statusOf treats checkboxes-but-zero-done as open, not in-flight', () => {
+    expect(_statusOf({ open: 5, done: 0, total: 5, percent: 0 })).toBe('open');
+  });
+
   it('scanDocs finds specs and plans, parses date from filename + frontmatter title', () => {
     fs.writeFileSync(
       path.join(root, 'superpowers', 'specs', '2026-05-26-foo-design.md'),

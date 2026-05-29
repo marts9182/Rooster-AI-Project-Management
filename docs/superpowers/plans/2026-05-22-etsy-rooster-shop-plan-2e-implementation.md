@@ -1,8 +1,8 @@
-# Etsy Rooster Shop — Plan 2e Implementation Plan
+﻿# Etsy Rooster Shop â€” Plan 2e Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship a `etsy-rooster generate video --sku-id=N` CLI that produces a 1:1 720×720 MP4 from a SKU's existing assets, attaches it as a `kind="video"` artifact, and auto-uploads to the Etsy listing if one already exists.
+**Goal:** Ship a `etsy-rooster generate video --sku-id=N` CLI that produces a 1:1 720Ã—720 MP4 from a SKU's existing assets, attaches it as a `kind="video"` artifact, and auto-uploads to the Etsy listing if one already exists.
 
 **Architecture:** New `etsy_rooster.video/` subpackage (types/treatments/ffmpeg_renderer/builder) reads existing SKU artifacts and shells out to ffmpeg (binary bundled via `imageio-ffmpeg`). Adds `EtsyClient.upload_listing_video` (multipart POST), extends `PublishOrchestrator` to upload `kind="video"` artifacts during publish, and adds a `generate video` CLI command. Task 0 extracts the duplicated OAuth refresh logic into a shared helper before adding another inline copy.
 
@@ -33,14 +33,14 @@ cli(['generate', 'video', '--sku-id=1'], standalone_mode=False)
 **Baseline before starting:** the nested repo HEAD is `d586e52` (svglib preview fix). Run `python -m pytest tests/ -q --no-cov` and confirm 202 passed + 5 deselected. That's the count to grow from.
 
 **Existing pieces this plan reuses unchanged:**
-- `etsy_rooster.catalog_db.CatalogDB` — `kind="video"` is just another free-text artifact kind, no schema change
-- `etsy_rooster.etsy.oauth.{TokenStore, EtsyOAuthConfig, refresh_token}` — Task 0 wraps these into the new helper
-- `etsy_rooster.etsy.client.EtsyClient` — existing methods (`_with_retry`, `_post_multipart`, `_headers`) are reused by the new `upload_listing_video`
-- `etsy_rooster.publish.orchestrator.PublishOrchestrator` — extended to also upload `kind="video"` artifacts (small addition, mirrors the existing image-upload loop)
-- Listings DB column `etsy_listing_id` — already populated for the 3 existing SKUs
+- `etsy_rooster.catalog_db.CatalogDB` â€” `kind="video"` is just another free-text artifact kind, no schema change
+- `etsy_rooster.etsy.oauth.{TokenStore, EtsyOAuthConfig, refresh_token}` â€” Task 0 wraps these into the new helper
+- `etsy_rooster.etsy.client.EtsyClient` â€” existing methods (`_with_retry`, `_post_multipart`, `_headers`) are reused by the new `upload_listing_video`
+- `etsy_rooster.publish.orchestrator.PublishOrchestrator` â€” extended to also upload `kind="video"` artifacts (small addition, mirrors the existing image-upload loop)
+- Listings DB column `etsy_listing_id` â€” already populated for the 3 existing SKUs
 
 **Existing duplication to clean up (Task 0):**
-The OAuth refresh dance — `if store.is_expired(): cfg = EtsyOAuthConfig(...); do_refresh(...); store.save(...); tokens = store.load()` — is inlined in 5 places:
+The OAuth refresh dance â€” `if store.is_expired(): cfg = EtsyOAuthConfig(...); do_refresh(...); store.save(...); tokens = store.load()` â€” is inlined in 5 places:
 1. `src/etsy_rooster/cli.py` (inside `publish` command, lines ~165-182)
 2. `tests/integration/test_e2e_coloring.py` (lines ~113-131)
 3. `tests/integration/test_e2e_themed_mandala.py` (the dance is in there too)
@@ -61,7 +61,7 @@ Task 0 extracts a single `ensure_fresh_token(store, env_or_cfg) -> dict` helper 
 - Modify: `projects/etsy-rooster-shop/tests/integration/test_e2e_themed_mandala.py` (same)
 - Modify: `projects/etsy-rooster-shop/tests/integration/test_e2e_poster.py` (same)
 
-- [ ] **Step 1: Write failing tests for the new helper**
+- [x] **Step 1: Write failing tests for the new helper**
 
 Create `projects/etsy-rooster-shop/tests/test_etsy_oauth_ensure_fresh.py`:
 
@@ -165,14 +165,14 @@ def test_ensure_fresh_token_preserves_old_refresh_when_etsy_omits_new(
     assert tokens["refresh_token"] == "old-refresh"
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && python -m pytest tests/test_etsy_oauth_ensure_fresh.py -v --no-cov
 ```
 Expected: 3 errors (`ImportError: cannot import name 'ensure_fresh_token'`).
 
-- [ ] **Step 3: Add the helper to `oauth.py`**
+- [x] **Step 3: Add the helper to `oauth.py`**
 
 Append to `projects/etsy-rooster-shop/src/etsy_rooster/etsy/oauth.py`:
 
@@ -181,7 +181,7 @@ def ensure_fresh_token(store: "TokenStore", cfg: "EtsyOAuthConfig") -> dict:
     """Load tokens from the store; refresh + save in place if expired.
 
     Returns the (possibly-refreshed) tokens dict. Used by every caller that
-    needs a valid access_token to hit Etsy — extracting this avoids the
+    needs a valid access_token to hit Etsy â€” extracting this avoids the
     5x-inlined refresh dance we accumulated through Plans 2a/2c/2d/2e.
 
     If Etsy's refresh response omits a new refresh_token (which happens
@@ -199,14 +199,14 @@ def ensure_fresh_token(store: "TokenStore", cfg: "EtsyOAuthConfig") -> dict:
     return store.load()
 ```
 
-- [ ] **Step 4: Run helper tests to verify pass**
+- [x] **Step 4: Run helper tests to verify pass**
 
 ```bash
 python -m pytest tests/test_etsy_oauth_ensure_fresh.py -v --no-cov
 ```
 Expected: 3 passed.
 
-- [ ] **Step 5: Replace inline dance in `cli.py`**
+- [x] **Step 5: Replace inline dance in `cli.py`**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, find the `publish` command (around line 154). The current inline OAuth refresh block (around lines 162-182) looks like:
 
@@ -257,7 +257,7 @@ to:
 
 (The `do_refresh` import is no longer needed since the helper wraps it.)
 
-- [ ] **Step 6: Replace inline dance in the 3 live integration tests**
+- [x] **Step 6: Replace inline dance in the 3 live integration tests**
 
 For each of:
 - `tests/integration/test_e2e_coloring.py`
@@ -304,16 +304,16 @@ from etsy_rooster.etsy.oauth import (
 )
 ```
 
-(The actual layout of imports varies slightly between the 3 test files — keep your edit minimal, just replace `refresh_token as do_refresh` with `ensure_fresh_token` and drop the manual dance.)
+(The actual layout of imports varies slightly between the 3 test files â€” keep your edit minimal, just replace `refresh_token as do_refresh` with `ensure_fresh_token` and drop the manual dance.)
 
-- [ ] **Step 7: Run the full suite to verify nothing regressed**
+- [x] **Step 7: Run the full suite to verify nothing regressed**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
-Expected: 205 passed, 5 deselected (202 prior + 3 new tests for ensure_fresh_token). Note: the 3 live tests were deselected before AND are still deselected — they touch the helper at collection time (via import) but don't execute.
+Expected: 205 passed, 5 deselected (202 prior + 3 new tests for ensure_fresh_token). Note: the 3 live tests were deselected before AND are still deselected â€” they touch the helper at collection time (via import) but don't execute.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/etsy/oauth.py src/etsy_rooster/cli.py tests/test_etsy_oauth_ensure_fresh.py tests/integration/test_e2e_coloring.py tests/integration/test_e2e_themed_mandala.py tests/integration/test_e2e_poster.py
@@ -327,7 +327,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 **Files:**
 - Modify: `projects/etsy-rooster-shop/pyproject.toml`
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 In `projects/etsy-rooster-shop/pyproject.toml`, find the `dependencies` array (around lines 14-25). Add `"imageio-ffmpeg>=0.5,<1",` to the list. The full section becomes:
 
@@ -348,14 +348,14 @@ dependencies = [
 ]
 ```
 
-- [ ] **Step 2: Install the dep**
+- [x] **Step 2: Install the dep**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && pip install -e ".[dev]" 2>&1 | tail -5
 ```
 Expected: successfully installs imageio-ffmpeg (might also fetch its underlying ffmpeg binary; first install takes ~30s).
 
-- [ ] **Step 3: Smoke-test the bundled ffmpeg**
+- [x] **Step 3: Smoke-test the bundled ffmpeg**
 
 ```bash
 python -c "
@@ -370,14 +370,14 @@ print(r.stdout.split('\n')[0])
 ```
 Expected: prints path to bundled ffmpeg + a version line like `ffmpeg version N-XXX-...`.
 
-- [ ] **Step 4: Full suite still green**
+- [x] **Step 4: Full suite still green**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 205 passed, 5 deselected (unchanged from Task 0).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add pyproject.toml
@@ -393,7 +393,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/video/types.py`
 - Create: `projects/etsy-rooster-shop/tests/test_video_types.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_video_types.py`:
 
@@ -464,21 +464,21 @@ def test_invalid_fps_rejected(tmp_path: Path) -> None:
 
 
 def test_page_flip_no_zoom_accepted(tmp_path: Path) -> None:
-    """Multi-frame treatment without zoom — used by coloring page-flip."""
+    """Multi-frame treatment without zoom â€” used by coloring page-flip."""
     frames = [_make_image(tmp_path, f"f{i}.png") for i in range(5)]
     t = VideoTreatment(frames=frames, frame_duration_s=0.7, zoom=None)
     assert len(t.frames) == 5
     assert t.zoom is None
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && python -m pytest tests/test_video_types.py -v --no-cov
 ```
 Expected: 8 errors (module `etsy_rooster.video.types` not found).
 
-- [ ] **Step 3: Create package marker**
+- [x] **Step 3: Create package marker**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/video/__init__.py`:
 
@@ -486,12 +486,12 @@ Create `projects/etsy-rooster-shop/src/etsy_rooster/video/__init__.py`:
 """Per-listing product video pipeline (Plan 2e)."""
 ```
 
-- [ ] **Step 4: Create the dataclass**
+- [x] **Step 4: Create the dataclass**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/video/types.py`:
 
 ```python
-"""VideoTreatment dataclass — renderer-agnostic plan for one product video.
+"""VideoTreatment dataclass â€” renderer-agnostic plan for one product video.
 
 Each niche-specific treatment builder (in treatments.py) returns one of
 these; the ffmpeg renderer (in ffmpeg_renderer.py) consumes it.
@@ -541,21 +541,21 @@ class VideoTreatment:
             raise ValueError(f"fps must be 24/30/60, got {self.fps}")
 ```
 
-- [ ] **Step 5: Run tests, verify pass**
+- [x] **Step 5: Run tests, verify pass**
 
 ```bash
 python -m pytest tests/test_video_types.py -v --no-cov
 ```
 Expected: 8 passed.
 
-- [ ] **Step 6: Full suite**
+- [x] **Step 6: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 213 passed, 5 deselected (205 prior + 8 new).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/video/__init__.py src/etsy_rooster/video/types.py tests/test_video_types.py
@@ -570,7 +570,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/video/ffmpeg_renderer.py`
 - Create: `projects/etsy-rooster-shop/tests/test_video_ffmpeg_renderer.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_video_ffmpeg_renderer.py`:
 
@@ -622,7 +622,7 @@ def test_render_page_flip_treatment_produces_mp4(tmp_path: Path) -> None:
 
 
 def test_render_static_treatment_produces_mp4(tmp_path: Path) -> None:
-    """Single-frame, no zoom — static hold."""
+    """Single-frame, no zoom â€” static hold."""
     frame = _make_image(tmp_path, "static.png")
     t = VideoTreatment(frames=[frame], frame_duration_s=3.0, zoom=None)
     out = tmp_path / "static.mp4"
@@ -652,14 +652,14 @@ def test_render_raises_when_ffmpeg_fails(tmp_path: Path) -> None:
         render(t, tmp_path / "out.mp4")
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_video_ffmpeg_renderer.py -v --no-cov
 ```
 Expected: 5 errors (module not found).
 
-- [ ] **Step 3: Implement the renderer**
+- [x] **Step 3: Implement the renderer**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/video/ffmpeg_renderer.py`:
 
@@ -790,21 +790,21 @@ def _build_static_cmd(
     ]
 ```
 
-- [ ] **Step 4: Run renderer tests**
+- [x] **Step 4: Run renderer tests**
 
 ```bash
 python -m pytest tests/test_video_ffmpeg_renderer.py -v --no-cov
 ```
 Expected: 5 passed. Each test takes 1-3s (ffmpeg invocation).
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 218 passed, 5 deselected (213 prior + 5 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/video/ffmpeg_renderer.py tests/test_video_ffmpeg_renderer.py
@@ -819,7 +819,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/video/treatments.py`
 - Create: `projects/etsy-rooster-shop/tests/test_video_treatments.py`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_video_treatments.py`:
 
@@ -954,14 +954,14 @@ def test_mandala_zoom_raises_when_no_preview(tmp_path: Path) -> None:
         mandala_zoom(db, sku_id)
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_video_treatments.py -v --no-cov
 ```
 Expected: 4 errors (module not found).
 
-- [ ] **Step 3: Implement the treatments**
+- [x] **Step 3: Implement the treatments**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/video/treatments.py`:
 
@@ -1053,21 +1053,21 @@ def _evenly_spaced_indices(total: int, *, n: int) -> list[int]:
     return [round(i * (total - 1) / (n - 1)) + 1 for i in range(n)]
 ```
 
-- [ ] **Step 4: Run treatment tests**
+- [x] **Step 4: Run treatment tests**
 
 ```bash
 python -m pytest tests/test_video_treatments.py -v --no-cov
 ```
 Expected: 4 passed.
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 222 passed, 5 deselected (218 prior + 4 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/video/treatments.py tests/test_video_treatments.py
@@ -1082,7 +1082,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/etsy/client.py`
 - Modify: `projects/etsy-rooster-shop/tests/test_etsy_client.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 Append to `projects/etsy-rooster-shop/tests/test_etsy_client.py`:
 
@@ -1154,14 +1154,14 @@ def test_upload_listing_video_uses_custom_name_when_provided(tmp_path: Path) -> 
     assert captured["data"]["name"] == "Cottagecore Mushroom Poster Video"
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 python -m pytest tests/test_etsy_client.py::test_upload_listing_video_posts_multipart -v --no-cov
 ```
 Expected: FAIL with `AttributeError: 'EtsyClient' object has no attribute 'upload_listing_video'`.
 
-- [ ] **Step 3: Add the method to EtsyClient**
+- [x] **Step 3: Add the method to EtsyClient**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/etsy/client.py`, find `upload_digital_file` (around line 85). Insert this new method right after it:
 
@@ -1189,21 +1189,21 @@ In `projects/etsy-rooster-shop/src/etsy_rooster/etsy/client.py`, find `upload_di
             )
 ```
 
-- [ ] **Step 4: Run tests, verify pass**
+- [x] **Step 4: Run tests, verify pass**
 
 ```bash
 python -m pytest tests/test_etsy_client.py -v --no-cov
 ```
 Expected: all client tests pass (existing + 2 new).
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 224 passed, 5 deselected (222 prior + 2 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/etsy/client.py tests/test_etsy_client.py
@@ -1218,7 +1218,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py`
 - Modify: `projects/etsy-rooster-shop/tests/test_publish_orchestrator.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 Append to `projects/etsy-rooster-shop/tests/test_publish_orchestrator.py`:
 
@@ -1300,14 +1300,14 @@ def test_publish_does_not_upload_video_when_none_attached(
     etsy.upload_listing_video.assert_not_called()
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 python -m pytest tests/test_publish_orchestrator.py::test_publish_uploads_video_when_attached -v --no-cov
 ```
 Expected: FAIL (`upload_listing_video.assert_called_once()` fires because the orchestrator doesn't upload videos yet).
 
-- [ ] **Step 3: Extend the orchestrator**
+- [x] **Step 3: Extend the orchestrator**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py`, find the `publish` method around lines 70-85 (where `upload_digital_file` is called). Add a video-upload block right after that, before `set_etsy_listing`:
 
@@ -1336,21 +1336,21 @@ In `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py`, find t
 
 (The above replaces the existing trailing portion of the `publish` method. Make sure the `set_etsy_listing` + `log_op` + `return` lines that were already there stay.)
 
-- [ ] **Step 4: Run orchestrator tests**
+- [x] **Step 4: Run orchestrator tests**
 
 ```bash
 python -m pytest tests/test_publish_orchestrator.py -v --no-cov
 ```
 Expected: all orchestrator tests pass (existing + 2 new).
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 226 passed, 5 deselected (224 prior + 2 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/publish/orchestrator.py tests/test_publish_orchestrator.py
@@ -1359,13 +1359,13 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 
 ---
 
-## Task 7: `builder.py` — generate + auto-upload orchestrator
+## Task 7: `builder.py` â€” generate + auto-upload orchestrator
 
 **Files:**
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/video/builder.py`
 - Create: `projects/etsy-rooster-shop/tests/test_video_builder.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 Create `projects/etsy-rooster-shop/tests/test_video_builder.py`:
 
@@ -1484,14 +1484,14 @@ def test_build_raises_for_unknown_niche(
         build_and_upload_video(db=db, sku_id=sku_id, etsy=None)
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_video_builder.py -v --no-cov
 ```
 Expected: 3 errors (module not found).
 
-- [ ] **Step 3: Implement the builder**
+- [x] **Step 3: Implement the builder**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/video/builder.py`:
 
@@ -1566,21 +1566,21 @@ def _get_listing_id(db: CatalogDB, sku_id: int) -> int | None:
     return int(row["etsy_listing_id"])
 ```
 
-- [ ] **Step 4: Run builder tests**
+- [x] **Step 4: Run builder tests**
 
 ```bash
 python -m pytest tests/test_video_builder.py -v --no-cov
 ```
 Expected: 3 passed.
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 229 passed, 5 deselected (226 prior + 3 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/video/builder.py tests/test_video_builder.py
@@ -1595,7 +1595,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`
 - Create: `projects/etsy-rooster-shop/tests/test_video_cli.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 Create `projects/etsy-rooster-shop/tests/test_video_cli.py`:
 
@@ -1720,14 +1720,14 @@ def test_generate_video_command_uploads_when_sku_has_listing(
     instance.upload_listing_video.assert_called_once()
 ```
 
-- [ ] **Step 2: Run tests to confirm failure**
+- [x] **Step 2: Run tests to confirm failure**
 
 ```bash
 python -m pytest tests/test_video_cli.py -v --no-cov
 ```
 Expected: 2 errors (no `generate video` subcommand yet).
 
-- [ ] **Step 3: Add the CLI subcommand**
+- [x] **Step 3: Add the CLI subcommand**
 
 In `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`, find the existing `generate_themed_mandala` function (the last subcommand in the `generate` group). Add the new `generate_video` subcommand right after it:
 
@@ -1772,23 +1772,23 @@ def generate_video(sku_id: int) -> None:
 ```
 
 Also add the imports at the top of cli.py (if not already present from Task 0):
-- The `EtsyClient` and `EtsyOAuthConfig`, `TokenStore`, `ensure_fresh_token` are already lazy-imported inside the function — no module-level changes needed.
+- The `EtsyClient` and `EtsyOAuthConfig`, `TokenStore`, `ensure_fresh_token` are already lazy-imported inside the function â€” no module-level changes needed.
 
-- [ ] **Step 4: Run CLI tests**
+- [x] **Step 4: Run CLI tests**
 
 ```bash
 python -m pytest tests/test_video_cli.py -v --no-cov
 ```
 Expected: 2 passed.
 
-- [ ] **Step 5: Full suite**
+- [x] **Step 5: Full suite**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 231 passed, 5 deselected (229 prior + 2 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add src/etsy_rooster/cli.py tests/test_video_cli.py
@@ -1797,14 +1797,14 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 
 ---
 
-## Task 9: Live integration test (file only — not executed)
+## Task 9: Live integration test (file only â€” not executed)
 
 **Files:**
 - Create: `projects/etsy-rooster-shop/tests/integration/test_e2e_video.py`
 
 **Scope limitation:** Write the test file only. Do NOT run it. The user authorizes live runs separately (real Etsy state change).
 
-- [ ] **Step 1: Create the live test**
+- [x] **Step 1: Create the live test**
 
 Create `projects/etsy-rooster-shop/tests/integration/test_e2e_video.py`:
 
@@ -1860,7 +1860,7 @@ EXISTING_LISTING_ID = 4508841550  # Cottagecore Mushroom Poster draft
 )
 def test_generate_video_and_upload_to_existing_poster_draft(tmp_path: Path) -> None:
     # 1. Set up an in-memory catalog with the poster SKU and its existing Etsy
-    #    listing (mirroring the shop's real state — listing_id 4508841550 is
+    #    listing (mirroring the shop's real state â€” listing_id 4508841550 is
     #    already published as draft).
     conn = sqlite3.connect(":memory:")
     db = CatalogDB(conn)
@@ -1919,18 +1919,18 @@ def test_generate_video_and_upload_to_existing_poster_draft(tmp_path: Path) -> N
     )
 ```
 
-- [ ] **Step 2: Sanity-check the suite (the new test is deselected by default)**
+- [x] **Step 2: Sanity-check the suite (the new test is deselected by default)**
 
 ```bash
 python -m pytest tests/ -q --no-cov 2>&1 | tail -3
 ```
 Expected: 231 passed, 6 deselected (5 prior live + 1 new).
 
-- [ ] **Step 3: DO NOT run with -m live**
+- [x] **Step 3: DO NOT run with -m live**
 
 The user authorizes the live run separately in Task 10.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop add tests/integration/test_e2e_video.py
@@ -1939,7 +1939,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/ets
 
 ---
 
-## Task 10: Backfill — user-side runbook for the 3 existing listings
+## Task 10: Backfill â€” user-side runbook for the 3 existing listings
 
 **This task spends real Etsy API quota and uploads real videos to your shop's listings. Confirm before running.**
 
@@ -1951,9 +1951,9 @@ The 3 existing SKUs that need videos:
 | `4508841550` DRAFT | poster (Cottagecore Mushroom Print) | slow zoom |
 | `4508771090` DRAFT | plain mandala SVG | detail zoom |
 
-The SKUs for these listings are in the live `data/catalog.db`. Their IDs are whatever you've assigned to them via earlier `generate coloring|poster|mandala` runs — confirm via `audit` first.
+The SKUs for these listings are in the live `data/catalog.db`. Their IDs are whatever you've assigned to them via earlier `generate coloring|poster|mandala` runs â€” confirm via `audit` first.
 
-- [ ] **Step 1: List the SKUs**
+- [x] **Step 1: List the SKUs**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && python -c "from etsy_rooster.cli import cli; cli(['audit'], standalone_mode=False)"
@@ -1961,7 +1961,7 @@ cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-ro
 
 Expected output: a list of SKUs with niche + state. Note the `sku_id` for the coloring book, poster, and plain mandala that match the live listings.
 
-- [ ] **Step 2: Run the live integration test for the poster path first (sanity check)**
+- [x] **Step 2: Run the live integration test for the poster path first (sanity check)**
 
 ```bash
 cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-rooster-shop && python -m pytest tests/integration/test_e2e_video.py -v -m live -s --no-cov
@@ -1970,10 +1970,10 @@ cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/projects/etsy-ro
 Expected: PASS in ~5-15 seconds. The test uses a fresh in-memory SKU pointing at the existing poster draft, so it won't conflict with your `data/catalog.db`. After this passes, listing `4508841550` will have a real video attached on Etsy.
 
 If this fails with `401` or `429`, troubleshoot before continuing:
-- `401 invalid_token` → re-run `scripts/etsy_oauth_setup.py` to mint a fresh token
-- `429` → wait a minute and try again; Etsy rate-limits exist
+- `401 invalid_token` â†’ re-run `scripts/etsy_oauth_setup.py` to mint a fresh token
+- `429` â†’ wait a minute and try again; Etsy rate-limits exist
 
-- [ ] **Step 3: Generate + upload for the coloring book and plain mandala**
+- [x] **Step 3: Generate + upload for the coloring book and plain mandala**
 
 For each of the remaining 2 SKUs (coloring + plain mandala), run:
 
@@ -1985,7 +1985,7 @@ Replace `<N>` with the actual sku_id from Step 1's audit. Expected: prints `sku_
 
 If the coloring SKU has multiple `preview_png` or other artifacts you don't want re-attached, you can inspect the artifact list first via `db.list_artifact_files(sku_id)` in a quick python -c.
 
-- [ ] **Step 4: Verify in the Etsy dashboard**
+- [x] **Step 4: Verify in the Etsy dashboard**
 
 For each of the 3 listings, open the dashboard and confirm a video appears in the carousel:
 
@@ -1993,39 +1993,39 @@ For each of the 3 listings, open the dashboard and confirm a video appears in th
 - https://www.etsy.com/your/shops/PocketRoosterPress/tools/listings/state:draft (for the 2 drafts)
 
 The video auto-plays muted in the listing carousel. Sanity-check:
-- Coloring book → 7-second page-flip showing variety
-- Poster → 9-second slow zoom on the watercolor master
-- Plain mandala → 7-second detail zoom on the geometric pattern
+- Coloring book â†’ 7-second page-flip showing variety
+- Poster â†’ 9-second slow zoom on the watercolor master
+- Plain mandala â†’ 7-second detail zoom on the geometric pattern
 
-If any video looks wrong (black frames, wrong aspect, glitchy), re-run `generate video --sku-id=N` to overwrite — the renderer is deterministic, but ffmpeg's `zoompan` quirks may have produced something off the first time.
+If any video looks wrong (black frames, wrong aspect, glitchy), re-run `generate video --sku-id=N` to overwrite â€” the renderer is deterministic, but ffmpeg's `zoompan` quirks may have produced something off the first time.
 
-- [ ] **Step 5: Update the checkpoint memory**
+- [x] **Step 5: Update the checkpoint memory**
 
 Ask the controller (in a new conversation) to update `C:\Users\marts\.claude\projects\c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management\memory\etsy-rooster-shop-checkpoint.md` to note that Plan 2e shipped + all 3 existing listings now have videos.
 
-No git commit for this task — runbook execution only.
+No git commit for this task â€” runbook execution only.
 
 ---
 
-## Acceptance — Plan 2e complete when
+## Acceptance â€” Plan 2e complete when
 
-- [ ] All 10 tasks above have every step checked
-- [ ] `python -m pytest tests/ -q --no-cov` shows ≥231 passed, 0 failed
-- [ ] Live video integration test (Task 9) passed at least once end-to-end (real video on real Etsy listing)
-- [ ] All 3 existing listings on the Etsy shop now have a video playing in the carousel
-- [ ] Checkpoint memory updated noting Plan 2e shipped
+- [x] All 10 tasks above have every step checked
+- [x] `python -m pytest tests/ -q --no-cov` shows â‰¥231 passed, 0 failed
+- [x] Live video integration test (Task 9) passed at least once end-to-end (real video on real Etsy listing)
+- [x] All 3 existing listings on the Etsy shop now have a video playing in the carousel
+- [x] Checkpoint memory updated noting Plan 2e shipped
 
 ## Deferred-debt acknowledgments
 
 Plan 2e cleared the OAuth-refresh-helper deferred-debt item (Task 0). Remaining items:
 
-1. **`google-generativeai` is EOL** — Plan 2e adds no new uses; still queued.
-2. **Mandala live test (`test_e2e_sandbox.py`) still doesn't import `ensure_fresh_token`** — was not updated in Task 0 because its OAuth section was already different from the other 3 live tests (didn't have the refresh dance at all). Worth a tiny follow-up commit to add the import + use it preemptively.
+1. **`google-generativeai` is EOL** â€” Plan 2e adds no new uses; still queued.
+2. **Mandala live test (`test_e2e_sandbox.py`) still doesn't import `ensure_fresh_token`** â€” was not updated in Task 0 because its OAuth section was already different from the other 3 live tests (didn't have the refresh dance at all). Worth a tiny follow-up commit to add the import + use it preemptively.
 3. **`_THEMED_MANDALA_DEFAULTS`** placement (cli.py vs themed_mandala_generator.py).
 4. **`shops_w` OAuth scope** for programmatic section assignment.
-5. **Themed mandala motif legibility** (Plan 2d learning) — product category paused.
-6. **24×36 print size** not in poster bundle.
-7. **No `--replace` flag** on `generate video` — re-running creates a duplicate video on Etsy. Worth adding if you find yourself iterating.
+5. **Themed mandala motif legibility** (Plan 2d learning) â€” product category paused.
+6. **24Ã—36 print size** not in poster bundle.
+7. **No `--replace` flag** on `generate video` â€” re-running creates a duplicate video on Etsy. Worth adding if you find yourself iterating.
 
 ## Self-review against the spec
 
@@ -2034,4 +2034,4 @@ Plan 2e cleared the OAuth-refresh-helper deferred-debt item (Task 0). Remaining 
 - **Spec coverage:** Every "In scope" bullet from the spec maps to at least one task. `VideoTreatment` dataclass (T2), ffmpeg renderer (T3), niche treatments (T4), `upload_listing_video` (T5), `PublishOrchestrator` extension (T6), `build_and_upload_video` orchestrator (T7), CLI (T8), live test (T9), backfill (T10). Task 0 covers the `ensure_fresh_token` extraction that the spec's Open Decision #5 called out.
 - **Placeholder scan:** No TBDs, no "implement later," no "similar to task N" without showing the code. Every step contains the actual code to write or command to run.
 - **Type consistency:** `VideoTreatment` field names + signatures match across types.py (T2), ffmpeg_renderer.py (T3), treatments.py (T4), builder.py (T7). `EtsyClient.upload_listing_video(*, listing_id, video_path, name=None)` signature consistent across client.py (T5), test_etsy_client.py (T5), orchestrator.py (T6), builder.py (T7), and the integration test (T9).
-- **One minor type-consistency note:** the `etsy` parameter of `build_and_upload_video` is typed as `Any` (duck-typed EtsyClient) — same convention as `PublishOrchestrator.__init__`. Intentional, kept for test ergonomics.
+- **One minor type-consistency note:** the `etsy` parameter of `build_and_upload_video` is typed as `Any` (duck-typed EtsyClient) â€” same convention as `PublishOrchestrator.__init__`. Intentional, kept for test ergonomics.

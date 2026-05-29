@@ -1,8 +1,8 @@
-# Diabetes Log Books Pair (A + C) — Implementation Plan
+﻿# Diabetes Log Books Pair (A + C) â€” Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship two diabetes log books to Amazon KDP — a senior-focused 8.5×11 large-print 2-year log (SKU A) and a portable 6×9 CGM companion logbook (SKU C) — using shared journal-page templates extracted into `journal_templates.py`.
+**Goal:** Ship two diabetes log books to Amazon KDP â€” a senior-focused 8.5Ã—11 large-print 2-year log (SKU A) and a portable 6Ã—9 CGM companion logbook (SKU C) â€” using shared journal-page templates extracted into `journal_templates.py`.
 
 **Architecture:** Extend `pocket_rooster_press/layout/journal_templates.py` with three new dataclass page templates (`DiabetesWeeklySpread`, `QuarterlyDoctorVisitPrep`, `MonthlyA1CTrend`) that follow the existing `.draw(c, template, page_num)` contract. Wire each SKU together as a journal-kind `BookConfig` (mirroring `garden_companion.py`) that feeds a list of page renderers into `BookAssembler.assemble_journal_book()`. Add two new color palettes to `config.py`. Add a font-size assertion to `audit_pdfs.py`. Ship each SKU through the existing `build_kdp_bundle.py` pipeline.
 
@@ -34,7 +34,7 @@
 |---|---|
 | `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py` | Add `DiabetesWeeklySpread`, `QuarterlyDoctorVisitPrep`, `MonthlyA1CTrend` dataclasses + export from `__all__` |
 | `projects/kdp-puzzle-press/src/pocket_rooster_press/config.py` | Add `PALETTE_DIABETES_SENIOR` and `PALETTE_CGM_COMPANION` constants |
-| `projects/kdp-puzzle-press/scripts/audit_pdfs.py` | Add `check_journal_body_font_size(audit, min_pt, sample_page)` — measure body text size on a sampled log page |
+| `projects/kdp-puzzle-press/scripts/audit_pdfs.py` | Add `check_journal_body_font_size(audit, min_pt, sample_page)` â€” measure body text size on a sampled log page |
 
 ---
 
@@ -43,9 +43,9 @@
 - All work happens inside `projects/kdp-puzzle-press/`. Commands assume cwd = repo root unless stated otherwise; use the `--rootdir` flag where shown.
 - Tests use `pytest` with `pypdf` for page-count assertions, ReportLab Canvas for rendering, and `io.BytesIO` to avoid disk writes. Follow the pattern in `tests/test_journal_templates.py`.
 - Every commit message starts with a conventional prefix: `feat(...)`, `test(...)`, `chore(...)`, `docs(...)`. Footer line `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`.
-- "Run: …" instructions show the exact pytest invocation. Always verify "Expected: …" matches reality before moving on.
-- Lines of `0.75pt` minimum and `1.25pt` for heavy rules — these are KDP minimums already encoded as `GRID_LINE_W` and `HEAVY_LINE_W` constants in `journal_templates.py`. Use them.
-- All template `.draw()` methods take `(canvas, template, page_num)` and must NOT call `c.showPage()` — the caller controls page advance.
+- "Run: â€¦" instructions show the exact pytest invocation. Always verify "Expected: â€¦" matches reality before moving on.
+- Lines of `0.75pt` minimum and `1.25pt` for heavy rules â€” these are KDP minimums already encoded as `GRID_LINE_W` and `HEAVY_LINE_W` constants in `journal_templates.py`. Use them.
+- All template `.draw()` methods take `(canvas, template, page_num)` and must NOT call `c.showPage()` â€” the caller controls page advance.
 
 ---
 
@@ -54,12 +54,12 @@
 **Files:**
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/config.py`
 
-- [ ] **Step 1: Append the two palettes**
+- [x] **Step 1: Append the two palettes**
 
 Open `projects/kdp-puzzle-press/src/pocket_rooster_press/config.py` and append the following block after `PALETTE_COZY_CHRISTMAS` (around line 225), before the `IMPRINT_NAME` block:
 
 ```python
-# Diabetes Log Book for Seniors — playful theme tuned to the medical-shelf
+# Diabetes Log Book for Seniors â€” playful theme tuned to the medical-shelf
 # senior buyer. Warm cream dominant, deep teal text, brass accents. Reads as
 # "calm, trustworthy, large print" on the Amazon thumbnail row.
 PALETTE_DIABETES_SENIOR = ColorPalette(
@@ -69,7 +69,7 @@ PALETTE_DIABETES_SENIOR = ColorPalette(
     accent="#FBF3E2",        # warm cream
 )
 
-# CGM Companion Logbook — cooler teal-dominant variant of the playful theme.
+# CGM Companion Logbook â€” cooler teal-dominant variant of the playful theme.
 # Targets a younger, tech-savvy diabetes buyer with a more clinical/modern
 # register while staying inside the imprint palette family.
 PALETTE_CGM_COMPANION = ColorPalette(
@@ -80,7 +80,7 @@ PALETTE_CGM_COMPANION = ColorPalette(
 )
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/config.py
@@ -100,13 +100,13 @@ EOF
 
 ## Task 2: Add `DiabetesWeeklySpread` template
 
-This template renders one week of diabetes logging on one page. Two modes: `mode="fingerstick"` for SKU A (4 meals × before/after + bedtime + BP + meds + weight + energy), `mode="cgm"` for SKU C (TIR% / avg / low / high from device + food/carbs + exercise + mood + insulin).
+This template renders one week of diabetes logging on one page. Two modes: `mode="fingerstick"` for SKU A (4 meals Ã— before/after + bedtime + BP + meds + weight + energy), `mode="cgm"` for SKU C (TIR% / avg / low / high from device + food/carbs + exercise + mood + insulin).
 
 **Files:**
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`
 - Create: `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`:
 
@@ -173,7 +173,7 @@ def test_diabetes_weekly_spread_rejects_unknown_mode() -> None:
         )
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
@@ -182,7 +182,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py::tes
 
 Expected: FAIL with `ImportError: cannot import name 'DiabetesWeeklySpread'`.
 
-- [ ] **Step 3: Implement `DiabetesWeeklySpread`**
+- [x] **Step 3: Implement `DiabetesWeeklySpread`**
 
 Open `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`. After the `WeeklyLogPage` class (around line 355, before the `MonthlyPlanSpread` block), add:
 
@@ -203,8 +203,8 @@ _CGM_COL_WEIGHTS = (0.07, 0.06, 0.06, 0.06, 0.06, 0.27, 0.13, 0.07, 0.22)
 class DiabetesWeeklySpread:
     """One week of diabetes logging on one page.
 
-    mode='fingerstick' — SKU A: meal-time before/after, BP, weight, energy.
-    mode='cgm' — SKU C: device-summary box, food/carbs, exercise, mood, insulin.
+    mode='fingerstick' â€” SKU A: meal-time before/after, BP, weight, energy.
+    mode='cgm' â€” SKU C: device-summary box, food/carbs, exercise, mood, insulin.
 
     Layout: header row, 7 day rows, 1 summary row at the bottom. All grid
     lines >= 0.75pt to satisfy KDP. Day labels are short ("Mon", "Tue", ...).
@@ -279,9 +279,9 @@ class DiabetesWeeklySpread:
         c.rect(x, body_top - n_rows * row_h, col_xs[-1] - x, n_rows * row_h, stroke=1, fill=0)
 ```
 
-Note the imports `Sequence`, `field`, `inch`, `rl_canvas`, `PageTemplate`, `GRID_LINE_W`, `HEAVY_LINE_W` are all already imported at the top of `journal_templates.py` — no new imports needed.
+Note the imports `Sequence`, `field`, `inch`, `rl_canvas`, `PageTemplate`, `GRID_LINE_W`, `HEAVY_LINE_W` are all already imported at the top of `journal_templates.py` â€” no new imports needed.
 
-- [ ] **Step 4: Update `__all__` in `journal_templates.py`**
+- [x] **Step 4: Update `__all__` in `journal_templates.py`**
 
 At the bottom of `journal_templates.py`, add `"DiabetesWeeklySpread"` to the `__all__` list:
 
@@ -300,7 +300,7 @@ __all__ = [
 ]
 ```
 
-- [ ] **Step 5: Run all three tests added so far**
+- [x] **Step 5: Run all three tests added so far**
 
 Run:
 ```bash
@@ -314,7 +314,7 @@ Expected (5 tests):
 - `test_diabetes_weekly_spread_cgm_renders[TEMPLATE_6X9_POCKET]` PASS
 - `test_diabetes_weekly_spread_rejects_unknown_mode` PASS
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py projects/kdp-puzzle-press/tests/test_diabetes_templates.py
@@ -341,7 +341,7 @@ A single-page checklist used every 13 weeks in both SKUs: A1C goal/actual, weigh
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`
 
-- [ ] **Step 1: Extend the imports + write the failing test**
+- [x] **Step 1: Extend the imports + write the failing test**
 
 In `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`, change the existing import block from:
 
@@ -374,16 +374,16 @@ def test_quarterly_doctor_visit_prep_renders(template) -> None:
     assert _page_count(buf) == 1
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
 python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v --rootdir=projects/kdp-puzzle-press
 ```
 
-Expected: collection fails with `ImportError: cannot import name 'QuarterlyDoctorVisitPrep'` (the import is at module top, so the whole file fails to collect — that is the "failing test" signal).
+Expected: collection fails with `ImportError: cannot import name 'QuarterlyDoctorVisitPrep'` (the import is at module top, so the whole file fails to collect â€” that is the "failing test" signal).
 
-- [ ] **Step 3: Implement `QuarterlyDoctorVisitPrep`**
+- [x] **Step 3: Implement `QuarterlyDoctorVisitPrep`**
 
 In `journal_templates.py`, after the `DiabetesWeeklySpread` class, add:
 
@@ -462,11 +462,11 @@ class QuarterlyDoctorVisitPrep:
             line_y -= 0.32 * inch
 ```
 
-- [ ] **Step 4: Update `__all__`**
+- [x] **Step 4: Update `__all__`**
 
 Add `"QuarterlyDoctorVisitPrep"` to the `__all__` list in `journal_templates.py`.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run:
 ```bash
@@ -475,7 +475,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py::tes
 
 Expected: PASS on both parametrized templates.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py projects/kdp-puzzle-press/tests/test_diabetes_templates.py
@@ -501,7 +501,7 @@ Twelve-row table for A1C, weight, average BG, and notes over a year. Used by SKU
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`
 
-- [ ] **Step 1: Extend the imports + write the failing test**
+- [x] **Step 1: Extend the imports + write the failing test**
 
 In `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`, change the import block to:
 
@@ -530,7 +530,7 @@ def test_monthly_a1c_trend_renders(template, include_gmi) -> None:
     assert _page_count(buf) == 1
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
@@ -539,7 +539,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v -
 
 Expected: collection fails with `ImportError: cannot import name 'MonthlyA1CTrend'`.
 
-- [ ] **Step 3: Implement `MonthlyA1CTrend`**
+- [x] **Step 3: Implement `MonthlyA1CTrend`**
 
 In `journal_templates.py`, after `QuarterlyDoctorVisitPrep`, add:
 
@@ -602,11 +602,11 @@ class MonthlyA1CTrend:
         c.rect(x, body_top - n_rows * row_h, col_xs[-1] - x, n_rows * row_h, stroke=1, fill=0)
 ```
 
-- [ ] **Step 4: Update `__all__`**
+- [x] **Step 4: Update `__all__`**
 
 Add `"MonthlyA1CTrend"` to the `__all__` list.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run:
 ```bash
@@ -615,7 +615,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v -
 
 Expected: 11 tests PASS (4 weekly-spread parametrized + 1 reject + 2 quarterly parametrized + 4 trend parametrized = 11).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py projects/kdp-puzzle-press/tests/test_diabetes_templates.py
@@ -635,12 +635,12 @@ EOF
 
 ## Task 5: Create the carb-reference data file
 
-Sixty common foods with carb counts in grams per typical serving. Pure data — no rendering yet.
+Sixty common foods with carb counts in grams per typical serving. Pure data â€” no rendering yet.
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/assets/carb_reference.json`
 
-- [ ] **Step 1: Verify the assets directory**
+- [x] **Step 1: Verify the assets directory**
 
 Run:
 ```bash
@@ -649,7 +649,7 @@ ls projects/kdp-puzzle-press/assets/
 
 Expected: directory exists (font files live here). If it doesn't, create it: `mkdir -p projects/kdp-puzzle-press/assets/`.
 
-- [ ] **Step 2: Create `carb_reference.json`**
+- [x] **Step 2: Create `carb_reference.json`**
 
 Write to `projects/kdp-puzzle-press/assets/carb_reference.json`:
 
@@ -767,7 +767,7 @@ Write to `projects/kdp-puzzle-press/assets/carb_reference.json`:
 }
 ```
 
-- [ ] **Step 3: Verify the JSON is valid**
+- [x] **Step 3: Verify the JSON is valid**
 
 Run:
 ```bash
@@ -776,7 +776,7 @@ python -c "import json; data = json.load(open('projects/kdp-puzzle-press/assets/
 
 Expected: `OK: 60 items in 8 categories`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/assets/carb_reference.json
@@ -802,7 +802,7 @@ A standalone module-level function in `journal_templates.py` that renders a 1- t
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`:
 
@@ -835,7 +835,7 @@ def test_carb_reference_page_renders() -> None:
     assert _page_count(buf) == 1
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
@@ -844,7 +844,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py::tes
 
 Expected: FAIL with `ImportError: cannot import name 'CarbReferencePage'`.
 
-- [ ] **Step 3: Implement `CarbReferencePage`**
+- [x] **Step 3: Implement `CarbReferencePage`**
 
 In `journal_templates.py`, after `MonthlyA1CTrend`, add:
 
@@ -877,7 +877,7 @@ class CarbReferencePage:
         c.drawString(
             x,
             top - 38,
-            "Approximate values. Not medical advice — consult your care team for personalized counting.",
+            "Approximate values. Not medical advice â€” consult your care team for personalized counting.",
         )
 
         # Two columns of category blocks
@@ -907,11 +907,11 @@ class CarbReferencePage:
                 cy -= 16
 ```
 
-- [ ] **Step 4: Update `__all__`**
+- [x] **Step 4: Update `__all__`**
 
 Add `"CarbReferencePage"` to the `__all__` list.
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run:
 ```bash
@@ -920,7 +920,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py::tes
 
 Expected: 2 PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py projects/kdp-puzzle-press/tests/test_diabetes_templates.py
@@ -941,13 +941,13 @@ EOF
 
 ## Task 7: Add `TextBlockPage` template
 
-A page that renders a block of prose with a bold title bar, optional subtitle, word-wrapped body paragraphs separated by blank lines, and an optional bullet list. Used by SKU C for the CGM primer, AGP-reader explainer, glossary, and sample-filled-in DVP. Single-page only — paginates by splitting long text across multiple `TextBlockPage` instances at the caller (book module) level.
+A page that renders a block of prose with a bold title bar, optional subtitle, word-wrapped body paragraphs separated by blank lines, and an optional bullet list. Used by SKU C for the CGM primer, AGP-reader explainer, glossary, and sample-filled-in DVP. Single-page only â€” paginates by splitting long text across multiple `TextBlockPage` instances at the caller (book module) level.
 
 **Files:**
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`
 
-- [ ] **Step 1: Extend the imports + write the failing test**
+- [x] **Step 1: Extend the imports + write the failing test**
 
 In `projects/kdp-puzzle-press/tests/test_diabetes_templates.py`, change the import block to:
 
@@ -1000,7 +1000,7 @@ def test_text_block_page_with_bullets() -> None:
 
 
 def test_text_block_page_truncates_overflow() -> None:
-    """If body + bullets exceed the safe box, the renderer must NOT crash —
+    """If body + bullets exceed the safe box, the renderer must NOT crash â€”
     it stops drawing once it runs out of vertical space (caller paginates)."""
     c, buf = _new_canvas(TEMPLATE_6X9_POCKET)
     huge_body = "\n\n".join(["This is a paragraph that says some things."] * 50)
@@ -1012,7 +1012,7 @@ def test_text_block_page_truncates_overflow() -> None:
     assert _page_count(buf) == 1
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
@@ -1021,7 +1021,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v -
 
 Expected: collection fails with `ImportError: cannot import name 'TextBlockPage'`.
 
-- [ ] **Step 3: Implement `TextBlockPage`**
+- [x] **Step 3: Implement `TextBlockPage`**
 
 In `journal_templates.py`, after `CarbReferencePage`, add:
 
@@ -1034,7 +1034,7 @@ class TextBlockPage:
 
     `body` is rendered with word-wrap, splitting on \\n\\n for paragraph
     breaks. Optional `bullets` render below the body as a dotted list.
-    If content overflows the safe box, drawing stops cleanly — the caller
+    If content overflows the safe box, drawing stops cleanly â€” the caller
     is responsible for splitting long content across multiple instances.
     """
     title: str = ""
@@ -1074,7 +1074,7 @@ class TextBlockPage:
                 continue
             for line in _wrap_text(c, paragraph, "Helvetica", self.body_font_size, w):
                 if cy < y + 12:
-                    return  # overflow — caller paginates
+                    return  # overflow â€” caller paginates
                 c.drawString(x, cy, line)
                 cy -= self.body_line_spacing
             cy -= self.paragraph_spacing
@@ -1088,7 +1088,7 @@ class TextBlockPage:
                     return
                 # Bullet glyph
                 c.setFont("Helvetica-Bold", self.body_font_size)
-                c.drawString(x, cy, "•")
+                c.drawString(x, cy, "â€¢")
                 c.setFont("Helvetica", self.body_font_size)
                 wrapped = _wrap_text(
                     c, bullet, "Helvetica", self.body_font_size, w - bullet_indent
@@ -1130,11 +1130,11 @@ def _wrap_text(
     return lines
 ```
 
-- [ ] **Step 4: Update `__all__`**
+- [x] **Step 4: Update `__all__`**
 
 Add `"TextBlockPage"` to the `__all__` list at the bottom of `journal_templates.py`.
 
-- [ ] **Step 5: Run all template tests**
+- [x] **Step 5: Run all template tests**
 
 Run:
 ```bash
@@ -1143,7 +1143,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_templates.py -v -
 
 Expected: 14 tests PASS (11 from prior tasks + 3 new TextBlockPage tests).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/journal_templates.py projects/kdp-puzzle-press/tests/test_diabetes_templates.py
@@ -1152,7 +1152,7 @@ feat(journal): add TextBlockPage template with body + bullets + overflow guard
 
 Single-page prose renderer with title bar, optional subtitle,
 word-wrapped paragraphs (split on \\n\\n), and an optional bullet
-list. Stops cleanly on overflow — caller paginates long content
+list. Stops cleanly on overflow â€” caller paginates long content
 across multiple instances. Used by SKU C for the CGM primer,
 AGP reader, glossary, and sample DVP pages.
 
@@ -1163,7 +1163,7 @@ EOF
 
 ---
 
-## Task 8: SKU A — `large_print_diabetes_log_v1.py` book module
+## Task 8: SKU A â€” `large_print_diabetes_log_v1.py` book module
 
 Wire SKU A together: 4 carb pages + sample week + 104 weekly logs + 8 quarterly DVP pages + 2 end-matter pages. Total target: 124 pp.
 
@@ -1171,7 +1171,7 @@ Wire SKU A together: 4 carb pages + sample week + 104 weekly logs + 8 quarterly 
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/books/large_print_diabetes_log_v1.py`
 - Create: `projects/kdp-puzzle-press/tests/test_diabetes_log_books.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `projects/kdp-puzzle-press/tests/test_diabetes_log_books.py`:
 
@@ -1197,7 +1197,7 @@ def test_sku_a_builds(tmp_path: Path) -> None:
     assert 120 <= n <= 128, f"SKU A page count {n} out of 120-128 window"
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
@@ -1206,7 +1206,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_log_books.py::tes
 
 Expected: FAIL with `ModuleNotFoundError: large_print_diabetes_log_v1`.
 
-- [ ] **Step 3: Implement the book module**
+- [x] **Step 3: Implement the book module**
 
 Create `projects/kdp-puzzle-press/src/pocket_rooster_press/books/large_print_diabetes_log_v1.py`:
 
@@ -1285,7 +1285,7 @@ def _build_page_renderers() -> list[Callable]:
 
     # One sample filled-in week (uses an empty DiabetesWeeklySpread; the
     # "filled in" version would be a hand-rendered example image. For v1
-    # we leave the grid blank with a "Example — fill in as you go" subtitle).
+    # we leave the grid blank with a "Example â€” fill in as you go" subtitle).
     pages.append(_renderer(DiabetesWeeklySpread(
         title="Example Week",
         mode="fingerstick",
@@ -1301,13 +1301,13 @@ def _build_page_renderers() -> list[Callable]:
         if week_num % QUARTERLY_EVERY_N_WEEKS == 0 and week_num < WEEKS_TOTAL:
             quarter = week_num // QUARTERLY_EVERY_N_WEEKS
             pages.append(_renderer(QuarterlyDoctorVisitPrep(
-                visit_label=f"Doctor Visit Prep — Quarter {quarter}",
+                visit_label=f"Doctor Visit Prep â€” Quarter {quarter}",
             )))
         week_num += 1
 
     # Final quarterly (covers weeks 92-104)
     pages.append(_renderer(QuarterlyDoctorVisitPrep(
-        visit_label="Doctor Visit Prep — Quarter 8",
+        visit_label="Doctor Visit Prep â€” Quarter 8",
     )))
 
     # End matter
@@ -1342,10 +1342,10 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
         TITLE,
         subtitle=SUBTITLE,
         page_count=page_count,
-        series_label="Pocket Rooster Press · Diabetes Log · Volume 1",
-        badge_text="2 Years · 18pt Large Print",
+        series_label="Pocket Rooster Press Â· Diabetes Log Â· Volume 1",
+        badge_text="2 Years Â· 18pt Large Print",
         back_bullets=[
-            "Genuinely 18pt large print — measured, not promised",
+            "Genuinely 18pt large print â€” measured, not promised",
             "104 weekly log pages + 8 quarterly doctor visit prep pages",
             "Tracks blood sugar, BP, medications, weight & energy together",
             "Built-in carb cheat sheet for 60 common foods",
@@ -1355,21 +1355,21 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
     return interior, cover
 ```
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run:
 ```bash
 python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_log_books.py::test_sku_a_builds -v --rootdir=projects/kdp-puzzle-press
 ```
 
-Expected: PASS. If page count is outside [120, 128], do NOT fudge the assertion — investigate the renderer counts in `_build_page_renderers()` and reconcile against the spec page budget.
+Expected: PASS. If page count is outside [120, 128], do NOT fudge the assertion â€” investigate the renderer counts in `_build_page_renderers()` and reconcile against the spec page budget.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/books/large_print_diabetes_log_v1.py projects/kdp-puzzle-press/tests/test_diabetes_log_books.py
 git commit -m "$(cat <<'EOF'
-feat(books): SKU A — Large Print Diabetes Log Book for Seniors
+feat(books): SKU A â€” Large Print Diabetes Log Book for Seniors
 
 Wires the new diabetes templates into a 124-page 2-year log:
 4 carb cheat-sheet pages + example week + 104 weekly fingerstick
@@ -1383,14 +1383,14 @@ EOF
 
 ---
 
-## Task 9: SKU A — metadata JSON
+## Task 9: SKU A â€” metadata JSON
 
 The bundle pipeline reads `metadata/<book_id_underscored>.json`. Mirrors `garden_companion.json` schema.
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/metadata/large_print_diabetes_log_v1.json`
 
-- [ ] **Step 1: Write the metadata file**
+- [x] **Step 1: Write the metadata file**
 
 Create `projects/kdp-puzzle-press/metadata/large_print_diabetes_log_v1.json`:
 
@@ -1481,7 +1481,7 @@ Create `projects/kdp-puzzle-press/metadata/large_print_diabetes_log_v1.json`:
       "net_per_copy": 1.834
     },
     "kdp_minimum_list_price_usd": 5.0,
-    "pricing_rationale": "Priced at $7.99 to match the top 3 bestsellers in 'large print diabetes log book' — we win on quality, not undercut."
+    "pricing_rationale": "Priced at $7.99 to match the top 3 bestsellers in 'large print diabetes log book' â€” we win on quality, not undercut."
   },
   "ai_disclosure": {
     "policy_doc": "docs/AI_DISCLOSURE_POLICY.md",
@@ -1509,7 +1509,7 @@ Create `projects/kdp-puzzle-press/metadata/large_print_diabetes_log_v1.json`:
 }
 ```
 
-- [ ] **Step 2: Validate the JSON**
+- [x] **Step 2: Validate the JSON**
 
 Run:
 ```bash
@@ -1518,12 +1518,12 @@ python -c "import json; m = json.load(open('projects/kdp-puzzle-press/metadata/l
 
 Expected: `OK: large-print-diabetes-log-v1 124 pp at 7.99`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/metadata/large_print_diabetes_log_v1.json
 git commit -m "$(cat <<'EOF'
-feat(metadata): SKU A — large-print-diabetes-log-v1 metadata
+feat(metadata): SKU A â€” large-print-diabetes-log-v1 metadata
 
 7 keywords, 3 categories, $7.99 price, 124 pp target. Mirrors
 garden_companion.json schema. Net royalty estimate $1.83/copy.
@@ -1535,21 +1535,21 @@ EOF
 
 ---
 
-## Task 10: SKU A — listing.md
+## Task 10: SKU A â€” listing.md
 
 Customer-facing copy used when actually filling in the KDP web form. Mirrors `garden-companion/listing.md`.
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/output/kdp-ready/large-print-diabetes-log-v1/listing.md`
 
-- [ ] **Step 1: Create the output directory**
+- [x] **Step 1: Create the output directory**
 
 Run:
 ```bash
 mkdir -p projects/kdp-puzzle-press/output/kdp-ready/large-print-diabetes-log-v1/
 ```
 
-- [ ] **Step 2: Write the listing**
+- [x] **Step 2: Write the listing**
 
 Create `projects/kdp-puzzle-press/output/kdp-ready/large-print-diabetes-log-v1/listing.md`:
 
@@ -1589,14 +1589,14 @@ Large Print Diabetes Log Book for Seniors
 ```html
 <h4>A 2-year diabetes log book in genuinely 18pt large print, with weekly blood sugar tracking, blood pressure, medications, weight, and a built-in doctor visit prep page every 13 weeks.</h4>
 
-<p><b>Large Print Diabetes Log Book for Seniors</b> — 104 weekly log pages, eight quarterly Doctor Visit Prep summaries, and a built-in carb cheat sheet for 60 common foods.</p>
+<p><b>Large Print Diabetes Log Book for Seniors</b> â€” 104 weekly log pages, eight quarterly Doctor Visit Prep summaries, and a built-in carb cheat sheet for 60 common foods.</p>
 
 <h5>What makes this log book different:</h5>
 <ul>
-<li><b>Genuinely 18pt large print</b> — measured, not just promised. Easy to read; easy to write in.</li>
-<li><b>Doctor Visit Prep pages every 13 weeks</b> — A1C, weight, BP, current medications, questions, observations on one page</li>
-<li><b>Carb cheat sheet for 60 common foods</b> — at the front of the book, ready to glance at</li>
-<li><b>Tracks four metrics together</b> — blood sugar, blood pressure, medications, and weight on one weekly spread</li>
+<li><b>Genuinely 18pt large print</b> â€” measured, not just promised. Easy to read; easy to write in.</li>
+<li><b>Doctor Visit Prep pages every 13 weeks</b> â€” A1C, weight, BP, current medications, questions, observations on one page</li>
+<li><b>Carb cheat sheet for 60 common foods</b> â€” at the front of the book, ready to glance at</li>
+<li><b>Tracks four metrics together</b> â€” blood sugar, blood pressure, medications, and weight on one weekly spread</li>
 </ul>
 
 <h5>What's inside:</h5>
@@ -1612,7 +1612,7 @@ Large Print Diabetes Log Book for Seniors
 
 <h5>From Pocket Rooster Press:</h5>
 
-<p>Pocket Rooster Press is a small imprint that publishes thoughtful, dignified books for quiet hands and curious minds — planners, log books, coloring books, and activity titles with clean typography, generous layouts, no padding, and no childish gimmicks. Just careful work for readers who notice the difference.</p>
+<p>Pocket Rooster Press is a small imprint that publishes thoughtful, dignified books for quiet hands and curious minds â€” planners, log books, coloring books, and activity titles with clean typography, generous layouts, no padding, and no childish gimmicks. Just careful work for readers who notice the difference.</p>
 
 <p><i>A Year of Pages, A Lifetime of Notes.</i></p>
 
@@ -1621,7 +1621,7 @@ Large Print Diabetes Log Book for Seniors
 
 ## 6. Bullet Highlights
 
-1. Genuinely 18pt large print — measured, not just promised
+1. Genuinely 18pt large print â€” measured, not just promised
 2. 2 years of weekly log pages (104 weeks total)
 3. Tracks blood sugar before/after meals, blood pressure, medications & weight together
 4. Quarterly Doctor Visit Prep pages built in (every 13 weeks)
@@ -1645,33 +1645,33 @@ Large Print Diabetes Log Book for Seniors
 
 ## 9. BISAC
 
-- HEA039050 — HEALTH & FITNESS / Diseases & Conditions / Diabetes
-- HEA048000 — HEALTH & FITNESS / Healthy Aging
+- HEA039050 â€” HEALTH & FITNESS / Diseases & Conditions / Diabetes
+- HEA048000 â€” HEALTH & FITNESS / Healthy Aging
 
 ## 10. Pricing
 
 - US: $7.99
-- UK: £6.79
-- EU: €7.99
+- UK: Â£6.79
+- EU: â‚¬7.99
 
 ## 11. Notes
 
 - Trim: **8.5x11**
 - Large print: **Yes (18pt verified)**
 - Low-content book: **Yes**
-- Medical-language gate: copy is **descriptive only** — "track" not "treat", "share with your doctor" not interpretation. No specific BG targets stated.
+- Medical-language gate: copy is **descriptive only** â€” "track" not "treat", "share with your doctor" not interpretation. No specific BG targets stated.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/output/kdp-ready/large-print-diabetes-log-v1/listing.md
 git commit -m "$(cat <<'EOF'
-docs(listing): SKU A — large-print-diabetes-log-v1 listing copy
+docs(listing): SKU A â€” large-print-diabetes-log-v1 listing copy
 
 Customer-facing KDP listing with the 4 cover-promised
 differentiators surfaced in the description. Medical-language
-gate observed throughout — descriptive only, no interpretation.
+gate observed throughout â€” descriptive only, no interpretation.
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
@@ -1687,11 +1687,11 @@ Audit a sampled weekly-log page and confirm the embedded text content is large e
 **Files:**
 - Modify: `projects/kdp-puzzle-press/scripts/audit_pdfs.py`
 
-- [ ] **Step 1: Locate the audit registration block**
+- [x] **Step 1: Locate the audit registration block**
 
 Read `projects/kdp-puzzle-press/scripts/audit_pdfs.py` lines 1-200 to find the per-book check loop (search for `check_` function definitions). The existing convention: define a `check_xxx(audit) -> CheckResult` function, then call it inside the per-book audit driver. Pick the same pattern.
 
-- [ ] **Step 2: Add the `check_min_font_size` function**
+- [x] **Step 2: Add the `check_min_font_size` function**
 
 Append to `projects/kdp-puzzle-press/scripts/audit_pdfs.py` (search for the last `check_` function in the file and add immediately after it):
 
@@ -1732,7 +1732,7 @@ def check_min_font_size(
         data = content.get_data() if hasattr(content, "get_data") else b"".join(
             obj.get_data() for obj in content
         )
-    except Exception as exc:  # noqa: BLE001 — defensive against malformed PDFs
+    except Exception as exc:  # noqa: BLE001 â€” defensive against malformed PDFs
         return CheckResult(
             name=f"min_font_size_p{sample_page_index}",
             passed=False,
@@ -1763,7 +1763,7 @@ def check_min_font_size(
     )
 ```
 
-- [ ] **Step 3: Add a smoke test**
+- [x] **Step 3: Add a smoke test**
 
 Append to `projects/kdp-puzzle-press/tests/test_diabetes_log_books.py`:
 
@@ -1783,9 +1783,9 @@ def test_sku_a_passes_min_font_size_audit(tmp_path: Path) -> None:
     assert result.passed, result.detail
 ```
 
-Note: we assert `min_pt=8.0` in the smoke test, not 18 — the page contains both the 18pt date numbers and the 9pt column headers. Use 8.0 as the structural lower bound (catches a regression where someone uses 6pt by accident). The "real 18pt" promise applies to the user-fill-in fields specifically, which we verify by spot-checking with `preview_pdfs.py` in Task 12.
+Note: we assert `min_pt=8.0` in the smoke test, not 18 â€” the page contains both the 18pt date numbers and the 9pt column headers. Use 8.0 as the structural lower bound (catches a regression where someone uses 6pt by accident). The "real 18pt" promise applies to the user-fill-in fields specifically, which we verify by spot-checking with `preview_pdfs.py` in Task 12.
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run:
 ```bash
@@ -1794,7 +1794,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_log_books.py::tes
 
 Expected: PASS. If FAIL with a smaller-than-expected min, inspect the column-header font size in `DiabetesWeeklySpread` and bump if needed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/scripts/audit_pdfs.py projects/kdp-puzzle-press/tests/test_diabetes_log_books.py
@@ -1812,24 +1812,24 @@ EOF
 
 ---
 
-## Task 12: SKU A — build artifacts, run full audit, bundle for KDP
+## Task 12: SKU A â€” build artifacts, run full audit, bundle for KDP
 
 End-to-end pipeline rehearsal for SKU A. After this task, the SKU is ready for human upload to KDP.
 
 **Files:**
 - No code changes; this task is build + verification.
 
-- [ ] **Step 1: Build SKU A to the real `output/` directory**
+- [x] **Step 1: Build SKU A to the real `output/` directory**
 
 Run:
 ```bash
 python -c "from pocket_rooster_press.books import large_print_diabetes_log_v1 as b; i, c = b.build(); print('interior:', i); print('cover:', c)"
 ```
-(Run this from `projects/kdp-puzzle-press/` — set `cd` there or use `PYTHONPATH=projects/kdp-puzzle-press/src`.)
+(Run this from `projects/kdp-puzzle-press/` â€” set `cd` there or use `PYTHONPATH=projects/kdp-puzzle-press/src`.)
 
 Expected: prints two paths under `projects/kdp-puzzle-press/output/large-print-diabetes-log-v1/`.
 
-- [ ] **Step 2: Run the full audit**
+- [x] **Step 2: Run the full audit**
 
 Run:
 ```bash
@@ -1838,7 +1838,7 @@ python projects/kdp-puzzle-press/scripts/audit_pdfs.py large-print-diabetes-log-
 
 Expected: exits 0; all checks PASS. If any FAIL, fix the cause (not the audit) before continuing.
 
-- [ ] **Step 3: Preview the cover and a sample interior page**
+- [x] **Step 3: Preview the cover and a sample interior page**
 
 Run:
 ```bash
@@ -1850,7 +1850,7 @@ Expected: PNG previews written next to the PDFs. Open them and visually confirm:
 - Sample weekly log page has clear column headers and the date column is readable
 - No clipped text, no overlapping elements
 
-- [ ] **Step 4: Build the KDP bundle**
+- [x] **Step 4: Build the KDP bundle**
 
 Run:
 ```bash
@@ -1859,7 +1859,7 @@ python projects/kdp-puzzle-press/scripts/build_kdp_bundle.py large-print-diabete
 
 Expected: bundle directory `projects/kdp-puzzle-press/output/kdp-ready/large-print-diabetes-log-v1/` is populated with `interior.pdf`, `cover.pdf`, the metadata JSON, the listing markdown, and an `UPLOAD_CHECKLIST.md`.
 
-- [ ] **Step 5: Inspect the bundle**
+- [x] **Step 5: Inspect the bundle**
 
 Run:
 ```bash
@@ -1868,7 +1868,7 @@ ls projects/kdp-puzzle-press/output/kdp-ready/large-print-diabetes-log-v1/
 
 Expected files: `interior.pdf`, `cover.pdf`, `large_print_diabetes_log_v1.json` (or similar metadata copy), `listing.md`, `UPLOAD_CHECKLIST.md`.
 
-- [ ] **Step 6: Commit the bundle outputs (if the project commits them)**
+- [x] **Step 6: Commit the bundle outputs (if the project commits them)**
 
 Check whether `output/kdp-ready/` is gitignored:
 
@@ -1893,15 +1893,15 @@ EOF
 
 ---
 
-## Task 13: SKU C — `cgm_companion_logbook_v1.py` book module
+## Task 13: SKU C â€” `cgm_companion_logbook_v1.py` book module
 
-Wires SKU C: CGM primer prose (1 what-captures + 1 primer-continued + 4 AGP-reader pages) + sample week + 104 CGM weekly logs + 8 quarterly DVP + 8 GMI-vs-A1C compare pages + sample DVP (narrative + blank ref) + glossary + 4 end-matter pages. Target: ~137 pp (spec 140 ±4).
+Wires SKU C: CGM primer prose (1 what-captures + 1 primer-continued + 4 AGP-reader pages) + sample week + 104 CGM weekly logs + 8 quarterly DVP + 8 GMI-vs-A1C compare pages + sample DVP (narrative + blank ref) + glossary + 4 end-matter pages. Target: ~137 pp (spec 140 Â±4).
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/books/cgm_companion_logbook_v1.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_diabetes_log_books.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `projects/kdp-puzzle-press/tests/test_diabetes_log_books.py`:
 
@@ -1917,7 +1917,7 @@ def test_sku_c_builds(tmp_path: Path) -> None:
     assert 136 <= n <= 144, f"SKU C page count {n} out of 136-144 window"
 ```
 
-- [ ] **Step 2: Run the test to verify it fails**
+- [x] **Step 2: Run the test to verify it fails**
 
 Run:
 ```bash
@@ -1926,7 +1926,7 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_log_books.py::tes
 
 Expected: FAIL with `ModuleNotFoundError: cgm_companion_logbook_v1`.
 
-- [ ] **Step 3: Implement the book module**
+- [x] **Step 3: Implement the book module**
 
 Create `projects/kdp-puzzle-press/src/pocket_rooster_press/books/cgm_companion_logbook_v1.py`:
 
@@ -1964,7 +1964,7 @@ from pocket_rooster_press.layout.templates import TEMPLATE_6X9_POCKET
 BOOK_ID = "cgm-companion-logbook-v1"
 TITLE = "CGM Companion Logbook"
 SUBTITLE = (
-    "Track Time-in-Range, Food, Patterns & Doctor Visits — "
+    "Track Time-in-Range, Food, Patterns & Doctor Visits â€” "
     "for Dexcom, Libre, Stelo & All Continuous Glucose Monitors"
 )
 INTRO = (
@@ -1988,7 +1988,7 @@ CGM_PRIMER_TEXT = (
     "tell a story your A1C alone cannot.\n\n"
     "GMI (Glucose Management Indicator) is your device's estimate of what "
     "your A1C would be given the last 14 or 30 days of CGM data. It does "
-    "not replace the lab A1C — the two often differ by a few tenths of "
+    "not replace the lab A1C â€” the two often differ by a few tenths of "
     "a percent. Capturing both side-by-side every quarter helps you and "
     "your care team see where the gap is widening or closing."
 )
@@ -1998,12 +1998,12 @@ AGP_READER_TEXT = (
     "from the last 14 days, showing the median glucose at each hour of "
     "the day with shaded bands for the 25-75% and 5-95% spreads.\n\n"
     "What to look for:\n\n"
-    "• Sustained highs in the late morning often point to a breakfast "
+    "â€¢ Sustained highs in the late morning often point to a breakfast "
     "carb bump or a missed pre-meal dose.\n\n"
-    "• An overnight dip can indicate too-much basal insulin or a "
+    "â€¢ An overnight dip can indicate too-much basal insulin or a "
     "delayed bedtime snack effect wearing off.\n\n"
-    "• A widening spread band (large 5-95% range) means glucose is "
-    "swinging more day-to-day — worth a conversation with your care "
+    "â€¢ A widening spread band (large 5-95% range) means glucose is "
+    "swinging more day-to-day â€” worth a conversation with your care "
     "team about cause."
 )
 
@@ -2039,11 +2039,11 @@ SAMPLE_DVP_TEXT = (
     "below 70%, the weeks where your average climbed, and any new patterns "
     "you spotted.\n\n"
     "Write your A1C goal in the first box (the number your care team last "
-    "set). Leave the actual blank — your doctor will fill it in after the "
+    "set). Leave the actual blank â€” your doctor will fill it in after the "
     "lab draw, and you'll have both side-by-side for next quarter.\n\n"
     "In the medications box, list everything you take now and any dose "
     "change since last visit. In the questions box, write what you want "
-    "to leave the visit having answered — be specific. \"Why did my "
+    "to leave the visit having answered â€” be specific. \"Why did my "
     "overnight low keep happening on Tuesdays?\" is better than \"sleep.\""
 )
 
@@ -2087,7 +2087,7 @@ def _build_page_renderers() -> list[Callable]:
             "a missed pre-meal dose, or a steroid medication."
         ),
         bullets=[
-            "Check the weekly logs for those mornings — what did you eat?",
+            "Check the weekly logs for those mornings â€” what did you eat?",
             "Note whether the high happened on workdays vs weekends.",
             "Bring the AGP screenshot to your next visit and ask whether "
             "your breakfast carb ratio needs adjusting.",
@@ -2101,10 +2101,10 @@ def _build_page_renderers() -> list[Callable]:
             "bedtime snack effect is wearing off before sunrise."
         ),
         bullets=[
-            "Note the timing — consistent dips at the same hour suggest "
+            "Note the timing â€” consistent dips at the same hour suggest "
             "basal; varied timing suggests food or activity.",
             "Cross-check with your weekly notes for late exercise.",
-            "Do not adjust your insulin without your care team — bring "
+            "Do not adjust your insulin without your care team â€” bring "
             "the pattern to them.",
         ],
     )))
@@ -2118,7 +2118,7 @@ def _build_page_renderers() -> list[Callable]:
         bullets=[
             "Variability often tracks with stress, illness, or schedule changes.",
             "Look at the weekly mood/exercise/sleep columns for context.",
-            "Coefficient of Variation (CV) is the precise metric — your "
+            "Coefficient of Variation (CV) is the precise metric â€” your "
             "care team aims for 36% or lower.",
         ],
     )))
@@ -2141,10 +2141,10 @@ def _build_page_renderers() -> list[Callable]:
         if week_num % QUARTERLY_EVERY_N_WEEKS == 0 and week_num < WEEKS_TOTAL:
             quarter += 1
             pages.append(_renderer(QuarterlyDoctorVisitPrep(
-                visit_label=f"Doctor Visit Prep — Quarter {quarter}",
+                visit_label=f"Doctor Visit Prep â€” Quarter {quarter}",
             )))
             pages.append(_renderer(MonthlyA1CTrend(
-                title=f"GMI vs A1C — Quarter {quarter}",
+                title=f"GMI vs A1C â€” Quarter {quarter}",
                 n_rows=3,
                 include_gmi=True,
             )))
@@ -2152,15 +2152,15 @@ def _build_page_renderers() -> list[Callable]:
 
     # Final quarterly + final GMI-vs-A1C (covers weeks 92-104)
     pages.append(_renderer(QuarterlyDoctorVisitPrep(
-        visit_label="Doctor Visit Prep — Quarter 8",
+        visit_label="Doctor Visit Prep â€” Quarter 8",
     )))
     pages.append(_renderer(MonthlyA1CTrend(
-        title="GMI vs A1C — Quarter 8",
+        title="GMI vs A1C â€” Quarter 8",
         n_rows=3,
         include_gmi=True,
     )))
 
-    # Sample filled-in doctor visit prep — narrative text + a blank DVP
+    # Sample filled-in doctor visit prep â€” narrative text + a blank DVP
     # template the reader can use as a reference.
     pages.append(_renderer(TextBlockPage(
         title="Sample: filling in your DVP",
@@ -2208,10 +2208,10 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
         TITLE,
         subtitle=SUBTITLE,
         page_count=page_count,
-        series_label="Pocket Rooster Press · CGM Companion · Volume 1",
-        badge_text="2 Years · Portable 6x9",
+        series_label="Pocket Rooster Press Â· CGM Companion Â· Volume 1",
+        badge_text="2 Years Â· Portable 6x9",
         back_bullets=[
-            "Works with any CGM — Dexcom, Libre, Stelo, and more",
+            "Works with any CGM â€” Dexcom, Libre, Stelo, and more",
             "Captures the food, mood, and exercise context your app misses",
             "Quarterly GMI vs A1C reconciliation page",
             "Built-in time-in-range review and doctor visit prep",
@@ -2221,9 +2221,9 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
     return interior, cover
 ```
 
-> **Note for the implementer:** The prose sections (CGM primer, AGP reader patterns, sample DVP, glossary) all use the new `TextBlockPage` template added in Task 7. The example DVP page is rendered as a blank `QuarterlyDoctorVisitPrep` with the label "Sample Doctor Visit Prep (reference)" so the reader sees the actual form they'll be filling in. Expected page count: ~137 pp (spec target 140; ±4 window in the test).
+> **Note for the implementer:** The prose sections (CGM primer, AGP reader patterns, sample DVP, glossary) all use the new `TextBlockPage` template added in Task 7. The example DVP page is rendered as a blank `QuarterlyDoctorVisitPrep` with the label "Sample Doctor Visit Prep (reference)" so the reader sees the actual form they'll be filling in. Expected page count: ~137 pp (spec target 140; Â±4 window in the test).
 
-- [ ] **Step 4: Run the test to verify it passes**
+- [x] **Step 4: Run the test to verify it passes**
 
 Run:
 ```bash
@@ -2232,12 +2232,12 @@ python -m pytest projects/kdp-puzzle-press/tests/test_diabetes_log_books.py::tes
 
 Expected: PASS. If page count is outside [136, 144], reconcile renderer counts against the spec.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/books/cgm_companion_logbook_v1.py projects/kdp-puzzle-press/tests/test_diabetes_log_books.py
 git commit -m "$(cat <<'EOF'
-feat(books): SKU C — CGM Companion Logbook (6x9, ~137 pp)
+feat(books): SKU C â€” CGM Companion Logbook (6x9, ~137 pp)
 
 Brand-agnostic CGM supplement: 104 weekly CGM-mode spreads
 interleaved with 8 quarterly doctor visit prep pages and 8
@@ -2253,12 +2253,12 @@ EOF
 
 ---
 
-## Task 14: SKU C — metadata JSON
+## Task 14: SKU C â€” metadata JSON
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`
 
-- [ ] **Step 1: Write the metadata file**
+- [x] **Step 1: Write the metadata file**
 
 Create `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`:
 
@@ -2268,7 +2268,7 @@ Create `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`:
   "book_id": "cgm-companion-logbook-v1",
   "imprint": "Pocket Rooster Press",
   "title": "CGM Companion Logbook",
-  "subtitle": "Track Time-in-Range, Food, Patterns & Doctor Visits — for Dexcom, Libre, Stelo & All Continuous Glucose Monitors",
+  "subtitle": "Track Time-in-Range, Food, Patterns & Doctor Visits â€” for Dexcom, Libre, Stelo & All Continuous Glucose Monitors",
   "series": {
     "name": "CGM Companion",
     "volume": 1
@@ -2308,7 +2308,7 @@ Create `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`:
     "banned_terms_check": [
       "no 'best seller', 'free', 'kindle', 'new', 'on sale', 'sale'",
       "no series-name spam",
-      "Dexcom / Libre / Stelo used nominatively (works with X) — no logos, no implied partnership"
+      "Dexcom / Libre / Stelo used nominatively (works with X) â€” no logos, no implied partnership"
     ]
   },
   "audience": {
@@ -2349,7 +2349,7 @@ Create `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`:
       "net_per_copy": 2.864
     },
     "kdp_minimum_list_price_usd": 5.0,
-    "pricing_rationale": "Priced at $8.99 — premium for newer niche with less price compression; clears approximately $2.86 net per copy."
+    "pricing_rationale": "Priced at $8.99 â€” premium for newer niche with less price compression; clears approximately $2.86 net per copy."
   },
   "ai_disclosure": {
     "policy_doc": "docs/AI_DISCLOSURE_POLICY.md",
@@ -2377,7 +2377,7 @@ Create `projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json`:
 }
 ```
 
-- [ ] **Step 2: Validate the JSON**
+- [x] **Step 2: Validate the JSON**
 
 Run:
 ```bash
@@ -2386,12 +2386,12 @@ python -c "import json; m = json.load(open('projects/kdp-puzzle-press/metadata/c
 
 Expected: `OK: cgm-companion-logbook-v1 140 pp at 8.99`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/metadata/cgm_companion_logbook_v1.json
 git commit -m "$(cat <<'EOF'
-feat(metadata): SKU C — cgm-companion-logbook-v1 metadata
+feat(metadata): SKU C â€” cgm-companion-logbook-v1 metadata
 
 7 keywords (brand-agnostic), 3 categories incl. endocrinology,
 $8.99 premium price, 140 pp target. Net royalty est. $2.86/copy.
@@ -2404,19 +2404,19 @@ EOF
 
 ---
 
-## Task 15: SKU C — listing.md
+## Task 15: SKU C â€” listing.md
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/output/kdp-ready/cgm-companion-logbook-v1/listing.md`
 
-- [ ] **Step 1: Create the output directory**
+- [x] **Step 1: Create the output directory**
 
 Run:
 ```bash
 mkdir -p projects/kdp-puzzle-press/output/kdp-ready/cgm-companion-logbook-v1/
 ```
 
-- [ ] **Step 2: Write the listing**
+- [x] **Step 2: Write the listing**
 
 Create `projects/kdp-puzzle-press/output/kdp-ready/cgm-companion-logbook-v1/listing.md`:
 
@@ -2439,7 +2439,7 @@ CGM Companion Logbook
 ## 2. Subtitle
 
 ```
-Track Time-in-Range, Food, Patterns & Doctor Visits — for Dexcom, Libre, Stelo & All Continuous Glucose Monitors
+Track Time-in-Range, Food, Patterns & Doctor Visits â€” for Dexcom, Libre, Stelo & All Continuous Glucose Monitors
 ```
 
 ## 3. Series
@@ -2456,14 +2456,14 @@ Track Time-in-Range, Food, Patterns & Doctor Visits — for Dexcom, Libre, Stelo
 ```html
 <h4>A brand-agnostic paper logbook for continuous glucose monitor users. Captures the food, exercise, mood, and insulin context your app doesn't see, with weekly time-in-range review and quarterly GMI vs A1C reconciliation.</h4>
 
-<p><b>CGM Companion Logbook</b> — 104 weekly spreads, eight quarterly Doctor Visit Prep pages, and eight GMI vs A1C reconciliation pages, in a portable 6x9 format that fits in a bag.</p>
+<p><b>CGM Companion Logbook</b> â€” 104 weekly spreads, eight quarterly Doctor Visit Prep pages, and eight GMI vs A1C reconciliation pages, in a portable 6x9 format that fits in a bag.</p>
 
 <h5>What makes this logbook different:</h5>
 <ul>
-<li><b>Works with any CGM</b> — Dexcom, Libre, Stelo, and all continuous glucose monitors</li>
-<li><b>Captures the food, mood, and exercise context your app misses</b> — the context that explains the patterns</li>
-<li><b>Quarterly GMI vs A1C reconciliation page</b> — capture both side-by-side every quarter so you and your care team can see how they're tracking</li>
-<li><b>Built-in time-in-range review and doctor visit prep</b> — one artifact to bring to every visit</li>
+<li><b>Works with any CGM</b> â€” Dexcom, Libre, Stelo, and all continuous glucose monitors</li>
+<li><b>Captures the food, mood, and exercise context your app misses</b> â€” the context that explains the patterns</li>
+<li><b>Quarterly GMI vs A1C reconciliation page</b> â€” capture both side-by-side every quarter so you and your care team can see how they're tracking</li>
+<li><b>Built-in time-in-range review and doctor visit prep</b> â€” one artifact to bring to every visit</li>
 </ul>
 
 <h5>What's inside:</h5>
@@ -2480,20 +2480,20 @@ Track Time-in-Range, Food, Patterns & Doctor Visits — for Dexcom, Libre, Stelo
 
 <h5>From Pocket Rooster Press:</h5>
 
-<p>Pocket Rooster Press is a small imprint that publishes thoughtful, dignified books for quiet hands and curious minds — planners, log books, coloring books, and activity titles with clean typography, generous layouts, no padding, and no childish gimmicks. Just careful work for readers who notice the difference.</p>
+<p>Pocket Rooster Press is a small imprint that publishes thoughtful, dignified books for quiet hands and curious minds â€” planners, log books, coloring books, and activity titles with clean typography, generous layouts, no padding, and no childish gimmicks. Just careful work for readers who notice the difference.</p>
 
 <p><i>A Year of Pages, A Lifetime of Notes.</i></p>
 
-<p><i>This logbook is independently produced and not affiliated with Dexcom, Abbott, or any CGM manufacturer. For tracking only — not medical advice. Always share your records with your care team.</i></p>
+<p><i>This logbook is independently produced and not affiliated with Dexcom, Abbott, or any CGM manufacturer. For tracking only â€” not medical advice. Always share your records with your care team.</i></p>
 ```
 
 ## 6. Bullet Highlights
 
-1. Works with any CGM — Dexcom, Libre, Stelo, and all continuous glucose monitors
+1. Works with any CGM â€” Dexcom, Libre, Stelo, and all continuous glucose monitors
 2. Captures the food, mood, and exercise context your CGM app misses
 3. Quarterly GMI vs A1C reconciliation page built in
 4. Built-in time-in-range review and Doctor Visit Prep
-5. Portable 6x9 — fits in a bag, two full years of weekly tracking
+5. Portable 6x9 â€” fits in a bag, two full years of weekly tracking
 
 ## 7. Keywords (7 max)
 
@@ -2513,14 +2513,14 @@ Track Time-in-Range, Food, Patterns & Doctor Visits — for Dexcom, Libre, Stelo
 
 ## 9. BISAC
 
-- HEA039050 — HEALTH & FITNESS / Diseases & Conditions / Diabetes
-- MED027000 — MEDICAL / Diabetes
+- HEA039050 â€” HEALTH & FITNESS / Diseases & Conditions / Diabetes
+- MED027000 â€” MEDICAL / Diabetes
 
 ## 10. Pricing
 
 - US: $8.99
-- UK: £7.69
-- EU: €8.99
+- UK: Â£7.69
+- EU: â‚¬8.99
 
 ## 11. Notes
 
@@ -2528,15 +2528,15 @@ Track Time-in-Range, Food, Patterns & Doctor Visits — for Dexcom, Libre, Stelo
 - Large print: **No** (CGM buyers are typically younger; portability matters more)
 - Low-content book: **Yes**
 - Trademark gate: Dexcom, Freestyle Libre, Stelo used **nominatively** ("works with X"). No logos. Explicit "not affiliated" disclaimer in description.
-- Medical-language gate: copy is **descriptive only** — "track" not "treat", "share with your care team" not interpretation.
+- Medical-language gate: copy is **descriptive only** â€” "track" not "treat", "share with your care team" not interpretation.
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/output/kdp-ready/cgm-companion-logbook-v1/listing.md
 git commit -m "$(cat <<'EOF'
-docs(listing): SKU C — cgm-companion-logbook-v1 listing copy
+docs(listing): SKU C â€” cgm-companion-logbook-v1 listing copy
 
 Brand-agnostic CGM logbook listing. Nominative-fair-use phrasing
 for Dexcom/Libre/Stelo refs + explicit "not affiliated"
@@ -2549,12 +2549,12 @@ EOF
 
 ---
 
-## Task 16: SKU C — build artifacts, run full audit, bundle for KDP
+## Task 16: SKU C â€” build artifacts, run full audit, bundle for KDP
 
 **Files:**
 - No code changes; this task is build + verification.
 
-- [ ] **Step 1: Build SKU C to the real `output/` directory**
+- [x] **Step 1: Build SKU C to the real `output/` directory**
 
 Run:
 ```bash
@@ -2563,7 +2563,7 @@ python -c "from pocket_rooster_press.books import cgm_companion_logbook_v1 as b;
 
 Expected: prints two paths under `projects/kdp-puzzle-press/output/cgm-companion-logbook-v1/`.
 
-- [ ] **Step 2: Run the full audit**
+- [x] **Step 2: Run the full audit**
 
 Run:
 ```bash
@@ -2572,7 +2572,7 @@ python projects/kdp-puzzle-press/scripts/audit_pdfs.py cgm-companion-logbook-v1
 
 Expected: exits 0; all checks PASS.
 
-- [ ] **Step 3: Preview the cover and a sample interior page**
+- [x] **Step 3: Preview the cover and a sample interior page**
 
 Run:
 ```bash
@@ -2584,7 +2584,7 @@ Expected: PNG previews next to the PDFs. Visually confirm:
 - "Works with Dexcom, Libre, Stelo" reads clearly somewhere on the cover (front or back)
 - Sample weekly CGM spread shows the device-summary box clearly differentiated from the food/exercise columns
 
-- [ ] **Step 4: Build the KDP bundle**
+- [x] **Step 4: Build the KDP bundle**
 
 Run:
 ```bash
@@ -2593,7 +2593,7 @@ python projects/kdp-puzzle-press/scripts/build_kdp_bundle.py cgm-companion-logbo
 
 Expected: `output/kdp-ready/cgm-companion-logbook-v1/` populated with interior, cover, metadata, listing, and UPLOAD_CHECKLIST.md.
 
-- [ ] **Step 5: Commit bundle (if tracked)**
+- [x] **Step 5: Commit bundle (if tracked)**
 
 Same check as Task 12 Step 6. If output is tracked:
 
@@ -2611,11 +2611,11 @@ EOF
 
 ---
 
-## Task 17: Final regression — full test suite + audit both books
+## Task 17: Final regression â€” full test suite + audit both books
 
 Catch any cross-book regression (e.g. a shared template change that broke one of the SKUs).
 
-- [ ] **Step 1: Run the full test suite for the project**
+- [x] **Step 1: Run the full test suite for the project**
 
 Run:
 ```bash
@@ -2624,7 +2624,7 @@ python -m pytest projects/kdp-puzzle-press/tests/ -v --rootdir=projects/kdp-puzz
 
 Expected: ALL tests PASS. No failures, no errors.
 
-- [ ] **Step 2: Re-run audit on both SKUs**
+- [x] **Step 2: Re-run audit on both SKUs**
 
 Run:
 ```bash
@@ -2633,20 +2633,20 @@ python projects/kdp-puzzle-press/scripts/audit_pdfs.py large-print-diabetes-log-
 
 Expected: both exit 0; all checks PASS.
 
-- [ ] **Step 3: Update the catalog status memory**
+- [x] **Step 3: Update the catalog status memory**
 
-Open `C:\Users\marts\.claude\projects\c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management\memory\kdp-catalog-status-2026-05-17.md` and add an entry to the **Built but not bundled** section (or create a new "Built and bundled — awaiting upload" section if it doesn't exist):
+Open `C:\Users\marts\.claude\projects\c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management\memory\kdp-catalog-status-2026-05-17.md` and add an entry to the **Built but not bundled** section (or create a new "Built and bundled â€” awaiting upload" section if it doesn't exist):
 
 ```markdown
-## Built and bundled — awaiting upload (as of 2026-05-2X)
+## Built and bundled â€” awaiting upload (as of 2026-05-2X)
 
-- `large-print-diabetes-log-v1` — SKU A: Large Print Diabetes Log Book for Seniors (124 pp, 8.5x11, $7.99)
-- `cgm-companion-logbook-v1` — SKU C: CGM Companion Logbook (140 pp, 6x9, $8.99)
+- `large-print-diabetes-log-v1` â€” SKU A: Large Print Diabetes Log Book for Seniors (124 pp, 8.5x11, $7.99)
+- `cgm-companion-logbook-v1` â€” SKU C: CGM Companion Logbook (140 pp, 6x9, $8.99)
 ```
 
 Bump the "as of" date in the file header and the memory's `description` line.
 
-- [ ] **Step 4: Final commit**
+- [x] **Step 4: Final commit**
 
 ```bash
 git add C:/Users/marts/.claude/projects/c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management/memory/kdp-catalog-status-2026-05-17.md
@@ -2662,11 +2662,11 @@ EOF
 
 ## Done criteria
 
-- [ ] All 16 tasks checked off
-- [ ] Full pytest suite green
-- [ ] `audit_pdfs.py` exits 0 for both `large-print-diabetes-log-v1` and `cgm-companion-logbook-v1`
-- [ ] Both bundles populated in `output/kdp-ready/`
-- [ ] User can take the two bundles, log into KDP, and complete uploads without further code work
+- [x] All 16 tasks checked off
+- [x] Full pytest suite green
+- [x] `audit_pdfs.py` exits 0 for both `large-print-diabetes-log-v1` and `cgm-companion-logbook-v1`
+- [x] Both bundles populated in `output/kdp-ready/`
+- [x] User can take the two bundles, log into KDP, and complete uploads without further code work
 
 ## Post-plan handoff (human only)
 
@@ -2678,4 +2678,4 @@ The user (not Claude) performs:
    - Upload `interior.pdf` and `cover.pdf` from the bundle
    - Set price from `metadata/*.json`
 3. Submit both for KDP review (~72h turnaround)
-4. Once accepted, update `kdp-catalog-status-2026-05-17.md` to move both SKUs from "Built and bundled — awaiting upload" to "In KDP review"
+4. Once accepted, update `kdp-catalog-status-2026-05-17.md` to move both SKUs from "Built and bundled â€” awaiting upload" to "In KDP review"

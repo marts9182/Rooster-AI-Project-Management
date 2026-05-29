@@ -1,4 +1,4 @@
-# Publishing Ops Dashboard — Plan C: Etsy + Calendar
+﻿# Publishing Ops Dashboard â€” Plan C: Etsy + Calendar
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -20,16 +20,16 @@ You are working inside the outer repo at `C:/Sandbox/AIProjectManagement/Rooster
 
 **Plan A is assumed shipped.** These pieces exist already and you import them:
 
-- `web.ui/backend/db.js` — better-sqlite3 wrapper exporting `openDb()` (opens WAL-mode SQLite + runs migrations, returns a `Database` handle).
-- `web.ui/backend/events.js` — `recordEvent(kind, payload)` writes to `events` table AND fans out to SSE subscribers (single call covers both — there is no separate broadcast export); also exports `subscribe(fn)` and `replayRecent(n)`.
-- `web.ui/backend/workerStatus.js` — exports the procedural functions `setWorkerHeartbeat(worker: string)`, `setWorkerError(worker: string, message: string)`, `getAllStatuses()`, and `trayColor()`. Workers call these directly with their own name string (no factory).
+- `web.ui/backend/db.js` â€” better-sqlite3 wrapper exporting `openDb()` (opens WAL-mode SQLite + runs migrations, returns a `Database` handle).
+- `web.ui/backend/events.js` â€” `recordEvent(kind, payload)` writes to `events` table AND fans out to SSE subscribers (single call covers both â€” there is no separate broadcast export); also exports `subscribe(fn)` and `replayRecent(n)`.
+- `web.ui/backend/workerStatus.js` â€” exports the procedural functions `setWorkerHeartbeat(worker: string)`, `setWorkerError(worker: string, message: string)`, `getAllStatuses()`, and `trayColor()`. Workers call these directly with their own name string (no factory).
 - `/api/events` SSE route lives in `server.js` (set up by Plan A) and emits whatever `recordEvent` sends.
-- Tables `etsy_listings`, `reminders`, `pinterest_queue`, `kdp_books`, `events`, `profile` exist (schema per spec §4).
+- Tables `etsy_listings`, `reminders`, `pinterest_queue`, `kdp_books`, `events`, `profile` exist (schema per spec Â§4).
 - `web.ui/frontend-react/src/pages/EtsyCatalog.tsx`, `EtsyListingDetail.tsx`, `Calendar.tsx` are empty stub components rendered by React Router. You fill them in.
 - `web.ui/frontend-react/src/hooks/useSseChannel.ts` exists; signature: `useSseChannel<T>(channelPrefix: string, onEvent: (e: T) => void)`.
 - `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction` are already in `web.ui/frontend-react/package.json`.
 
-**Plan B may or may not be shipped.** Your calendar aggregator queries `kdp_books` — if the table is empty your aggregator returns zero KDP events, which is fine. Tests use a temp DB with rows you insert directly.
+**Plan B may or may not be shipped.** Your calendar aggregator queries `kdp_books` â€” if the table is empty your aggregator returns zero KDP events, which is fine. Tests use a temp DB with rows you insert directly.
 
 **Test commands (all run from `web.ui/backend/`):**
 
@@ -50,17 +50,17 @@ npm run typecheck                 # tsc --noEmit
 
 - The Etsy v3 `x-api-key` header MUST be `<keystring>:<shared_secret>` (colon-joined). Sending the keystring alone returns 403 `"Shared secret is required in x-api-key header."`.
 - Bearer access token is sent in the `Authorization` header.
-- Token refresh endpoint: `POST https://api.etsy.com/v3/public/oauth/token` with `grant_type=refresh_token`, `client_id=<keystring>`, `refresh_token=<…>` as form data.
+- Token refresh endpoint: `POST https://api.etsy.com/v3/public/oauth/token` with `grant_type=refresh_token`, `client_id=<keystring>`, `refresh_token=<â€¦>` as form data.
 - Refresh response may omit a fresh `refresh_token`; if so, preserve the old one (matches `ensure_fresh_token` semantics in the Python helper).
 - Listings endpoint: `GET https://openapi.etsy.com/v3/application/shops/{shop_id}/listings?state={state}&limit={limit}&offset={offset}`. Default `state=active`. Pass `limit=100` (Etsy's max); page until response `count` is satisfied or `results.length < limit`.
 - Single-listing endpoint: `GET https://openapi.etsy.com/v3/application/listings/{listing_id}`.
 
 **Env vars (read from `web.ui/backend/.env`, gitignored):**
 
-- `ETSY_KEYSTRING` — Etsy app keystring.
-- `ETSY_SHARED_SECRET` — Etsy app shared secret.
-- `ETSY_SHOP_ID` — numeric shop id (66064739 in dev).
-- `ETSY_TOKEN_PATH` — optional override; default `data/etsy_token.json`.
+- `ETSY_KEYSTRING` â€” Etsy app keystring.
+- `ETSY_SHARED_SECRET` â€” Etsy app shared secret.
+- `ETSY_SHOP_ID` â€” numeric shop id (66064739 in dev).
+- `ETSY_TOKEN_PATH` â€” optional override; default `data/etsy_token.json`.
 
 `data/etsy_token.json` is gitignored. Confirm the gitignore entry exists in Task 1.
 
@@ -70,11 +70,11 @@ npm run typecheck                 # tsc --noEmit
 
 **Files:**
 - Modify: `web.ui/backend/.env.example`
-- Modify: `web.ui/backend/.gitignore` (create if missing — verify first)
+- Modify: `web.ui/backend/.gitignore` (create if missing â€” verify first)
 - New: `web.ui/backend/etsy/config.js`
 - New: `web.ui/backend/etsy/__tests__/config.test.js`
 
-- [ ] **Step 1: Verify gitignore and add token path**
+- [x] **Step 1: Verify gitignore and add token path**
 
 Run:
 
@@ -89,12 +89,12 @@ Expected output: file exists and lists `data/` or similar. If `data/etsy_token.j
 data/etsy_token.json
 ```
 
-- [ ] **Step 2: Append Etsy keys to `.env.example`**
+- [x] **Step 2: Append Etsy keys to `.env.example`**
 
 Edit `web.ui/backend/.env.example`, appending:
 
 ```
-# Etsy v3 — required for the etsy syncer
+# Etsy v3 â€” required for the etsy syncer
 ETSY_KEYSTRING=
 ETSY_SHARED_SECRET=
 ETSY_SHOP_ID=
@@ -102,7 +102,7 @@ ETSY_SHOP_ID=
 ETSY_TOKEN_PATH=
 ```
 
-- [ ] **Step 3: Write failing test for `etsyConfig()`**
+- [x] **Step 3: Write failing test for `etsyConfig()`**
 
 Create `web.ui/backend/etsy/__tests__/config.test.js`:
 
@@ -174,7 +174,7 @@ cd web.ui/backend && npm test -- config.test
 
 Expected output: 4 failing tests (`Cannot find module '../config.js'`).
 
-- [ ] **Step 4: Implement `etsy/config.js` to pass tests**
+- [x] **Step 4: Implement `etsy/config.js` to pass tests**
 
 Create `web.ui/backend/etsy/config.js`:
 
@@ -223,7 +223,7 @@ cd web.ui/backend && npm test -- config.test
 
 Expected output: 4 passing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/.env.example web.ui/backend/.gitignore web.ui/backend/etsy/config.js web.ui/backend/etsy/__tests__/config.test.js
@@ -240,7 +240,7 @@ git commit -m "feat(etsy): config loader for keystring/secret/shop_id/token_path
 
 This re-implements the Python helper from `projects/etsy-rooster-shop/src/etsy_rooster/etsy/oauth.py` (function `ensure_fresh_token`) in Node so the dashboard stays fully Node-based.
 
-- [ ] **Step 1: Failing test for token file read/write + refresh**
+- [x] **Step 1: Failing test for token file read/write + refresh**
 
 Create `web.ui/backend/etsy/__tests__/oauth.test.js`:
 
@@ -376,7 +376,7 @@ cd web.ui/backend && npm test -- oauth.test
 
 Expected output: 5 failing tests (`Cannot find module '../oauth.js'`).
 
-- [ ] **Step 2: Implement `etsy/oauth.js`**
+- [x] **Step 2: Implement `etsy/oauth.js`**
 
 Create `web.ui/backend/etsy/oauth.js`:
 
@@ -456,7 +456,7 @@ cd web.ui/backend && npm test -- oauth.test
 
 Expected output: 5 passing.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/backend/etsy/oauth.js web.ui/backend/etsy/__tests__/oauth.test.js
@@ -472,7 +472,7 @@ git commit -m "feat(etsy): Node OAuth refresh helper (port of ensure_fresh_token
 - New: `web.ui/backend/etsy/client.js`
 - New: `web.ui/backend/etsy/__tests__/client.test.js`
 
-- [ ] **Step 1: Add msw dependency**
+- [x] **Step 1: Add msw dependency**
 
 ```bash
 cd web.ui/backend && npm install --save-dev msw@^2.6.0
@@ -480,7 +480,7 @@ cd web.ui/backend && npm install --save-dev msw@^2.6.0
 
 Expected output: `added N packages`. Verify `package.json` now lists `msw` under `devDependencies`.
 
-- [ ] **Step 2: Failing test for `listListings` + `getListing` with msw**
+- [x] **Step 2: Failing test for `listListings` + `getListing` with msw**
 
 Create `web.ui/backend/etsy/__tests__/client.test.js`:
 
@@ -575,7 +575,7 @@ cd web.ui/backend && npm test -- client.test
 
 Expected output: 4 failing tests (`Cannot find module '../client.js'`).
 
-- [ ] **Step 3: Implement `etsy/client.js`**
+- [x] **Step 3: Implement `etsy/client.js`**
 
 Create `web.ui/backend/etsy/client.js`:
 
@@ -689,7 +689,7 @@ cd web.ui/backend && npm test -- client.test
 
 Expected output: 4 passing.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/backend/package.json web.ui/backend/package-lock.json web.ui/backend/etsy/client.js web.ui/backend/etsy/__tests__/client.test.js
@@ -706,7 +706,7 @@ git commit -m "feat(etsy): v3 client wrapper with msw-mocked tests"
 
 Pure SQL helpers wrapping the `etsy_listings` table. Isolating these makes the syncer unit-testable without HTTP.
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 Create `web.ui/backend/etsy/__tests__/repo.test.js`:
 
@@ -799,7 +799,7 @@ cd web.ui/backend && npm test -- repo.test
 
 Expected output: 3 failing tests (`Cannot find module '../repo.js'`).
 
-- [ ] **Step 2: Implement `etsy/repo.js`**
+- [x] **Step 2: Implement `etsy/repo.js`**
 
 Create `web.ui/backend/etsy/repo.js`:
 
@@ -930,7 +930,7 @@ cd web.ui/backend && npm test -- repo.test
 
 Expected output: 3 passing.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/backend/etsy/repo.js web.ui/backend/etsy/__tests__/repo.test.js
@@ -947,7 +947,7 @@ git commit -m "feat(etsy): upsert + diff repository for etsy_listings"
 
 The syncer is the "do one pass" orchestrator. It is wired to the 30-min worker in Task 6. Keeping the loop separate from the pass makes the pass directly unit-testable.
 
-- [ ] **Step 1: Failing test for `runSyncPass`**
+- [x] **Step 1: Failing test for `runSyncPass`**
 
 Create `web.ui/backend/etsy/__tests__/syncer.test.js`:
 
@@ -1033,7 +1033,7 @@ describe('runSyncPass', () => {
     expect(reminders[2].title).toMatch(/Day-90/);
   });
 
-  it('emits etsy:status-changed on transition active→inactive', async () => {
+  it('emits etsy:status-changed on transition activeâ†’inactive', async () => {
     // seed an existing active row
     const client1 = { listAllListings: vi.fn().mockResolvedValue([rowFromEtsy()]) };
     await runSyncPass({ db, client: client1, emit, now: () => new Date('2026-05-26T12:00:00Z') });
@@ -1067,7 +1067,7 @@ cd web.ui/backend && npm test -- syncer.test
 
 Expected output: 4 failing tests.
 
-- [ ] **Step 2: Implement `etsy/syncer.js`**
+- [x] **Step 2: Implement `etsy/syncer.js`**
 
 Create `web.ui/backend/etsy/syncer.js`:
 
@@ -1213,11 +1213,11 @@ cd web.ui/backend && npm test -- syncer.test
 
 Expected output: 4 passing.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/backend/etsy/syncer.js web.ui/backend/etsy/__tests__/syncer.test.js
-git commit -m "feat(etsy): sync pass — upsert + diff + Day-30/60/90 reminders + SSE"
+git commit -m "feat(etsy): sync pass â€” upsert + diff + Day-30/60/90 reminders + SSE"
 ```
 
 ---
@@ -1229,7 +1229,7 @@ git commit -m "feat(etsy): sync pass — upsert + diff + Day-30/60/90 reminders 
 - New: `web.ui/backend/etsy/__tests__/worker.test.js`
 - Modify: `web.ui/backend/server.js`
 
-- [ ] **Step 1: Failing test for `startEtsyWorker`**
+- [x] **Step 1: Failing test for `startEtsyWorker`**
 
 Create `web.ui/backend/etsy/__tests__/worker.test.js`:
 
@@ -1293,7 +1293,7 @@ cd web.ui/backend && npm test -- worker.test
 
 Expected output: 2 failing tests.
 
-- [ ] **Step 2: Implement `etsy/worker.js`**
+- [x] **Step 2: Implement `etsy/worker.js`**
 
 Create `web.ui/backend/etsy/worker.js`:
 
@@ -1373,9 +1373,9 @@ cd web.ui/backend && npm test -- worker.test
 
 Expected output: 2 passing.
 
-- [ ] **Step 3: Wire the worker into `server.js`**
+- [x] **Step 3: Wire the worker into `server.js`**
 
-Open `web.ui/backend/server.js`. Locate the section where Plan A wires up background workers (each worker calls `setWorkerHeartbeat`/`setWorkerError` directly with its own name string — there is no factory). Add the Etsy worker boot. Insert before `app.listen(...)`:
+Open `web.ui/backend/server.js`. Locate the section where Plan A wires up background workers (each worker calls `setWorkerHeartbeat`/`setWorkerError` directly with its own name string â€” there is no factory). Add the Etsy worker boot. Insert before `app.listen(...)`:
 
 ```javascript
 import { startEtsyWorkerDefault } from './etsy/worker.js';
@@ -1397,7 +1397,7 @@ cd web.ui/backend && npm run typecheck && npm test
 
 Expected output: typecheck clean; all Vitest tests green.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/backend/etsy/worker.js web.ui/backend/etsy/__tests__/worker.test.js web.ui/backend/server.js
@@ -1413,7 +1413,7 @@ git commit -m "feat(etsy): 30-min syncer worker wired into server boot"
 - New: `web.ui/backend/etsy/__tests__/routes.test.js`
 - Modify: `web.ui/backend/server.js`
 
-- [ ] **Step 1: Failing test using supertest**
+- [x] **Step 1: Failing test using supertest**
 
 Create `web.ui/backend/etsy/__tests__/routes.test.js`:
 
@@ -1522,7 +1522,7 @@ cd web.ui/backend && npm test -- routes.test
 
 Expected output: 7 failing tests.
 
-- [ ] **Step 2: Implement `etsy/routes.js`**
+- [x] **Step 2: Implement `etsy/routes.js`**
 
 Create `web.ui/backend/etsy/routes.js`:
 
@@ -1586,7 +1586,7 @@ cd web.ui/backend && npm test -- routes.test
 
 Expected output: 7 passing.
 
-- [ ] **Step 3: Mount in `server.js`**
+- [x] **Step 3: Mount in `server.js`**
 
 Edit `web.ui/backend/server.js`. Add the import near other route imports:
 
@@ -1624,23 +1624,23 @@ cd web.ui/backend && npm test
 
 Expected output: all green.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/backend/etsy/routes.js web.ui/backend/etsy/__tests__/routes.test.js web.ui/backend/server.js
-git commit -m "feat(etsy): REST routes — listings list/detail + manual sync"
+git commit -m "feat(etsy): REST routes â€” listings list/detail + manual sync"
 ```
 
 ---
 
-## Task 8: Frontend `/etsy` page — sortable filterable table
+## Task 8: Frontend `/etsy` page â€” sortable filterable table
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/pages/EtsyCatalog.tsx`
 - New: `web.ui/frontend-react/src/pages/__tests__/EtsyCatalog.test.tsx`
 - New: `web.ui/frontend-react/src/services/etsyApi.ts`
 
-- [ ] **Step 1: Implement the API service module**
+- [x] **Step 1: Implement the API service module**
 
 Create `web.ui/frontend-react/src/services/etsyApi.ts`:
 
@@ -1694,7 +1694,7 @@ export async function triggerEtsySync(init?: RequestInit): Promise<{ inserted: n
 }
 ```
 
-- [ ] **Step 2: Failing test for the page**
+- [x] **Step 2: Failing test for the page**
 
 Create `web.ui/frontend-react/src/pages/__tests__/EtsyCatalog.test.tsx`:
 
@@ -1750,7 +1750,7 @@ cd web.ui/frontend-react && npm test -- EtsyCatalog
 
 Expected output: 3 failing tests (the existing page is an empty stub).
 
-- [ ] **Step 3: Implement the page**
+- [x] **Step 3: Implement the page**
 
 Replace `web.ui/frontend-react/src/pages/EtsyCatalog.tsx`:
 
@@ -1763,17 +1763,17 @@ import { useSseChannel } from '../hooks/useSseChannel';
 type SortKey = 'title' | 'status' | 'favorites' | 'views' | 'price_usd' | 'listed_at';
 
 function formatPrice(p: number | null): string {
-  if (p == null) return '—';
+  if (p == null) return 'â€”';
   return `$${p.toFixed(2)}`;
 }
 
 function statusBadge(status: string): string {
   switch (status) {
-    case 'active': return '🟢 active';
-    case 'draft': return '⚪ draft';
-    case 'inactive': return '🟡 inactive';
-    case 'sold_out': return '🔴 sold out';
-    case 'expired': return '🟠 expired';
+    case 'active': return 'ðŸŸ¢ active';
+    case 'draft': return 'âšª draft';
+    case 'inactive': return 'ðŸŸ¡ inactive';
+    case 'sold_out': return 'ðŸ”´ sold out';
+    case 'expired': return 'ðŸŸ  expired';
     default: return status;
   }
 }
@@ -1846,7 +1846,7 @@ export function EtsyCatalog() {
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>Etsy catalog</h1>
         <button onClick={() => void onSyncNow()} disabled={syncing}>
-          {syncing ? 'Syncing…' : 'Sync now'}
+          {syncing ? 'Syncingâ€¦' : 'Sync now'}
         </button>
       </header>
       {error && <div role="alert" style={{ color: 'crimson' }}>{error}</div>}
@@ -1876,12 +1876,12 @@ export function EtsyCatalog() {
             <tr key={r.etsy_listing_id}>
               <td><Link to={`/etsy/${r.etsy_listing_id}`}>{r.title}</Link></td>
               <td>{statusBadge(r.status)}</td>
-              <td>{r.section ?? '—'}</td>
-              <td>{r.niche ?? '—'}</td>
+              <td>{r.section ?? 'â€”'}</td>
+              <td>{r.niche ?? 'â€”'}</td>
               <td>{formatPrice(r.price_usd)}</td>
               <td>{r.favorites}</td>
               <td>{r.views}</td>
-              <td>{r.listed_at?.slice(0, 10) ?? '—'}</td>
+              <td>{r.listed_at?.slice(0, 10) ?? 'â€”'}</td>
             </tr>
           ))}
         </tbody>
@@ -1901,7 +1901,7 @@ cd web.ui/frontend-react && npm test -- EtsyCatalog && npm run typecheck
 
 Expected output: 3 tests passing; typecheck clean.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/services/etsyApi.ts web.ui/frontend-react/src/pages/EtsyCatalog.tsx web.ui/frontend-react/src/pages/__tests__/EtsyCatalog.test.tsx
@@ -1916,7 +1916,7 @@ git commit -m "feat(etsy): catalog page with filters, sort, sync-now, SSE refres
 - Modify: `web.ui/frontend-react/src/pages/EtsyListingDetail.tsx`
 - New: `web.ui/frontend-react/src/pages/__tests__/EtsyListingDetail.test.tsx`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 Create `web.ui/frontend-react/src/pages/__tests__/EtsyListingDetail.test.tsx`:
 
@@ -1973,7 +1973,7 @@ cd web.ui/frontend-react && npm test -- EtsyListingDetail
 
 Expected output: 2 failing.
 
-- [ ] **Step 2: Implement detail page**
+- [x] **Step 2: Implement detail page**
 
 Replace `web.ui/frontend-react/src/pages/EtsyListingDetail.tsx`:
 
@@ -1998,7 +1998,7 @@ export function EtsyListingDetail() {
   }, [listingId]);
 
   if (error) return <div role="alert" style={{ color: 'crimson' }}>{error}</div>;
-  if (!row) return <div>Loading…</div>;
+  if (!row) return <div>Loadingâ€¦</div>;
 
   const sellerDashboardUrl = `https://www.etsy.com/your/shops/me/tools/listings/${row.etsy_listing_id}`;
   const publicUrl = row.listing_url ?? `https://www.etsy.com/listing/${row.etsy_listing_id}`;
@@ -2011,12 +2011,12 @@ export function EtsyListingDetail() {
       </header>
       <dl>
         <dt>Listing ID</dt><dd>{row.etsy_listing_id}</dd>
-        <dt>Section</dt><dd>{row.section ?? '—'}</dd>
-        <dt>Niche</dt><dd>{row.niche ?? '—'}</dd>
-        <dt>Price (USD)</dt><dd>{row.price_usd != null ? `$${row.price_usd.toFixed(2)}` : '—'}</dd>
+        <dt>Section</dt><dd>{row.section ?? 'â€”'}</dd>
+        <dt>Niche</dt><dd>{row.niche ?? 'â€”'}</dd>
+        <dt>Price (USD)</dt><dd>{row.price_usd != null ? `$${row.price_usd.toFixed(2)}` : 'â€”'}</dd>
         <dt>Favorites</dt><dd>{row.favorites}</dd>
         <dt>Views</dt><dd>{row.views}</dd>
-        <dt>Listed at</dt><dd>{row.listed_at?.slice(0, 10) ?? '—'}</dd>
+        <dt>Listed at</dt><dd>{row.listed_at?.slice(0, 10) ?? 'â€”'}</dd>
         <dt>Last synced</dt><dd>{row.last_synced_at}</dd>
       </dl>
       <nav style={{ display: 'flex', gap: 8 }}>
@@ -2039,7 +2039,7 @@ cd web.ui/frontend-react && npm test -- EtsyListingDetail && npm run typecheck
 
 Expected output: 2 passing; typecheck clean.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/pages/EtsyListingDetail.tsx web.ui/frontend-react/src/pages/__tests__/EtsyListingDetail.test.tsx
@@ -2054,9 +2054,9 @@ git commit -m "feat(etsy): listing detail page with deep-link to seller dashboar
 - New: `web.ui/backend/calendar/aggregator.js`
 - New: `web.ui/backend/calendar/__tests__/aggregator.test.js`
 
-The aggregator reads `kdp_books`, `etsy_listings`, `reminders`, `pinterest_queue` and emits a unified array of `{date, kind, title, source_kind, source_id, url}`. Pure — no side effects, fully unit-testable.
+The aggregator reads `kdp_books`, `etsy_listings`, `reminders`, `pinterest_queue` and emits a unified array of `{date, kind, title, source_kind, source_id, url}`. Pure â€” no side effects, fully unit-testable.
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 Create `web.ui/backend/calendar/__tests__/aggregator.test.js`:
 
@@ -2202,7 +2202,7 @@ cd web.ui/backend && npm test -- aggregator.test
 
 Expected output: 6 failing.
 
-- [ ] **Step 2: Implement `calendar/aggregator.js`**
+- [x] **Step 2: Implement `calendar/aggregator.js`**
 
 Create `web.ui/backend/calendar/aggregator.js`:
 
@@ -2252,7 +2252,7 @@ export function aggregateCalendarEvents(db, from, to) {
     });
   }
 
-  // Etsy listings — using the date portion of listed_at
+  // Etsy listings â€” using the date portion of listed_at
   const etsyRows = db
     .prepare(
       `SELECT etsy_listing_id, title, listed_at
@@ -2273,7 +2273,7 @@ export function aggregateCalendarEvents(db, from, to) {
     });
   }
 
-  // Reminders — only pending; date portion of due_at; carry source link if any
+  // Reminders â€” only pending; date portion of due_at; carry source link if any
   const reminderRows = db
     .prepare(
       `SELECT id, title, due_at, source_kind, source_id
@@ -2336,7 +2336,7 @@ cd web.ui/backend && npm test -- aggregator.test
 
 Expected output: 6 passing.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/backend/calendar/aggregator.js web.ui/backend/calendar/__tests__/aggregator.test.js
@@ -2352,7 +2352,7 @@ git commit -m "feat(calendar): pure aggregator over kdp/etsy/reminder/pinterest"
 - New: `web.ui/backend/calendar/__tests__/routes.test.js`
 - Modify: `web.ui/backend/server.js`
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 Create `web.ui/backend/calendar/__tests__/routes.test.js`:
 
@@ -2453,7 +2453,7 @@ cd web.ui/backend && npm test -- routes.test
 
 Expected output: 3 new failing (plus the previously-passing etsy routes still green).
 
-- [ ] **Step 2: Implement `calendar/routes.js`**
+- [x] **Step 2: Implement `calendar/routes.js`**
 
 Create `web.ui/backend/calendar/routes.js`:
 
@@ -2492,7 +2492,7 @@ cd web.ui/backend && npm test
 
 Expected output: all green.
 
-- [ ] **Step 3: Mount in `server.js`**
+- [x] **Step 3: Mount in `server.js`**
 
 Edit `web.ui/backend/server.js`. Add:
 
@@ -2510,7 +2510,7 @@ cd web.ui/backend && npm run typecheck && npm test
 
 Expected output: typecheck clean, all tests green.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/backend/calendar/routes.js web.ui/backend/calendar/__tests__/routes.test.js web.ui/backend/server.js
@@ -2528,7 +2528,7 @@ git commit -m "feat(calendar): /api/calendar/events route over aggregator"
 
 The Calendar drawer needs to act on reminders (snooze / dismiss). Plan D owns reminder *firing*; Plan C owns these CRUD endpoints because the Calendar page is the first consumer.
 
-- [ ] **Step 1: Failing test**
+- [x] **Step 1: Failing test**
 
 Create `web.ui/backend/reminders/__tests__/routes.test.js`:
 
@@ -2608,7 +2608,7 @@ cd web.ui/backend && npm test -- reminders/routes
 
 Expected output: 4 failing.
 
-- [ ] **Step 2: Implement `reminders/routes.js`**
+- [x] **Step 2: Implement `reminders/routes.js`**
 
 Create `web.ui/backend/reminders/routes.js`:
 
@@ -2658,7 +2658,7 @@ cd web.ui/backend && npm test -- reminders/routes
 
 Expected output: 4 passing.
 
-- [ ] **Step 3: Mount in `server.js`**
+- [x] **Step 3: Mount in `server.js`**
 
 Edit `web.ui/backend/server.js`. Add:
 
@@ -2676,7 +2676,7 @@ cd web.ui/backend && npm test
 
 Expected output: all green.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/backend/reminders/routes.js web.ui/backend/reminders/__tests__/routes.test.js web.ui/backend/server.js
@@ -2685,7 +2685,7 @@ git commit -m "feat(reminders): snooze + dismiss action endpoints for calendar d
 
 ---
 
-## Task 13: Frontend `/calendar` page — FullCalendar + filter chips + drawer
+## Task 13: Frontend `/calendar` page â€” FullCalendar + filter chips + drawer
 
 **Files:**
 - New: `web.ui/frontend-react/src/services/calendarApi.ts`
@@ -2693,7 +2693,7 @@ git commit -m "feat(reminders): snooze + dismiss action endpoints for calendar d
 - Modify: `web.ui/frontend-react/src/pages/Calendar.tsx`
 - New: `web.ui/frontend-react/src/pages/__tests__/Calendar.test.tsx`
 
-- [ ] **Step 1: API services**
+- [x] **Step 1: API services**
 
 Create `web.ui/frontend-react/src/services/calendarApi.ts`:
 
@@ -2738,7 +2738,7 @@ export async function snoozeReminder(id: number, hours: number, init?: RequestIn
 }
 ```
 
-- [ ] **Step 2: Failing test for the page**
+- [x] **Step 2: Failing test for the page**
 
 Create `web.ui/frontend-react/src/pages/__tests__/Calendar.test.tsx`:
 
@@ -2801,7 +2801,7 @@ cd web.ui/frontend-react && npm test -- Calendar
 
 Expected output: 3 failing.
 
-- [ ] **Step 3: Implement the page**
+- [x] **Step 3: Implement the page**
 
 Replace `web.ui/frontend-react/src/pages/Calendar.tsx`:
 
@@ -2933,7 +2933,7 @@ export function Calendar() {
           aria-label="event details"
           style={{ position: 'fixed', right: 0, top: 0, width: 360, height: '100vh', background: 'white', boxShadow: '-4px 0 16px rgba(0,0,0,0.1)', padding: 16, overflowY: 'auto' }}
         >
-          <button onClick={() => setSelected(null)} aria-label="close drawer">×</button>
+          <button onClick={() => setSelected(null)} aria-label="close drawer">Ã—</button>
           <h2>{selected.title}</h2>
           <p>Kind: {selected.kind}</p>
           <p>Date: {selected.date}</p>
@@ -2963,7 +2963,7 @@ cd web.ui/frontend-react && npm test -- Calendar && npm run typecheck
 
 Expected output: 3 passing; typecheck clean.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/services/calendarApi.ts web.ui/frontend-react/src/services/reminderApi.ts web.ui/frontend-react/src/pages/Calendar.tsx web.ui/frontend-react/src/pages/__tests__/Calendar.test.tsx
@@ -2980,7 +2980,7 @@ git commit -m "feat(calendar): FullCalendar page with kind filters + reminder dr
 
 The catalog page (Task 8) already reloads on `etsy:*` SSE events. Mirror that on the calendar so newly-listed Etsy items and newly-inserted reminders appear without a manual refresh.
 
-- [ ] **Step 1: Add a failing test**
+- [x] **Step 1: Add a failing test**
 
 Append to `web.ui/frontend-react/src/pages/__tests__/Calendar.test.tsx` inside the existing `describe('<Calendar />')`:
 
@@ -3011,7 +3011,7 @@ cd web.ui/frontend-react && npm test -- Calendar
 
 Expected output: the new test fails (`handlers.find` returns undefined).
 
-- [ ] **Step 2: Wire `useSseChannel` into `Calendar.tsx`**
+- [x] **Step 2: Wire `useSseChannel` into `Calendar.tsx`**
 
 Edit `web.ui/frontend-react/src/pages/Calendar.tsx`. Add the import near the others:
 
@@ -3036,7 +3036,7 @@ cd web.ui/frontend-react && npm test -- Calendar && npm run typecheck
 
 Expected output: 4 passing; typecheck clean.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/pages/Calendar.tsx web.ui/frontend-react/src/pages/__tests__/Calendar.test.tsx
@@ -3049,7 +3049,7 @@ git commit -m "feat(calendar): live refresh on etsy/reminder/kdp/pinterest SSE c
 
 **Files:** (verification only)
 
-- [ ] **Step 1: Run the full backend test suite**
+- [x] **Step 1: Run the full backend test suite**
 
 ```bash
 cd web.ui/backend && npm test
@@ -3057,7 +3057,7 @@ cd web.ui/backend && npm test
 
 Expected output: every Vitest test green; no warnings about open handles. If anything fails, fix before moving on.
 
-- [ ] **Step 2: Run the full frontend test suite + typecheck + lint**
+- [x] **Step 2: Run the full frontend test suite + typecheck + lint**
 
 ```bash
 cd web.ui/frontend-react && npm test && npm run typecheck
@@ -3065,7 +3065,7 @@ cd web.ui/frontend-react && npm test && npm run typecheck
 
 Expected output: every Vitest test green; tsc emits nothing.
 
-- [ ] **Step 3: Boot the server and hit the new endpoints**
+- [x] **Step 3: Boot the server and hit the new endpoints**
 
 In one shell:
 
@@ -3082,11 +3082,11 @@ curl -s "http://127.0.0.1:5000/api/etsy/listings" | head -c 500
 curl -s "http://127.0.0.1:5000/api/calendar/events?from=2026-05-01&to=2026-07-01" | head -c 500
 ```
 
-Expected output: both return JSON with at least `{"listings": …}` or `{"events": …}` keys (empty arrays are fine on a fresh DB). HTTP status 200.
+Expected output: both return JSON with at least `{"listings": â€¦}` or `{"events": â€¦}` keys (empty arrays are fine on a fresh DB). HTTP status 200.
 
 Stop the server (Ctrl-C).
 
-- [ ] **Step 4: Verify `.env.example` is complete**
+- [x] **Step 4: Verify `.env.example` is complete**
 
 Open `web.ui/backend/.env.example`. Confirm it contains:
 
@@ -3104,12 +3104,12 @@ git commit -m "chore(etsy): finalize .env.example for Plan C variables"
 
 (Skip the commit if nothing changed.)
 
-- [ ] **Step 5: Sanity-check git log**
+- [x] **Step 5: Sanity-check git log**
 
 ```bash
 git log --oneline -15
 ```
 
-Expected output: 12–14 new commits with `feat(etsy):`, `feat(calendar):`, and `feat(reminders):` prefixes. No leftover WIP commits.
+Expected output: 12â€“14 new commits with `feat(etsy):`, `feat(calendar):`, and `feat(reminders):` prefixes. No leftover WIP commits.
 
 Plan C complete. Hand off to Plan D (reminders firing + Pinterest) and Plan E (profile + help).

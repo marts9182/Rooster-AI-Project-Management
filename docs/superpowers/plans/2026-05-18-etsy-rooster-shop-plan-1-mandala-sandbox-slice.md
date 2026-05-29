@@ -1,10 +1,10 @@
-# Etsy Rooster Shop — Plan 1: Mandala Sandbox Slice
+﻿# Etsy Rooster Shop â€” Plan 1: Mandala Sandbox Slice
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Take one mandala SVG from generation → LLM-authored Etsy metadata → Etsy sandbox draft listing, end-to-end, via a single CLI invocation. This proves the riskiest integration (Etsy OAuth + API) on the smallest possible scope.
+**Goal:** Take one mandala SVG from generation â†’ LLM-authored Etsy metadata â†’ Etsy sandbox draft listing, end-to-end, via a single CLI invocation. This proves the riskiest integration (Etsy OAuth + API) on the smallest possible scope.
 
-**Architecture:** New Python project at `projects/etsy-rooster-shop/` (sibling to `kdp-puzzle-press`). Pure deterministic mandala renderer + SQLite catalog DB + LLM-driven listing authoring + Etsy Open API v3 client + click CLI. Each component is independently testable. No Nano Banana, no posters, no brand-kit refactor, no batching — those come in Plan 2 and Plan 3.
+**Architecture:** New Python project at `projects/etsy-rooster-shop/` (sibling to `kdp-puzzle-press`). Pure deterministic mandala renderer + SQLite catalog DB + LLM-driven listing authoring + Etsy Open API v3 client + click CLI. Each component is independently testable. No Nano Banana, no posters, no brand-kit refactor, no batching â€” those come in Plan 2 and Plan 3.
 
 **Tech Stack:** Python 3.11+, setuptools, click, sqlite3 (stdlib), requests + requests-oauthlib, anthropic OR google-generativeai (configurable), pytest + pytest-cov, ruff + black + mypy.
 
@@ -24,49 +24,49 @@ nested-repo root.
 
 ```
 projects/etsy-rooster-shop/
-├── pyproject.toml                    # project + dev deps
-├── README.md                         # setup, env vars, OAuth flow, CLI usage
-├── .env.example                      # ETSY_KEYSTRING, ETSY_SHARED_SECRET, GEMINI_API_KEY, etc.
-├── .gitignore                        # data/, .env, ~/.etsy-rooster/
-├── src/etsy_rooster/
-│   ├── __init__.py                   # version
-│   ├── cli.py                        # click entry point: generate, author-metadata, publish, audit
-│   ├── config.py                     # env loading, paths, default model names
-│   ├── catalog_db.py                 # SQLite schema, CRUD, state transitions
-│   ├── svg_render/
-│   │   ├── __init__.py
-│   │   ├── artifact.py               # SvgArtifact dataclass
-│   │   ├── mandala_generator.py      # MandalaGenerator + MandalaParams
-│   │   └── validators.py             # validate_svg(closed paths, viewBox, no-zero-area)
-│   ├── listing_authoring/
-│   │   ├── __init__.py
-│   │   ├── author.py                 # LLMListingAuthor; ListingDraft dataclass
-│   │   └── prompts/
-│   │       └── mandala-prompt.md     # niche prompt for mandala listings
-│   ├── etsy/
-│   │   ├── __init__.py
-│   │   ├── oauth.py                  # PKCE flow, token storage at ~/.etsy-rooster/token.json
-│   │   └── client.py                 # EtsyClient: create_draft_listing, upload_image, upload_file, activate, get
-│   └── publish/
-│       ├── __init__.py
-│       └── orchestrator.py           # high-level: take an AUTHORED sku → Etsy sandbox draft
-├── tests/
-│   ├── __init__.py
-│   ├── conftest.py                   # in-memory db, fake responses
-│   ├── fixtures/
-│   │   └── mandalas/                 # golden SVG outputs for seeds A..E
-│   ├── test_catalog_db.py
-│   ├── test_mandala_generator.py
-│   ├── test_validators.py
-│   ├── test_listing_authoring.py
-│   ├── test_etsy_oauth.py
-│   ├── test_etsy_client.py
-│   ├── test_publish_orchestrator.py
-│   └── integration/
-│       ├── __init__.py
-│       └── test_e2e_sandbox.py       # live; marked @pytest.mark.live
-└── scripts/
-    └── etsy_oauth_setup.py           # interactive OAuth bootstrap; writes token.json
+â”œâ”€â”€ pyproject.toml                    # project + dev deps
+â”œâ”€â”€ README.md                         # setup, env vars, OAuth flow, CLI usage
+â”œâ”€â”€ .env.example                      # ETSY_KEYSTRING, ETSY_SHARED_SECRET, GEMINI_API_KEY, etc.
+â”œâ”€â”€ .gitignore                        # data/, .env, ~/.etsy-rooster/
+â”œâ”€â”€ src/etsy_rooster/
+â”‚   â”œâ”€â”€ __init__.py                   # version
+â”‚   â”œâ”€â”€ cli.py                        # click entry point: generate, author-metadata, publish, audit
+â”‚   â”œâ”€â”€ config.py                     # env loading, paths, default model names
+â”‚   â”œâ”€â”€ catalog_db.py                 # SQLite schema, CRUD, state transitions
+â”‚   â”œâ”€â”€ svg_render/
+â”‚   â”‚   â”œâ”€â”€ __init__.py
+â”‚   â”‚   â”œâ”€â”€ artifact.py               # SvgArtifact dataclass
+â”‚   â”‚   â”œâ”€â”€ mandala_generator.py      # MandalaGenerator + MandalaParams
+â”‚   â”‚   â””â”€â”€ validators.py             # validate_svg(closed paths, viewBox, no-zero-area)
+â”‚   â”œâ”€â”€ listing_authoring/
+â”‚   â”‚   â”œâ”€â”€ __init__.py
+â”‚   â”‚   â”œâ”€â”€ author.py                 # LLMListingAuthor; ListingDraft dataclass
+â”‚   â”‚   â””â”€â”€ prompts/
+â”‚   â”‚       â””â”€â”€ mandala-prompt.md     # niche prompt for mandala listings
+â”‚   â”œâ”€â”€ etsy/
+â”‚   â”‚   â”œâ”€â”€ __init__.py
+â”‚   â”‚   â”œâ”€â”€ oauth.py                  # PKCE flow, token storage at ~/.etsy-rooster/token.json
+â”‚   â”‚   â””â”€â”€ client.py                 # EtsyClient: create_draft_listing, upload_image, upload_file, activate, get
+â”‚   â””â”€â”€ publish/
+â”‚       â”œâ”€â”€ __init__.py
+â”‚       â””â”€â”€ orchestrator.py           # high-level: take an AUTHORED sku â†’ Etsy sandbox draft
+â”œâ”€â”€ tests/
+â”‚   â”œâ”€â”€ __init__.py
+â”‚   â”œâ”€â”€ conftest.py                   # in-memory db, fake responses
+â”‚   â”œâ”€â”€ fixtures/
+â”‚   â”‚   â””â”€â”€ mandalas/                 # golden SVG outputs for seeds A..E
+â”‚   â”œâ”€â”€ test_catalog_db.py
+â”‚   â”œâ”€â”€ test_mandala_generator.py
+â”‚   â”œâ”€â”€ test_validators.py
+â”‚   â”œâ”€â”€ test_listing_authoring.py
+â”‚   â”œâ”€â”€ test_etsy_oauth.py
+â”‚   â”œâ”€â”€ test_etsy_client.py
+â”‚   â”œâ”€â”€ test_publish_orchestrator.py
+â”‚   â””â”€â”€ integration/
+â”‚       â”œâ”€â”€ __init__.py
+â”‚       â””â”€â”€ test_e2e_sandbox.py       # live; marked @pytest.mark.live
+â””â”€â”€ scripts/
+    â””â”€â”€ etsy_oauth_setup.py           # interactive OAuth bootstrap; writes token.json
 ```
 
 ---
@@ -82,7 +82,7 @@ projects/etsy-rooster-shop/
 - Create: `projects/etsy-rooster-shop/tests/__init__.py`
 - Create: `projects/etsy-rooster-shop/tests/conftest.py`
 
-- [ ] **Step 1: Create directory layout and init nested git repo**
+- [x] **Step 1: Create directory layout and init nested git repo**
 
 The outer repo (`Rooster-AI-Project-Management`) gitignores `projects/`.
 Each project is its own git repo, matching the existing `kdp-puzzle-press`
@@ -102,9 +102,9 @@ git init
 ```
 
 The pre-existing `SETUP.md` in this directory will be included in the first
-commit at Step 9 — it's the Etsy account setup runbook.
+commit at Step 9 â€” it's the Etsy account setup runbook.
 
-- [ ] **Step 2: Write pyproject.toml**
+- [x] **Step 2: Write pyproject.toml**
 
 ```toml
 [build-system]
@@ -169,10 +169,10 @@ python_version = "3.11"
 strict = false
 ```
 
-- [ ] **Step 3: Write .env.example**
+- [x] **Step 3: Write .env.example**
 
 ```
-# Etsy Open API v3 — get these from https://www.etsy.com/developers/your-apps
+# Etsy Open API v3 â€” get these from https://www.etsy.com/developers/your-apps
 ETSY_KEYSTRING=
 ETSY_SHARED_SECRET=
 ETSY_REDIRECT_URI=http://localhost:3003/oauth/callback
@@ -189,7 +189,7 @@ ANTHROPIC_API_KEY=
 ETSY_ROOSTER_DATA_DIR=./data
 ```
 
-- [ ] **Step 4: Write .gitignore**
+- [x] **Step 4: Write .gitignore**
 
 ```
 __pycache__/
@@ -207,7 +207,7 @@ data/
 ~/.etsy-rooster/
 ```
 
-- [ ] **Step 5: Write src/etsy_rooster/__init__.py**
+- [x] **Step 5: Write src/etsy_rooster/__init__.py**
 
 ```python
 """Etsy automation pipeline for Pocket Rooster Press."""
@@ -215,7 +215,7 @@ data/
 __version__ = "0.1.0"
 ```
 
-- [ ] **Step 6: Write tests/__init__.py and tests/conftest.py**
+- [x] **Step 6: Write tests/__init__.py and tests/conftest.py**
 
 `tests/__init__.py` is empty.
 
@@ -251,7 +251,7 @@ def tmp_data_dir(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     return data
 ```
 
-- [ ] **Step 7: Write README.md skeleton**
+- [x] **Step 7: Write README.md skeleton**
 
 ```markdown
 # Etsy Rooster Shop
@@ -261,21 +261,21 @@ Automation pipeline for the Pocket Rooster Press sister shop on Etsy.
 ## Setup
 
 1. `pip install -e ".[dev]"` from `projects/etsy-rooster-shop/`.
-2. Copy `.env.example` → `.env` and fill in keys.
+2. Copy `.env.example` â†’ `.env` and fill in keys.
 3. Run `python scripts/etsy_oauth_setup.py` to bootstrap Etsy OAuth.
 4. `etsy-rooster --help` to see commands.
 
 ## CLI
 
-- `etsy-rooster generate mandala --seed <name>` — generate one mandala.
-- `etsy-rooster author-metadata --sku <id>` — LLM authors title/tags/desc.
-- `etsy-rooster publish --sku <id> --env sandbox` — push to Etsy as draft.
-- `etsy-rooster audit` — reconcile DB ↔ Etsy.
+- `etsy-rooster generate mandala --seed <name>` â€” generate one mandala.
+- `etsy-rooster author-metadata --sku <id>` â€” LLM authors title/tags/desc.
+- `etsy-rooster publish --sku <id> --env sandbox` â€” push to Etsy as draft.
+- `etsy-rooster audit` â€” reconcile DB â†” Etsy.
 
 See `docs/superpowers/specs/2026-05-18-etsy-rooster-shop-design.md` for full design.
 ```
 
-- [ ] **Step 8: Install in editable mode and verify**
+- [x] **Step 8: Install in editable mode and verify**
 
 ```bash
 cd projects/etsy-rooster-shop
@@ -285,7 +285,7 @@ python -c "import etsy_rooster; print(etsy_rooster.__version__)"
 
 Expected: `0.1.0`
 
-- [ ] **Step 9: Commit (inside the nested repo)**
+- [x] **Step 9: Commit (inside the nested repo)**
 
 ```bash
 # you are still cd'd into projects/etsy-rooster-shop
@@ -304,7 +304,7 @@ of the Etsy Rooster Shop design spec."
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/catalog_db.py`
 - Create: `projects/etsy-rooster-shop/tests/test_catalog_db.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_catalog_db.py`:
 
@@ -424,7 +424,7 @@ def test_log_op_writes_to_ops_log(in_memory_db: sqlite3.Connection) -> None:
     assert rows[0]["event"] == "generated"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd projects/etsy-rooster-shop
@@ -433,7 +433,7 @@ pytest tests/test_catalog_db.py -v
 
 Expected: 9 errors / collection failures with `ImportError: cannot import name 'CatalogDB' from 'etsy_rooster.catalog_db'`.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 `src/etsy_rooster/catalog_db.py`:
 
@@ -647,7 +647,7 @@ def _now() -> str:
     return datetime.utcnow().isoformat(timespec="seconds") + "Z"
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 pytest tests/test_catalog_db.py -v
@@ -655,7 +655,7 @@ pytest tests/test_catalog_db.py -v
 
 Expected: 9 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/catalog_db.py \
@@ -672,7 +672,7 @@ git commit -m "feat(etsy-rooster-shop): catalog DB with SKU lifecycle"
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/svg_render/artifact.py`
 - Create: `projects/etsy-rooster-shop/tests/test_artifact.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_artifact.py`:
 
@@ -725,7 +725,7 @@ def test_artifact_dimensions_must_be_positive() -> None:
         )
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 pytest tests/test_artifact.py -v
@@ -733,7 +733,7 @@ pytest tests/test_artifact.py -v
 
 Expected: 3 errors with `ImportError`.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `src/etsy_rooster/svg_render/__init__.py`: empty file.
 
@@ -767,7 +767,7 @@ class SvgArtifact:
             raise ValueError(f"dimensions must be positive: got {self.dimensions}")
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 pytest tests/test_artifact.py -v
@@ -775,7 +775,7 @@ pytest tests/test_artifact.py -v
 
 Expected: 3 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/svg_render/
@@ -791,7 +791,7 @@ git commit -m "feat(etsy-rooster-shop): SvgArtifact dataclass"
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/svg_render/validators.py`
 - Create: `projects/etsy-rooster-shop/tests/test_validators.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_validators.py`:
 
@@ -854,7 +854,7 @@ def test_malformed_xml_fails() -> None:
         validate_svg("<svg><circle></svg>")
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 pytest tests/test_validators.py -v
@@ -862,7 +862,7 @@ pytest tests/test_validators.py -v
 
 Expected: 6 import errors.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `src/etsy_rooster/svg_render/validators.py`:
 
@@ -918,7 +918,7 @@ def validate_svg(svg_text: str) -> None:
             raise SvgValidationError(f"zero-area rect width={w} height={h}")
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 pytest tests/test_validators.py -v
@@ -926,7 +926,7 @@ pytest tests/test_validators.py -v
 
 Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/svg_render/validators.py
@@ -943,7 +943,7 @@ git commit -m "feat(etsy-rooster-shop): SVG cut-file validator"
 - Create: `projects/etsy-rooster-shop/tests/test_mandala_generator.py`
 - Create: `projects/etsy-rooster-shop/tests/fixtures/mandalas/alpha.svg` (golden, written by test on first run)
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_mandala_generator.py`:
 
@@ -999,7 +999,7 @@ def test_render_includes_one_ring_per_param() -> None:
     assert svg.count("<circle") == 6 + 8 + 10
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 pytest tests/test_mandala_generator.py -v
@@ -1007,7 +1007,7 @@ pytest tests/test_mandala_generator.py -v
 
 Expected: import error.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `src/etsy_rooster/svg_render/mandala_generator.py`:
 
@@ -1092,7 +1092,7 @@ class MandalaGenerator:
         )
 ```
 
-- [ ] **Step 4: Run tests; first run writes the golden file**
+- [x] **Step 4: Run tests; first run writes the golden file**
 
 ```bash
 pytest tests/test_mandala_generator.py -v
@@ -1100,11 +1100,11 @@ pytest tests/test_mandala_generator.py -v
 
 Expected: 5 passed (the golden test self-bootstraps on first run).
 
-- [ ] **Step 5: Visually inspect the golden**
+- [x] **Step 5: Visually inspect the golden**
 
 Open `tests/fixtures/mandalas/alpha.svg` in a browser or Inkscape. Confirm it looks like a recognizable mandala. If it doesn't, fix `mandala_generator.py` and delete the golden so the next test run rewrites it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/etsy_rooster/svg_render/mandala_generator.py
@@ -1124,7 +1124,7 @@ git commit -m "feat(etsy-rooster-shop): deterministic mandala generator"
 
 We need PNG previews for Etsy thumbnails. Use `cairosvg` since it ships pre-built wheels and handles plain SVG cleanly.
 
-- [ ] **Step 1: Add cairosvg to dependencies**
+- [x] **Step 1: Add cairosvg to dependencies**
 
 In `pyproject.toml` under `[project] dependencies`, add:
 
@@ -1138,7 +1138,7 @@ Then:
 pip install -e ".[dev]"
 ```
 
-- [ ] **Step 2: Write the failing test**
+- [x] **Step 2: Write the failing test**
 
 Append to `tests/test_mandala_generator.py`:
 
@@ -1159,7 +1159,7 @@ def test_render_artifact_writes_svg_and_pngs(tmp_path: Path) -> None:
     assert "mandala" in artifact.theme_tags
 ```
 
-- [ ] **Step 3: Run the new test to verify it fails**
+- [x] **Step 3: Run the new test to verify it fails**
 
 ```bash
 pytest tests/test_mandala_generator.py::test_render_artifact_writes_svg_and_pngs -v
@@ -1167,7 +1167,7 @@ pytest tests/test_mandala_generator.py::test_render_artifact_writes_svg_and_pngs
 
 Expected: `AttributeError: 'MandalaGenerator' object has no attribute 'render_artifact'`.
 
-- [ ] **Step 4: Add render_artifact to MandalaGenerator**
+- [x] **Step 4: Add render_artifact to MandalaGenerator**
 
 Append to `src/etsy_rooster/svg_render/mandala_generator.py`:
 
@@ -1207,7 +1207,7 @@ class MandalaGenerator:
         )
 ```
 
-**Note:** the `class MandalaGenerator:` line should *replace* the existing one — Python doesn't allow re-opening a class. Easier: leave one class block and put both methods in it. Final state of the class:
+**Note:** the `class MandalaGenerator:` line should *replace* the existing one â€” Python doesn't allow re-opening a class. Easier: leave one class block and put both methods in it. Final state of the class:
 
 ```python
 class MandalaGenerator:
@@ -1222,7 +1222,7 @@ class MandalaGenerator:
         ...
 ```
 
-- [ ] **Step 5: Run all mandala tests**
+- [x] **Step 5: Run all mandala tests**
 
 ```bash
 pytest tests/test_mandala_generator.py -v
@@ -1230,7 +1230,7 @@ pytest tests/test_mandala_generator.py -v
 
 Expected: 6 passed.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pyproject.toml \
@@ -1245,10 +1245,10 @@ git commit -m "feat(etsy-rooster-shop): rasterize mandala SVG to PNG preview"
 
 **Files:**
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/__init__.py` (empty)
-- Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/author.py` (partial — just ListingDraft for now)
+- Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/author.py` (partial â€” just ListingDraft for now)
 - Create: `projects/etsy-rooster-shop/tests/test_listing_authoring.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_listing_authoring.py`:
 
@@ -1312,7 +1312,7 @@ def test_empty_description_rejected() -> None:
         )
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 pytest tests/test_listing_authoring.py -v
@@ -1320,7 +1320,7 @@ pytest tests/test_listing_authoring.py -v
 
 Expected: import errors.
 
-- [ ] **Step 3: Implement ListingDraft**
+- [x] **Step 3: Implement ListingDraft**
 
 `src/etsy_rooster/listing_authoring/__init__.py`: empty file.
 
@@ -1365,7 +1365,7 @@ class ListingDraft:
             raise ValueError(f"price_usd must be > 0, got {self.price_usd}")
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 pytest tests/test_listing_authoring.py -v
@@ -1373,7 +1373,7 @@ pytest tests/test_listing_authoring.py -v
 
 Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/listing_authoring/
@@ -1390,7 +1390,7 @@ git commit -m "feat(etsy-rooster-shop): ListingDraft with Etsy field validation"
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/mandala-prompt.md`
 - Modify: `projects/etsy-rooster-shop/tests/test_listing_authoring.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `tests/test_listing_authoring.py`:
 
@@ -1474,7 +1474,7 @@ def _default_prompts_dir() -> Path:
     return Path(_author_mod.__file__).parent / "prompts"
 ```
 
-- [ ] **Step 2: Write the prompt file**
+- [x] **Step 2: Write the prompt file**
 
 `src/etsy_rooster/listing_authoring/prompts/mandala-prompt.md`:
 
@@ -1484,7 +1484,7 @@ def _default_prompts_dir() -> Path:
 You write Etsy listings for procedurally generated mandala SVG cut files for
 Pocket Rooster Press. The shop sells digital downloads (SVG, PNG) for Cricut,
 Silhouette, and similar cutting machines. Voice: warm, calm, hobby-craft tone.
-Never make up the file contents — the artifact summary lists what's included.
+Never make up the file contents â€” the artifact summary lists what's included.
 
 Return a single JSON object with these exact keys:
   title (string, <= 140 chars, keyword-front-loaded)
@@ -1500,7 +1500,7 @@ Niche: {niche}
 Artifact summary: {artifact_summary_json}
 ```
 
-- [ ] **Step 3: Run failing tests**
+- [x] **Step 3: Run failing tests**
 
 ```bash
 pytest tests/test_listing_authoring.py::test_author_mandala_listing_returns_listing_draft -v
@@ -1508,7 +1508,7 @@ pytest tests/test_listing_authoring.py::test_author_mandala_listing_returns_list
 
 Expected: `ImportError: cannot import name 'LLMListingAuthor'`.
 
-- [ ] **Step 4: Implement LLMListingAuthor**
+- [x] **Step 4: Implement LLMListingAuthor**
 
 Append to `src/etsy_rooster/listing_authoring/author.py`:
 
@@ -1564,7 +1564,7 @@ class LLMListingAuthor:
         return system, user
 ```
 
-- [ ] **Step 5: Run tests; verify all pass**
+- [x] **Step 5: Run tests; verify all pass**
 
 ```bash
 pytest tests/test_listing_authoring.py -v
@@ -1572,7 +1572,7 @@ pytest tests/test_listing_authoring.py -v
 
 Expected: 9 passed (6 prior + 3 new).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/etsy_rooster/listing_authoring/
@@ -1588,7 +1588,7 @@ git commit -m "feat(etsy-rooster-shop): LLM-driven listing authoring with retry"
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/gemini_adapter.py`
 - Modify: `projects/etsy-rooster-shop/tests/test_listing_authoring.py`
 
-- [ ] **Step 1: Write the gemini adapter**
+- [x] **Step 1: Write the gemini adapter**
 
 `src/etsy_rooster/listing_authoring/gemini_adapter.py`:
 
@@ -1626,7 +1626,7 @@ class GeminiListingClient:
         return json.loads(text)
 ```
 
-- [ ] **Step 2: Write the live smoke test**
+- [x] **Step 2: Write the live smoke test**
 
 Append to `tests/test_listing_authoring.py`:
 
@@ -1662,15 +1662,15 @@ def test_gemini_authors_a_mandala_listing() -> None:
     assert len(draft.tags) == 13
 ```
 
-- [ ] **Step 3: Run the live test (manual)**
+- [x] **Step 3: Run the live test (manual)**
 
 ```bash
 GEMINI_API_KEY=<your-key> pytest tests/test_listing_authoring.py -v -m live
 ```
 
-Expected: 1 passed. Inspect the printed title and tags — they should look like reasonable Etsy listing copy.
+Expected: 1 passed. Inspect the printed title and tags â€” they should look like reasonable Etsy listing copy.
 
-- [ ] **Step 4: Run non-live tests stay green**
+- [x] **Step 4: Run non-live tests stay green**
 
 ```bash
 pytest tests/test_listing_authoring.py -v
@@ -1678,7 +1678,7 @@ pytest tests/test_listing_authoring.py -v
 
 Expected: 9 passed, 1 deselected (the `@pytest.mark.live` one).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/listing_authoring/gemini_adapter.py
@@ -1704,7 +1704,7 @@ Etsy v3 uses OAuth2 PKCE. Reference: https://developers.etsy.com/documentation/e
 4. POST to `https://api.etsy.com/v3/public/oauth/token` with grant_type=authorization_code + code_verifier.
 5. Persist access_token + refresh_token to `~/.etsy-rooster/token.json`.
 
-- [ ] **Step 1: Write the failing test (pure-logic parts)**
+- [x] **Step 1: Write the failing test (pure-logic parts)**
 
 `tests/test_etsy_oauth.py`:
 
@@ -1781,7 +1781,7 @@ def test_token_store_missing_raises(tmp_path: Path) -> None:
         store.load()
 ```
 
-- [ ] **Step 2: Run failing tests**
+- [x] **Step 2: Run failing tests**
 
 ```bash
 pytest tests/test_etsy_oauth.py -v
@@ -1789,7 +1789,7 @@ pytest tests/test_etsy_oauth.py -v
 
 Expected: import errors.
 
-- [ ] **Step 3: Implement etsy/oauth.py**
+- [x] **Step 3: Implement etsy/oauth.py**
 
 `src/etsy_rooster/etsy/__init__.py`: empty.
 
@@ -1905,7 +1905,7 @@ class TokenStore:
         return time.time() >= data.get("expires_at", 0) - 60
 ```
 
-- [ ] **Step 4: Write the interactive bootstrap script**
+- [x] **Step 4: Write the interactive bootstrap script**
 
 `scripts/etsy_oauth_setup.py`:
 
@@ -2000,7 +2000,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 ```bash
 pytest tests/test_etsy_oauth.py -v
@@ -2008,7 +2008,7 @@ pytest tests/test_etsy_oauth.py -v
 
 Expected: 5 passed.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/etsy_rooster/etsy/
@@ -2026,15 +2026,15 @@ git commit -m "feat(etsy-rooster-shop): Etsy OAuth2 PKCE + token store + bootstr
 - Create: `projects/etsy-rooster-shop/tests/test_etsy_client.py`
 
 Etsy v3 endpoints used in v1:
-- `POST /v3/application/shops/{shop_id}/listings` — create draft listing.
-- `POST /v3/application/shops/{shop_id}/listings/{listing_id}/images` — upload image.
-- `POST /v3/application/shops/{shop_id}/listings/{listing_id}/files` — upload digital file.
-- `PUT /v3/application/shops/{shop_id}/listings/{listing_id}` — update (e.g., state=active).
-- `GET /v3/application/listings/{listing_id}` — read.
+- `POST /v3/application/shops/{shop_id}/listings` â€” create draft listing.
+- `POST /v3/application/shops/{shop_id}/listings/{listing_id}/images` â€” upload image.
+- `POST /v3/application/shops/{shop_id}/listings/{listing_id}/files` â€” upload digital file.
+- `PUT /v3/application/shops/{shop_id}/listings/{listing_id}` â€” update (e.g., state=active).
+- `GET /v3/application/listings/{listing_id}` â€” read.
 
 Auth: `Authorization: Bearer <access_token>` + `x-api-key: <keystring>`.
 
-- [ ] **Step 1: Write failing tests with the `responses` library**
+- [x] **Step 1: Write failing tests with the `responses` library**
 
 `tests/test_etsy_client.py`:
 
@@ -2147,7 +2147,7 @@ def test_rate_limit_retries_then_succeeds(client: EtsyClient) -> None:
     assert len(responses.calls) == 2
 ```
 
-- [ ] **Step 2: Run failing tests**
+- [x] **Step 2: Run failing tests**
 
 ```bash
 pytest tests/test_etsy_client.py -v
@@ -2155,7 +2155,7 @@ pytest tests/test_etsy_client.py -v
 
 Expected: import errors.
 
-- [ ] **Step 3: Implement EtsyClient**
+- [x] **Step 3: Implement EtsyClient**
 
 `src/etsy_rooster/etsy/client.py`:
 
@@ -2303,7 +2303,7 @@ class EtsyClient:
         raise EtsyAPIError(429, "rate-limited after retries")
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 pytest tests/test_etsy_client.py -v
@@ -2311,7 +2311,7 @@ pytest tests/test_etsy_client.py -v
 
 Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/etsy/client.py
@@ -2328,9 +2328,9 @@ git commit -m "feat(etsy-rooster-shop): EtsyClient with retry + multipart upload
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py`
 - Create: `projects/etsy-rooster-shop/tests/test_publish_orchestrator.py`
 
-Takes an AUTHORED sku → calls EtsyClient → records etsy_listing in catalog DB → transitions sku to STAGED.
+Takes an AUTHORED sku â†’ calls EtsyClient â†’ records etsy_listing in catalog DB â†’ transitions sku to STAGED.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_publish_orchestrator.py`:
 
@@ -2407,7 +2407,7 @@ def test_publish_is_idempotent(
     assert etsy.create_draft_listing.call_count == 1
 ```
 
-- [ ] **Step 2: Run failing test**
+- [x] **Step 2: Run failing test**
 
 ```bash
 pytest tests/test_publish_orchestrator.py -v
@@ -2415,7 +2415,7 @@ pytest tests/test_publish_orchestrator.py -v
 
 Expected: import error.
 
-- [ ] **Step 3: Implement orchestrator**
+- [x] **Step 3: Implement orchestrator**
 
 `src/etsy_rooster/publish/__init__.py`: empty.
 
@@ -2456,7 +2456,7 @@ class PublishOrchestrator:
         # Idempotency: if already published, return existing id.
         state = self._db.current_state(sku_id)
         if state in (SkuState.STAGED, SkuState.LIVE):
-            row = self._db._conn.execute(  # pragma: hack — small encapsulation break
+            row = self._db._conn.execute(  # pragma: hack â€” small encapsulation break
                 "SELECT etsy_listing_id FROM etsy_listing WHERE sku_id = ?",
                 (sku_id,),
             ).fetchone()
@@ -2507,7 +2507,7 @@ class PublishOrchestrator:
         return listing_id
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 pytest tests/test_publish_orchestrator.py -v
@@ -2515,7 +2515,7 @@ pytest tests/test_publish_orchestrator.py -v
 
 Expected: 2 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/etsy_rooster/publish/
@@ -2532,7 +2532,7 @@ git commit -m "feat(etsy-rooster-shop): PublishOrchestrator (DB + EtsyClient glu
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`
 - Create: `projects/etsy-rooster-shop/tests/test_cli.py`
 
-- [ ] **Step 1: Write failing CLI tests using click.testing**
+- [x] **Step 1: Write failing CLI tests using click.testing**
 
 `tests/test_cli.py`:
 
@@ -2565,7 +2565,7 @@ def test_generate_mandala_creates_sku(tmp_data_dir: Path) -> None:
     assert len(artifacts) == 1
 ```
 
-- [ ] **Step 2: Run failing test**
+- [x] **Step 2: Run failing test**
 
 ```bash
 pytest tests/test_cli.py -v
@@ -2573,7 +2573,7 @@ pytest tests/test_cli.py -v
 
 Expected: import error.
 
-- [ ] **Step 3: Implement config + cli**
+- [x] **Step 3: Implement config + cli**
 
 `src/etsy_rooster/config.py`:
 
@@ -2620,14 +2620,14 @@ def _db() -> CatalogDB:
     conn = sqlite3.connect(config.db_path())
     db = CatalogDB(conn)
     # init_schema is idempotent once Task 13 Step 4 changes the schema to
-    # `CREATE TABLE IF NOT EXISTS` — see that step. Always safe to call.
+    # `CREATE TABLE IF NOT EXISTS` â€” see that step. Always safe to call.
     db.init_schema()
     return db
 
 
 @click.group()
 def cli() -> None:
-    """Pocket Rooster Press — Etsy automation CLI."""
+    """Pocket Rooster Press â€” Etsy automation CLI."""
 
 
 @cli.group()
@@ -2723,11 +2723,11 @@ def audit() -> None:
 
 **Note on the `_db()` init_schema guard:** the current `CatalogDB.init_schema` will fail if tables already exist. Update `catalog_db.py` to use `CREATE TABLE IF NOT EXISTS` in the schema (one-line edit in each `CREATE TABLE`). Apply this change as part of this task.
 
-- [ ] **Step 4: Update catalog_db.py schema to be idempotent**
+- [x] **Step 4: Update catalog_db.py schema to be idempotent**
 
-Edit `_SCHEMA` in `src/etsy_rooster/catalog_db.py` — replace every `CREATE TABLE ` with `CREATE TABLE IF NOT EXISTS `.
+Edit `_SCHEMA` in `src/etsy_rooster/catalog_db.py` â€” replace every `CREATE TABLE ` with `CREATE TABLE IF NOT EXISTS `.
 
-- [ ] **Step 5: Run tests**
+- [x] **Step 5: Run tests**
 
 ```bash
 pytest tests/test_cli.py -v
@@ -2735,7 +2735,7 @@ pytest tests/test_cli.py -v
 
 Expected: 2 passed.
 
-- [ ] **Step 6: Run all tests**
+- [x] **Step 6: Run all tests**
 
 ```bash
 pytest -v
@@ -2743,7 +2743,7 @@ pytest -v
 
 Expected: all green except `@pytest.mark.live` (skipped).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/etsy_rooster/cli.py \
@@ -2768,7 +2768,7 @@ This is the integration milestone: actually push one mandala to Etsy's API and c
 2. `python scripts/etsy_oauth_setup.py` has been run; `~/.etsy-rooster/token.json` exists.
 3. `ETSY_SHOP_ID` set in `.env` to the user's shop id.
 
-- [ ] **Step 1: Write the integration test**
+- [x] **Step 1: Write the integration test**
 
 `tests/integration/__init__.py`: empty.
 
@@ -2864,7 +2864,7 @@ def test_end_to_end_one_mandala_to_etsy_draft(tmp_path: Path) -> None:
     print(f"View at: https://www.etsy.com/your/shops/me/draft-listings")
 ```
 
-- [ ] **Step 2: Run the integration test (requires real credentials)**
+- [x] **Step 2: Run the integration test (requires real credentials)**
 
 ```bash
 pytest tests/integration/test_e2e_sandbox.py -v -m live -s
@@ -2872,7 +2872,7 @@ pytest tests/integration/test_e2e_sandbox.py -v -m live -s
 
 Expected: 1 passed. The test prints the new draft listing id and a link to inspect it in the Etsy seller dashboard.
 
-- [ ] **Step 3: Manually inspect the draft on Etsy**
+- [x] **Step 3: Manually inspect the draft on Etsy**
 
 Open https://www.etsy.com/your/shops/me/draft-listings. The new mandala draft should be visible with title, tag set, preview image, and an attached digital file (the SVG). Inspect:
 - Title is sensible (not malformed)
@@ -2882,11 +2882,11 @@ Open https://www.etsy.com/your/shops/me/draft-listings. The new mandala draft sh
 
 If anything looks wrong, fix the offending component and rerun.
 
-- [ ] **Step 4: Manually delete the test draft on Etsy**
+- [x] **Step 4: Manually delete the test draft on Etsy**
 
-Click "Delete" on the listing — keeps the dashboard clean for Plan 2 and 3.
+Click "Delete" on the listing â€” keeps the dashboard clean for Plan 2 and 3.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tests/integration/
@@ -2900,7 +2900,7 @@ git commit -m "test(etsy-rooster-shop): end-to-end Etsy sandbox integration test
 **Files:**
 - Modify: `projects/etsy-rooster-shop/README.md`
 
-- [ ] **Step 1: Flesh out README**
+- [x] **Step 1: Flesh out README**
 
 Replace `README.md`:
 
@@ -2909,7 +2909,7 @@ Replace `README.md`:
 
 Automation pipeline for the Pocket Rooster Press sister shop on Etsy.
 
-Status: **Plan 1 complete** — one mandala can be generated, authored, and pushed to Etsy as a draft listing.
+Status: **Plan 1 complete** â€” one mandala can be generated, authored, and pushed to Etsy as a draft listing.
 
 ## Setup
 
@@ -2918,14 +2918,14 @@ Status: **Plan 1 complete** — one mandala can be generated, authored, and push
    pip install -e ".[dev]"
    ```
 2. Copy `.env.example` to `.env` and fill in:
-   - `ETSY_KEYSTRING`, `ETSY_SHARED_SECRET` — from https://www.etsy.com/developers/your-apps
-   - `ETSY_SHOP_ID` — your shop's numeric id
-   - `GEMINI_API_KEY` — same key the KDP project uses
+   - `ETSY_KEYSTRING`, `ETSY_SHARED_SECRET` â€” from https://www.etsy.com/developers/your-apps
+   - `ETSY_SHOP_ID` â€” your shop's numeric id
+   - `GEMINI_API_KEY` â€” same key the KDP project uses
 3. Bootstrap Etsy OAuth (one-time per machine):
    ```bash
    python scripts/etsy_oauth_setup.py
    ```
-   Opens browser → authorize → token saved to `~/.etsy-rooster/token.json`.
+   Opens browser â†’ authorize â†’ token saved to `~/.etsy-rooster/token.json`.
 
 ## CLI Usage
 
@@ -2958,7 +2958,7 @@ pytest -m live -s     # live tests (Gemini + Etsy)
 - Plan 3: scale to 80 SKUs + launch.
 ```
 
-- [ ] **Step 2: Final test sweep**
+- [x] **Step 2: Final test sweep**
 
 ```bash
 pytest -v
@@ -2968,21 +2968,21 @@ black --check src tests
 
 All green.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add README.md
-git commit -m "docs(etsy-rooster-shop): Plan 1 complete — README + setup instructions"
+git commit -m "docs(etsy-rooster-shop): Plan 1 complete â€” README + setup instructions"
 ```
 
 ---
 
 ## Plan 1 Definition of Done
 
-- [ ] All 15 tasks committed.
-- [ ] `pytest` (non-live) passes 100%.
-- [ ] `pytest -m live -s` passes when credentials are present.
-- [ ] One real draft listing was created on Etsy via the integration test and manually verified, then deleted.
-- [ ] README documents setup and CLI.
+- [x] All 15 tasks committed.
+- [x] `pytest` (non-live) passes 100%.
+- [x] `pytest -m live -s` passes when credentials are present.
+- [x] One real draft listing was created on Etsy via the integration test and manually verified, then deleted.
+- [x] README documents setup and CLI.
 
 When Plan 1 is done, Plan 2 picks up with: factor out `pocket_rooster_brand`, add `NanoBananaClient`, build `PosterGenerator`, support `etsy-rooster generate poster`, regenerate prompts directory with `poster-prompt.md`.

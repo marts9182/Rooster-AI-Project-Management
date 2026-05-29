@@ -73,14 +73,14 @@ export function computeProgress(markdown) {
 /**
  * Derive a status label from progress counts.
  * - `done`      → all checkboxes complete (total > 0, open == 0)
- * - `in-flight` → at least one done OR at least one open and at least one done
- * - `open`      → no checkboxes at all (no plan started)
- * For files with checkboxes but zero done → `in-flight` (work has started).
+ * - `in-flight` → at least one done AND at least one open (work has started)
+ * - `open`      → no checkboxes at all, OR checkboxes exist but none are ticked yet
  * @param {PlanProgress} progress
  * @returns {'open'|'in-flight'|'done'}
  */
 export function _statusOf(progress) {
   if (progress.total === 0) return 'open';
+  if (progress.done === 0) return 'open';
   if (progress.open === 0) return 'done';
   return 'in-flight';
 }

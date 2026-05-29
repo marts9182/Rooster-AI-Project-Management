@@ -1,10 +1,10 @@
-# KDP Bookshelf Scraper Implementation Plan
+﻿# KDP Bookshelf Scraper Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Let Claude for Chrome scrape kdp.amazon.com/bookshelf and POST results to a new dashboard ingest endpoint that previews matches against the local catalog, then applies them on user confirmation, establishing the ASIN ↔ slug pairing the dashboard currently lacks.
+**Goal:** Let Claude for Chrome scrape kdp.amazon.com/bookshelf and POST results to a new dashboard ingest endpoint that previews matches against the local catalog, then applies them on user confirmation, establishing the ASIN â†” slug pairing the dashboard currently lacks.
 
-**Architecture:** A new `web.ui/backend/kdp/ingest.js` module computes a preview by matching scraped books to existing dashboard rows (ASIN-first, normalized-title fallback). Previews live for 30 minutes in an in-memory `Map` (`preview_store.js`). Three new routes — `POST /ingest-bookshelf`, `GET /ingest-bookshelf/pending`, `POST /ingest-bookshelf/commit` — are mounted into the existing `createKdpRouter` factory. On the frontend, a `<KdpPendingSyncBanner />` polls `/pending` on mount; when a preview exists, opening `<KdpIngestReviewModal />` lets the user resolve ambiguity, opt into orphan creation, and POST the confirmed mapping to `/commit`. One migration adds two columns (`kdp_status_raw`, `last_scraped_at`); no other schema changes.
+**Architecture:** A new `web.ui/backend/kdp/ingest.js` module computes a preview by matching scraped books to existing dashboard rows (ASIN-first, normalized-title fallback). Previews live for 30 minutes in an in-memory `Map` (`preview_store.js`). Three new routes â€” `POST /ingest-bookshelf`, `GET /ingest-bookshelf/pending`, `POST /ingest-bookshelf/commit` â€” are mounted into the existing `createKdpRouter` factory. On the frontend, a `<KdpPendingSyncBanner />` polls `/pending` on mount; when a preview exists, opening `<KdpIngestReviewModal />` lets the user resolve ambiguity, opt into orphan creation, and POST the confirmed mapping to `/commit`. One migration adds two columns (`kdp_status_raw`, `last_scraped_at`); no other schema changes.
 
 **Tech Stack:** Express + better-sqlite3 + vitest + supertest (backend); React 19 + Vite + TypeScript + vitest + React Testing Library + user-event (frontend).
 
@@ -15,17 +15,17 @@
 ## File Structure
 
 **Created (backend):**
-- `web.ui/backend/migrations/0004_kdp_ingest.sql` — `ALTER TABLE` for two new columns.
-- `web.ui/backend/kdp/status_map.js` — `kdpToDashboardStatus(raw)`.
-- `web.ui/backend/kdp/preview_store.js` — TTL-keyed in-memory preview map.
-- `web.ui/backend/kdp/ingest.js` — `computeIngestPreview()` + `applyIngestCommit()`.
+- `web.ui/backend/migrations/0004_kdp_ingest.sql` â€” `ALTER TABLE` for two new columns.
+- `web.ui/backend/kdp/status_map.js` â€” `kdpToDashboardStatus(raw)`.
+- `web.ui/backend/kdp/preview_store.js` â€” TTL-keyed in-memory preview map.
+- `web.ui/backend/kdp/ingest.js` â€” `computeIngestPreview()` + `applyIngestCommit()`.
 - `web.ui/backend/__tests__/kdp/status_map.test.js`
 - `web.ui/backend/__tests__/kdp/preview_store.test.js`
 - `web.ui/backend/__tests__/kdp/ingest.test.js`
 
 **Modified (backend):**
-- `web.ui/backend/kdp/routes.js` — three new routes wired through the existing `createKdpRouter(opts)` factory.
-- `web.ui/backend/__tests__/kdp/routes.test.js` — five new route-level cases.
+- `web.ui/backend/kdp/routes.js` â€” three new routes wired through the existing `createKdpRouter(opts)` factory.
+- `web.ui/backend/__tests__/kdp/routes.test.js` â€” five new route-level cases.
 
 **Created (frontend):**
 - `web.ui/frontend-react/src/components/KdpPendingSyncBanner.tsx`
@@ -34,36 +34,36 @@
 - `web.ui/frontend-react/src/components/__tests__/KdpIngestReviewModal.test.tsx`
 
 **Modified (frontend):**
-- `web.ui/frontend-react/src/api/kdp.ts` — add `IngestedBook`, `IngestPreview`, `getPendingIngest()`, `commitIngest()`.
-- `web.ui/frontend-react/src/pages/KdpCatalog.tsx` — mount the banner.
-- `web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx` — extend to mock `/api/kdp/ingest-bookshelf/pending`.
+- `web.ui/frontend-react/src/api/kdp.ts` â€” add `IngestedBook`, `IngestPreview`, `getPendingIngest()`, `commitIngest()`.
+- `web.ui/frontend-react/src/pages/KdpCatalog.tsx` â€” mount the banner.
+- `web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx` â€” extend to mock `/api/kdp/ingest-bookshelf/pending`.
 
 **Created (docs):**
-- `docs/kdp-bookshelf-scrape.md` — the Claude-for-Chrome prompt + schema + workflow.
+- `docs/kdp-bookshelf-scrape.md` â€” the Claude-for-Chrome prompt + schema + workflow.
 
 ---
 
-## Task 1: Migration 0004 — add `kdp_status_raw` and `last_scraped_at`
+## Task 1: Migration 0004 â€” add `kdp_status_raw` and `last_scraped_at`
 
 **Files:**
 - Create: `web.ui/backend/migrations/0004_kdp_ingest.sql`
 
-- [ ] **Step 1: Write the migration file**
+- [x] **Step 1: Write the migration file**
 
 Create `web.ui/backend/migrations/0004_kdp_ingest.sql`:
 
 ```sql
--- Migration 0004 — columns for the KDP bookshelf ingest pipeline.
--- Spec: docs/superpowers/specs/2026-05-27-kdp-bookshelf-scraper-design.md §2
+-- Migration 0004 â€” columns for the KDP bookshelf ingest pipeline.
+-- Spec: docs/superpowers/specs/2026-05-27-kdp-bookshelf-scraper-design.md Â§2
 
 ALTER TABLE kdp_books ADD COLUMN kdp_status_raw TEXT;
 ALTER TABLE kdp_books ADD COLUMN last_scraped_at TEXT;
 ```
 
-- [ ] **Step 2: Verify the migration applies cleanly**
+- [x] **Step 2: Verify the migration applies cleanly**
 
 Run: `cd web.ui/backend && npm test`
-Expected: all 370+ existing backend tests still pass — `openDb()` applies the new migration on its first call inside each test, and SQLite's `ALTER TABLE ADD COLUMN` is idempotent at the row level (new columns default to `NULL`).
+Expected: all 370+ existing backend tests still pass â€” `openDb()` applies the new migration on its first call inside each test, and SQLite's `ALTER TABLE ADD COLUMN` is idempotent at the row level (new columns default to `NULL`).
 
 Then verify the live DB also picked it up:
 
@@ -76,13 +76,13 @@ Expected output:
   last_scraped_at TEXT
 ```
 
-(If the live DB doesn't have it yet, simply restart the backend — `openDb()` runs migrations on boot.)
+(If the live DB doesn't have it yet, simply restart the backend â€” `openDb()` runs migrations on boot.)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/backend/migrations/0004_kdp_ingest.sql
-git commit -m "feat(kdp): migration 0004 — kdp_status_raw + last_scraped_at"
+git commit -m "feat(kdp): migration 0004 â€” kdp_status_raw + last_scraped_at"
 ```
 
 ---
@@ -95,7 +95,7 @@ git commit -m "feat(kdp): migration 0004 — kdp_status_raw + last_scraped_at"
 
 Pure function. No I/O, no state. Maps the verbatim KDP status string to the dashboard's normalized enum.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/kdp/status_map.test.js`:
 
@@ -157,12 +157,12 @@ describe('kdpToDashboardStatus', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/status_map.test.js`
-Expected: FAIL — `Cannot find module '../../kdp/status_map.js'`.
+Expected: FAIL â€” `Cannot find module '../../kdp/status_map.js'`.
 
-- [ ] **Step 3: Implement the function**
+- [x] **Step 3: Implement the function**
 
 Create `web.ui/backend/kdp/status_map.js`:
 
@@ -195,12 +195,12 @@ export function kdpToDashboardStatus(raw) {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/status_map.test.js`
 Expected: PASS (7 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/kdp/status_map.js web.ui/backend/__tests__/kdp/status_map.test.js
@@ -217,7 +217,7 @@ git commit -m "feat(kdp): kdpToDashboardStatus mapping helper"
 
 In-memory Map with 30-minute TTL. No persistence. Exposes `put`, `get`, `getLatest`, `delete`, `_resetForTests`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/kdp/preview_store.test.js`:
 
@@ -278,12 +278,12 @@ describe('preview_store', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/preview_store.test.js`
-Expected: FAIL — `Cannot find module '../../kdp/preview_store.js'`.
+Expected: FAIL â€” `Cannot find module '../../kdp/preview_store.js'`.
 
-- [ ] **Step 3: Implement the store**
+- [x] **Step 3: Implement the store**
 
 Create `web.ui/backend/kdp/preview_store.js`:
 
@@ -351,18 +351,18 @@ export function deletePreview(previewId) {
   store.delete(previewId);
 }
 
-/** Test helper — clears the store. */
+/** Test helper â€” clears the store. */
 export function _resetForTests() {
   store.clear();
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/preview_store.test.js`
 Expected: PASS (6 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/kdp/preview_store.js web.ui/backend/__tests__/kdp/preview_store.test.js
@@ -371,7 +371,7 @@ git commit -m "feat(kdp): preview_store with 30-minute TTL"
 
 ---
 
-## Task 4: `ingest.js` — matching + commit logic
+## Task 4: `ingest.js` â€” matching + commit logic
 
 **Files:**
 - Create: `web.ui/backend/kdp/ingest.js`
@@ -379,7 +379,7 @@ git commit -m "feat(kdp): preview_store with 30-minute TTL"
 
 The matching algorithm and commit transaction. This is the biggest single module in the plan.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/backend/__tests__/kdp/ingest.test.js`:
 
@@ -670,18 +670,18 @@ describe('applyIngestCommit', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/ingest.test.js`
-Expected: FAIL — `Cannot find module '../../kdp/ingest.js'`.
+Expected: FAIL â€” `Cannot find module '../../kdp/ingest.js'`.
 
-- [ ] **Step 3: Implement the module**
+- [x] **Step 3: Implement the module**
 
 Create `web.ui/backend/kdp/ingest.js`:
 
 ```js
 /**
- * KDP bookshelf ingest — match scraped books to dashboard rows, then commit.
+ * KDP bookshelf ingest â€” match scraped books to dashboard rows, then commit.
  *
  * No HTTP layer here; the routes module wraps these functions.
  *
@@ -721,7 +721,7 @@ import { kdpToDashboardStatus } from './status_map.js';
 /**
  * Normalize a title for fuzzy matching:
  *  - lowercase
- *  - "Vol. N" / "Vol N" / "Volume N" → "vol-N"
+ *  - "Vol. N" / "Vol N" / "Volume N" â†’ "vol-N"
  *  - drop everything after the first colon (subtitle)
  *  - replace non-alphanumeric runs with hyphens
  *  - trim leading/trailing hyphens
@@ -887,7 +887,7 @@ export function applyIngestCommit({
 
   /**
    * Resolve a scraped book's dashboard status string. Returns null when
-   * the KDP status is unmapped — caller skips that row.
+   * the KDP status is unmapped â€” caller skips that row.
    *
    * @param {string} kdpStatus
    * @returns {string | null}
@@ -978,12 +978,12 @@ export function applyIngestCommit({
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/ingest.test.js`
-Expected: PASS (all describe blocks — 4 normalize, 7 preview, 5 commit = 16 tests).
+Expected: PASS (all describe blocks â€” 4 normalize, 7 preview, 5 commit = 16 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/kdp/ingest.js web.ui/backend/__tests__/kdp/ingest.test.js
@@ -998,7 +998,7 @@ git commit -m "feat(kdp): ingest preview + commit logic"
 - Modify: `web.ui/backend/kdp/routes.js`
 - Test: `web.ui/backend/__tests__/kdp/routes.test.js`
 
-- [ ] **Step 1: Write the failing tests (append to routes.test.js)**
+- [x] **Step 1: Write the failing tests (append to routes.test.js)**
 
 Append to `web.ui/backend/__tests__/kdp/routes.test.js` inside the same top-level test setup (it already has its own `app` builder). Add a new `describe` block at the end of the file, before any final closing braces:
 
@@ -1103,7 +1103,7 @@ describe('Ingest routes', () => {
 });
 ```
 
-Also, at the top of `routes.test.js`, add `_resetForTests as _resetPreviewStore` to the imports — and make sure `beforeEach` (or the existing setup) calls `_resetPreviewStore()` to keep the store clean across the new tests. Find the existing `beforeEach` block and append the reset call to it. If you can't find a clear single `beforeEach`, add a fresh one scoped to the `describe('Ingest routes', ...)` block:
+Also, at the top of `routes.test.js`, add `_resetForTests as _resetPreviewStore` to the imports â€” and make sure `beforeEach` (or the existing setup) calls `_resetPreviewStore()` to keep the store clean across the new tests. Find the existing `beforeEach` block and append the reset call to it. If you can't find a clear single `beforeEach`, add a fresh one scoped to the `describe('Ingest routes', ...)` block:
 
 ```js
 // add this at the very top of the new describe block, right under describe('Ingest routes', () => {
@@ -1118,12 +1118,12 @@ Top-of-file import change:
 import { _resetForTests as _resetPreviewStore } from '../../kdp/preview_store.js';
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/routes.test.js`
-Expected: FAIL — `Cannot POST /api/kdp/ingest-bookshelf`, etc.
+Expected: FAIL â€” `Cannot POST /api/kdp/ingest-bookshelf`, etc.
 
-- [ ] **Step 3: Implement the three routes**
+- [x] **Step 3: Implement the three routes**
 
 Edit `web.ui/backend/kdp/routes.js`. Add imports at the top, next to the existing `import { renderPreviewsForBook }` line:
 
@@ -1163,7 +1163,7 @@ Add a helper near the top of `createKdpRouter`'s body (after `const router = exp
 Add the three routes inside `createKdpRouter`, before `return router;`:
 
 ```js
-  // ── Ingest: POST scraped bookshelf, return preview ──────────────────────
+  // â”€â”€ Ingest: POST scraped bookshelf, return preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   router.post('/ingest-bookshelf', (req, res) => {
     const body = req.body ?? {};
     const books = Array.isArray(body.books) ? body.books : null;
@@ -1184,13 +1184,13 @@ Add the three routes inside `createKdpRouter`, before `return router;`:
     res.json(preview);
   });
 
-  // ── Ingest: GET pending preview ─────────────────────────────────────────
+  // â”€â”€ Ingest: GET pending preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   router.get('/ingest-bookshelf/pending', (_req, res) => {
     const preview = getLatestPreview();
     res.json({ preview });
   });
 
-  // ── Ingest: POST commit ─────────────────────────────────────────────────
+  // â”€â”€ Ingest: POST commit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   router.post('/ingest-bookshelf/commit', (req, res) => {
     const body = req.body ?? {};
     const previewId = typeof body.preview_id === 'string' ? body.preview_id : null;
@@ -1227,17 +1227,17 @@ Add the three routes inside `createKdpRouter`, before `return router;`:
   });
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/backend && npm test -- --run __tests__/kdp/routes.test.js`
-Expected: PASS — original KDP route tests + 6 new ingest route tests.
+Expected: PASS â€” original KDP route tests + 6 new ingest route tests.
 
 Then run the full backend suite to confirm nothing else broke:
 
 Run: `cd web.ui/backend && npm test`
 Expected: all PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/backend/kdp/routes.js web.ui/backend/__tests__/kdp/routes.test.js
@@ -1246,14 +1246,14 @@ git commit -m "feat(kdp): ingest-bookshelf + pending + commit routes"
 
 ---
 
-## Task 6: Frontend API client — types + two functions
+## Task 6: Frontend API client â€” types + two functions
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/api/kdp.ts`
 
-- [ ] **Step 1: Add the types and fetch wrappers**
+- [x] **Step 1: Add the types and fetch wrappers**
 
-Edit `web.ui/frontend-react/src/api/kdp.ts`. After the existing exports, before the file-final `export { ApiError };` (or the last export — the file's exact shape determines where, but append AFTER the existing book-detail/list helpers), insert:
+Edit `web.ui/frontend-react/src/api/kdp.ts`. After the existing exports, before the file-final `export { ApiError };` (or the last export â€” the file's exact shape determines where, but append AFTER the existing book-detail/list helpers), insert:
 
 ```ts
 export interface IngestedBook {
@@ -1329,14 +1329,14 @@ export async function commitIngest(args: {
 }
 ```
 
-(If the file uses a local `throwForStatus` helper for other functions, use it instead of inlining the `ApiError` — match the existing style.)
+(If the file uses a local `throwForStatus` helper for other functions, use it instead of inlining the `ApiError` â€” match the existing style.)
 
-- [ ] **Step 2: Type-check**
+- [x] **Step 2: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/api/kdp.ts
@@ -1351,7 +1351,7 @@ git commit -m "feat(kdp): typed wrappers for ingest preview + commit"
 - Create: `web.ui/frontend-react/src/components/KdpPendingSyncBanner.tsx`
 - Test: `web.ui/frontend-react/src/components/__tests__/KdpPendingSyncBanner.test.tsx`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `web.ui/frontend-react/src/components/__tests__/KdpPendingSyncBanner.test.tsx`:
 
@@ -1423,12 +1423,12 @@ describe('KdpPendingSyncBanner', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/KdpPendingSyncBanner.test.tsx`
-Expected: FAIL — `Cannot find module '../KdpPendingSyncBanner'`.
+Expected: FAIL â€” `Cannot find module '../KdpPendingSyncBanner'`.
 
-- [ ] **Step 3: Implement the banner**
+- [x] **Step 3: Implement the banner**
 
 Create `web.ui/frontend-react/src/components/KdpPendingSyncBanner.tsx`:
 
@@ -1480,7 +1480,7 @@ export default function KdpPendingSyncBanner({ onApplied }: Props) {
         }}
       >
         <span>
-          <strong>Pending KDP sync</strong> — {matched} matched, {ambiguous} ambiguous, {orphans} orphan{orphans === 1 ? '' : 's'}
+          <strong>Pending KDP sync</strong> â€” {matched} matched, {ambiguous} ambiguous, {orphans} orphan{orphans === 1 ? '' : 's'}
         </span>
         <button
           type="button"
@@ -1506,19 +1506,19 @@ export default function KdpPendingSyncBanner({ onApplied }: Props) {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/KdpPendingSyncBanner.test.tsx`
-Expected: FAIL — the banner imports `KdpIngestReviewModal` which we haven't built yet. That's intentional; Task 8 builds the modal and the import resolves then. Skip the banner test run until Task 8 lands.
+Expected: FAIL â€” the banner imports `KdpIngestReviewModal` which we haven't built yet. That's intentional; Task 8 builds the modal and the import resolves then. Skip the banner test run until Task 8 lands.
 
 Instead, do a type-check now:
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
-Expected: error — cannot find module `./KdpIngestReviewModal`. Continue to Task 8 — the type-check will pass after Task 8 creates the modal.
+Expected: error â€” cannot find module `./KdpIngestReviewModal`. Continue to Task 8 â€” the type-check will pass after Task 8 creates the modal.
 
-- [ ] **Step 5: Commit (do this after Task 8 too if you want a single combined commit; otherwise commit now)**
+- [x] **Step 5: Commit (do this after Task 8 too if you want a single combined commit; otherwise commit now)**
 
-Defer the commit to after Task 8 — they form a single feature unit. Leave the banner uncommitted in the working tree.
+Defer the commit to after Task 8 â€” they form a single feature unit. Leave the banner uncommitted in the working tree.
 
 ---
 
@@ -1528,7 +1528,7 @@ Defer the commit to after Task 8 — they form a single feature unit. Leave the 
 - Create: `web.ui/frontend-react/src/components/KdpIngestReviewModal.tsx`
 - Test: `web.ui/frontend-react/src/components/__tests__/KdpIngestReviewModal.test.tsx`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `web.ui/frontend-react/src/components/__tests__/KdpIngestReviewModal.test.tsx`:
 
@@ -1676,12 +1676,12 @@ describe('KdpIngestReviewModal', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/KdpIngestReviewModal.test.tsx`
-Expected: FAIL — `Cannot find module '../KdpIngestReviewModal'`.
+Expected: FAIL â€” `Cannot find module '../KdpIngestReviewModal'`.
 
-- [ ] **Step 3: Implement the modal**
+- [x] **Step 3: Implement the modal**
 
 Create `web.ui/frontend-react/src/components/KdpIngestReviewModal.tsx`:
 
@@ -1768,11 +1768,11 @@ export default function KdpIngestReviewModal({ preview, onClose, onApplied }: Pr
           <ul>
             {preview.matches.map((m) => (
               <li key={m.dashboard_slug}>
-                <strong>{m.dashboard_slug}</strong>: {m.dashboard_title_before} → {m.scraped.kdp_title}
-                {' · '}ASIN {m.scraped.asin}
-                {' · '}{m.scraped.kdp_status} → {m.new_dashboard_status}
-                {m.title_will_change && <span style={{ color: '#b58105' }}> ●</span>}
-                {m.status_ambiguous && <span style={{ color: '#b91c1c' }}> ●</span>}
+                <strong>{m.dashboard_slug}</strong>: {m.dashboard_title_before} â†’ {m.scraped.kdp_title}
+                {' Â· '}ASIN {m.scraped.asin}
+                {' Â· '}{m.scraped.kdp_status} â†’ {m.new_dashboard_status}
+                {m.title_will_change && <span style={{ color: '#b58105' }}> â—</span>}
+                {m.status_ambiguous && <span style={{ color: '#b91c1c' }}> â—</span>}
               </li>
             ))}
           </ul>
@@ -1794,11 +1794,11 @@ export default function KdpIngestReviewModal({ preview, onClose, onApplied }: Pr
                     }))
                   }
                 >
-                  <option value="">— pick one —</option>
+                  <option value="">â€” pick one â€”</option>
                   {a.candidate_slugs.map((s) => (
                     <option key={s} value={s}>{s}</option>
                   ))}
-                  <option value="__skip__">— skip this —</option>
+                  <option value="__skip__">â€” skip this â€”</option>
                 </select>
               </label>
             </div>
@@ -1831,7 +1831,7 @@ export default function KdpIngestReviewModal({ preview, onClose, onApplied }: Pr
           <h3>Missing from KDP ({preview.missing_from_kdp.length})</h3>
           <ul>
             {preview.missing_from_kdp.map((m) => (
-              <li key={m.dashboard_slug}>{m.dashboard_slug} — {m.dashboard_title}</li>
+              <li key={m.dashboard_slug}>{m.dashboard_slug} â€” {m.dashboard_title}</li>
             ))}
           </ul>
         </section>
@@ -1852,7 +1852,7 @@ export default function KdpIngestReviewModal({ preview, onClose, onApplied }: Pr
             onClick={() => void handleApply()}
             disabled={!allAmbiguousResolved || submitting}
           >
-            {submitting ? 'Applying…' : 'Apply'}
+            {submitting ? 'Applyingâ€¦' : 'Apply'}
           </button>
         </div>
       </div>
@@ -1861,17 +1861,17 @@ export default function KdpIngestReviewModal({ preview, onClose, onApplied }: Pr
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/components/__tests__/KdpIngestReviewModal.test.tsx src/components/__tests__/KdpPendingSyncBanner.test.tsx`
-Expected: PASS — all 5 modal tests + both banner tests.
+Expected: PASS â€” all 5 modal tests + both banner tests.
 
-- [ ] **Step 5: Type-check**
+- [x] **Step 5: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 6: Commit (combined banner + modal)**
+- [x] **Step 6: Commit (combined banner + modal)**
 
 ```bash
 git add web.ui/frontend-react/src/components/KdpPendingSyncBanner.tsx \
@@ -1889,7 +1889,7 @@ git commit -m "feat(kdp): pending-sync banner + ingest review modal"
 - Modify: `web.ui/frontend-react/src/pages/KdpCatalog.tsx`
 - Modify: `web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx`
 
-- [ ] **Step 1: Extend the page test to expect the banner**
+- [x] **Step 1: Extend the page test to expect the banner**
 
 Edit `web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx`. Locate the existing `beforeEach` mock setup. If it's URL-routed (like the EtsyCatalog test we updated earlier in this session), add a branch for `/api/kdp/ingest-bookshelf/pending` that returns `{ preview: null }` by default. Otherwise, for each existing test that mounts the page, prepend a `.mockResolvedValueOnce(...)` for the banner's `getPendingIngest()` call.
 
@@ -1926,9 +1926,9 @@ Add one new test at the end of the existing describe block:
   });
 ```
 
-(The exact `MemoryRouter` import + the way `KdpCatalog` is rendered should match the existing tests in the file — copy their pattern.)
+(The exact `MemoryRouter` import + the way `KdpCatalog` is rendered should match the existing tests in the file â€” copy their pattern.)
 
-- [ ] **Step 2: Modify `KdpCatalog.tsx`**
+- [x] **Step 2: Modify `KdpCatalog.tsx`**
 
 Edit `web.ui/frontend-react/src/pages/KdpCatalog.tsx`. Add this import near the other component imports:
 
@@ -1936,7 +1936,7 @@ Edit `web.ui/frontend-react/src/pages/KdpCatalog.tsx`. Add this import near the 
 import KdpPendingSyncBanner from '../components/KdpPendingSyncBanner';
 ```
 
-Locate the JSX `return` in `KdpCatalog`. Mount the banner above the existing table, after the `<h1>`-style page header and before the table/filters. Pass `onApplied={() => reloadCatalog()}` (or whatever the existing catalog refresh callback is — find the one used by other refresh paths in the file). If no such helper exists, follow the EtsyCatalog precedent: pass a closure that re-runs the existing `useEffect` data fetch by bumping a state variable, e.g.:
+Locate the JSX `return` in `KdpCatalog`. Mount the banner above the existing table, after the `<h1>`-style page header and before the table/filters. Pass `onApplied={() => reloadCatalog()}` (or whatever the existing catalog refresh callback is â€” find the one used by other refresh paths in the file). If no such helper exists, follow the EtsyCatalog precedent: pass a closure that re-runs the existing `useEffect` data fetch by bumping a state variable, e.g.:
 
 ```tsx
 const [reloadKey, setReloadKey] = useState(0);
@@ -1945,9 +1945,9 @@ const [reloadKey, setReloadKey] = useState(0);
 <KdpPendingSyncBanner onApplied={() => setReloadKey((k) => k + 1)} />
 ```
 
-(Match the page's existing refresh pattern — if there's already a `reload()` function or a state-bumping refresh trigger from earlier work, reuse it.)
+(Match the page's existing refresh pattern â€” if there's already a `reload()` function or a state-bumping refresh trigger from earlier work, reuse it.)
 
-- [ ] **Step 3: Run page tests + full frontend suite**
+- [x] **Step 3: Run page tests + full frontend suite**
 
 Run: `cd web.ui/frontend-react && npm test -- --run src/__tests__/KdpCatalog.test.tsx`
 Expected: PASS, including the new banner test.
@@ -1957,12 +1957,12 @@ Then:
 Run: `cd web.ui/frontend-react && npm test`
 Expected: all tests PASS.
 
-- [ ] **Step 4: Type-check**
+- [x] **Step 4: Type-check**
 
 Run: `cd web.ui/frontend-react && npx tsc --noEmit`
 Expected: no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add web.ui/frontend-react/src/pages/KdpCatalog.tsx web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx
@@ -1976,7 +1976,7 @@ git commit -m "feat(kdp): mount pending-sync banner on /kdp"
 **Files:**
 - Create: `docs/kdp-bookshelf-scrape.md`
 
-- [ ] **Step 1: Write the documentation**
+- [x] **Step 1: Write the documentation**
 
 Create `docs/kdp-bookshelf-scrape.md`:
 
@@ -2002,8 +2002,8 @@ Paste this into Claude for Chrome on the bookshelf tab:
 > Scrape every book on this KDP bookshelf page. For each book, capture:
 > - the ASIN (typically a `B0`-prefixed 10-character code visible in the link or row),
 > - the verbatim title text exactly as KDP displays it,
-> - the verbatim status label — one of "Live", "In Review", "Draft", "Blocked", or "Unpublished",
-> - the format — one of "Paperback", "Kindle eBook", or "Hardcover".
+> - the verbatim status label â€” one of "Live", "In Review", "Draft", "Blocked", or "Unpublished",
+> - the format â€” one of "Paperback", "Kindle eBook", or "Hardcover".
 >
 > Then POST the result as JSON to http://localhost:5000/api/kdp/ingest-bookshelf with this shape:
 > ```
@@ -2047,14 +2047,14 @@ restarts mid-review, just re-run the scrape.
 The dashboard's local `kdp_books` table has every book's local-build state
 (title, page count, price, cover) but no link to the live KDP product. This
 workflow uses your existing browser session against KDP (via Claude for
-Chrome) as the data source — no KDP API key, no OAuth, no scraper
+Chrome) as the data source â€” no KDP API key, no OAuth, no scraper
 authentication of our own.
 
 See [`docs/superpowers/specs/2026-05-27-kdp-bookshelf-scraper-design.md`](superpowers/specs/2026-05-27-kdp-bookshelf-scraper-design.md)
 for the full design.
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add docs/kdp-bookshelf-scrape.md
@@ -2065,28 +2065,28 @@ git commit -m "docs(kdp): bookshelf scrape workflow via claude for chrome"
 
 ## Self-Review
 
-**Spec coverage check** — every spec requirement maps to a task:
+**Spec coverage check** â€” every spec requirement maps to a task:
 
-- §1 end-to-end flow → Tasks 5 (routes) + 7/8 (banner + modal) + 10 (docs).
-- §1 payload contract `{books: [{asin, kdp_title, kdp_status, format}]}` → Task 5 (validation) + Task 10 (prompt).
-- §2 migration `kdp_status_raw` + `last_scraped_at` → Task 1.
-- §2 `kdpToDashboardStatus` mapping → Task 2.
-- §2 matching algorithm (ASIN, normalized title, ambiguous, orphan, missing_from_kdp) → Task 4.
-- §2 preview store with 30-min TTL → Task 3.
-- §2 three routes (POST ingest, GET pending, POST commit) → Task 5.
-- §2 commit semantics (title replacement, status mapping, ambiguous resolution, orphan creation, skipped counts) → Task 4 (logic) + Task 5 (route).
-- §3 banner UX (counts in copy, Review button, mounts on /kdp) → Tasks 7 + 9.
-- §3 modal UX (four sections, ambiguous gating, orphan checkboxes, Apply error inline) → Task 8.
-- §3 docs file → Task 10.
-- §3 frontend types (`IngestedBook`, `IngestPreview*`, `CommitResult`) → Task 6.
+- Â§1 end-to-end flow â†’ Tasks 5 (routes) + 7/8 (banner + modal) + 10 (docs).
+- Â§1 payload contract `{books: [{asin, kdp_title, kdp_status, format}]}` â†’ Task 5 (validation) + Task 10 (prompt).
+- Â§2 migration `kdp_status_raw` + `last_scraped_at` â†’ Task 1.
+- Â§2 `kdpToDashboardStatus` mapping â†’ Task 2.
+- Â§2 matching algorithm (ASIN, normalized title, ambiguous, orphan, missing_from_kdp) â†’ Task 4.
+- Â§2 preview store with 30-min TTL â†’ Task 3.
+- Â§2 three routes (POST ingest, GET pending, POST commit) â†’ Task 5.
+- Â§2 commit semantics (title replacement, status mapping, ambiguous resolution, orphan creation, skipped counts) â†’ Task 4 (logic) + Task 5 (route).
+- Â§3 banner UX (counts in copy, Review button, mounts on /kdp) â†’ Tasks 7 + 9.
+- Â§3 modal UX (four sections, ambiguous gating, orphan checkboxes, Apply error inline) â†’ Task 8.
+- Â§3 docs file â†’ Task 10.
+- Â§3 frontend types (`IngestedBook`, `IngestPreview*`, `CommitResult`) â†’ Task 6.
 
 No gaps.
 
-**Placeholder scan:** every step has actual code or actual commands. No "TBD" / "etc." / "similar to…" references.
+**Placeholder scan:** every step has actual code or actual commands. No "TBD" / "etc." / "similar toâ€¦" references.
 
 **Type consistency:**
-- `IngestedBook`, `IngestPreviewMatch`, `IngestPreviewAmbiguous`, `IngestPreviewOrphan`, `IngestPreviewMissing`, `IngestPreview`, `CommitResult` — same shape in backend JSDoc (Task 4) and frontend interfaces (Task 6). ✓
-- `Match.kind` is `'MATCHED_BY_ASIN' | 'MATCHED_BY_TITLE'` everywhere it appears. ✓
-- Commit body shape `{preview_id, confirmed_orphans, ambiguous_resolutions}` consistent between backend route (Task 5), modal (Task 8), API client (Task 6), and tests. ✓
-- `applyIngestCommit` returns `{applied, created, skipped, errors}` — same in commit route (Task 5), modal success copy (Task 8), and frontend tests (Tasks 4/8). ✓
-- `getPendingIngest()` returns `IngestPreview | null` — banner test mocks this shape (Task 7); modal accepts an `IngestPreview` directly via props (Task 8). ✓
+- `IngestedBook`, `IngestPreviewMatch`, `IngestPreviewAmbiguous`, `IngestPreviewOrphan`, `IngestPreviewMissing`, `IngestPreview`, `CommitResult` â€” same shape in backend JSDoc (Task 4) and frontend interfaces (Task 6). âœ“
+- `Match.kind` is `'MATCHED_BY_ASIN' | 'MATCHED_BY_TITLE'` everywhere it appears. âœ“
+- Commit body shape `{preview_id, confirmed_orphans, ambiguous_resolutions}` consistent between backend route (Task 5), modal (Task 8), API client (Task 6), and tests. âœ“
+- `applyIngestCommit` returns `{applied, created, skipped, errors}` â€” same in commit route (Task 5), modal success copy (Task 8), and frontend tests (Tasks 4/8). âœ“
+- `getPendingIngest()` returns `IngestPreview | null` â€” banner test mocks this shape (Task 7); modal accepts an `IngestPreview` directly via props (Task 8). âœ“

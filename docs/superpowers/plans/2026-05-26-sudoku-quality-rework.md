@@ -1,8 +1,8 @@
-# Sudoku Quality Rework Implementation Plan
+﻿# Sudoku Quality Rework Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Replace the broken sudoku generator with one that produces puzzles with verified unique solutions, 180° rotational symmetry, and difficulty matched to required solving techniques; add a per-book audit field to the dashboard; regenerate the 3 live sudoku SKUs.
+**Goal:** Replace the broken sudoku generator with one that produces puzzles with verified unique solutions, 180Â° rotational symmetry, and difficulty matched to required solving techniques; add a per-book audit field to the dashboard; regenerate the 3 live sudoku SKUs.
 
 **Architecture:** Three commits. (1) New Python generator under `projects/kdp-puzzle-press/`: filled-grid generator + symmetric removal loop + 5-tier technique grader + `dlxsudoku`-backed uniqueness checks. (2) Dashboard SQLite migration 0002 adds 3 columns to `kdp_books`; new `/api/kdp/books/:slug/audit-puzzles` endpoint shells to a Python audit CLI; new `<PuzzleAuditCard>` on `/kdp/:slug`. (3) Rebuild interiors for `large-print-sudoku-grandparents`, `travel-sudoku-v1`, `travel-sudoku-v2`; audit each; user uploads to KDP manually.
 
@@ -41,8 +41,8 @@ npx vitest run src/__tests__/PuzzleAuditCard.test.tsx           # one file
 
 **Existing infrastructure this plan extends (do NOT modify):**
 
-- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/base.py` — defines `Difficulty(Enum)`, `Puzzle(dataclass)`, `PuzzleGenerator(ABC)`. The new `SudokuGenerator` must subclass `PuzzleGenerator` with the same `generate(difficulty, **kwargs) -> Puzzle` and `validate(puzzle) -> bool` signatures.
-- `projects/kdp-puzzle-press/src/pocket_rooster_press/books/large_print_sudoku_grandparents.py`, `books/travel_sudoku_v1.py`, `books/travel_sudoku_v2.py` — three book modules that already import `from pocket_rooster_press.generators.sudoku import SudokuGenerator`. They will continue to work unchanged after the rewrite.
+- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/base.py` â€” defines `Difficulty(Enum)`, `Puzzle(dataclass)`, `PuzzleGenerator(ABC)`. The new `SudokuGenerator` must subclass `PuzzleGenerator` with the same `generate(difficulty, **kwargs) -> Puzzle` and `validate(puzzle) -> bool` signatures.
+- `projects/kdp-puzzle-press/src/pocket_rooster_press/books/large_print_sudoku_grandparents.py`, `books/travel_sudoku_v1.py`, `books/travel_sudoku_v2.py` â€” three book modules that already import `from pocket_rooster_press.generators.sudoku import SudokuGenerator`. They will continue to work unchanged after the rewrite.
 - `web.ui/backend/db.js` exports `openDb()` + `_resetForTests()`. Migrations under `web.ui/backend/migrations/*.sql` run automatically on first `openDb()` call.
 - `web.ui/backend/events.js` exports `recordEvent(kind, payload)`, `subscribe(fn)`, `replayRecent(n)`, `_resetSubscribersForTests()`.
 - `web.ui/backend/kdp/routes.js` already mounts `/api/kdp/books*` and exports `createKdpRouter(opts)` and `router`. We will create a **new** router file `audit_routes.js` and mount it next to the existing one (do not bolt the audit route inside `createKdpRouter`; keep the modules independent so tests stay focused).
@@ -75,14 +75,14 @@ Expected after Task 13: also includes `puzzle_audit_status, puzzle_audit_at, puz
 ## File structure
 
 **New Python source files (Commit 1):**
-- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_filled.py` — Las-Vegas backtracking filled-grid generator.
-- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py` — `UniquenessChecker` + 5-tier `TechniqueGrader`.
-- `projects/kdp-puzzle-press/scripts/audit_puzzles.py` — CLI emitting per-puzzle JSON.
-- `projects/kdp-puzzle-press/scripts/rebuild_sudoku.py` — CLI that runs a sudoku book module's `build()` and writes `puzzles.json` alongside `interior.pdf`.
+- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_filled.py` â€” Las-Vegas backtracking filled-grid generator.
+- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py` â€” `UniquenessChecker` + 5-tier `TechniqueGrader`.
+- `projects/kdp-puzzle-press/scripts/audit_puzzles.py` â€” CLI emitting per-puzzle JSON.
+- `projects/kdp-puzzle-press/scripts/rebuild_sudoku.py` â€” CLI that runs a sudoku book module's `build()` and writes `puzzles.json` alongside `interior.pdf`.
 
 **Modified Python source files:**
-- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py` — full rewrite (removes `py-sudoku` dependence).
-- `projects/kdp-puzzle-press/pyproject.toml` — add `dlxsudoku` runtime dep, drop `py-sudoku` after rewrite lands.
+- `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py` â€” full rewrite (removes `py-sudoku` dependence).
+- `projects/kdp-puzzle-press/pyproject.toml` â€” add `dlxsudoku` runtime dep, drop `py-sudoku` after rewrite lands.
 
 **New Python test files:**
 - `projects/kdp-puzzle-press/tests/test_sudoku_filled.py`
@@ -91,7 +91,7 @@ Expected after Task 13: also includes `puzzle_audit_status, puzzle_audit_at, puz
 - `projects/kdp-puzzle-press/tests/test_rebuild_sudoku_cli.py`
 
 **Overhauled Python test files:**
-- `projects/kdp-puzzle-press/tests/test_sudoku.py` — replaces the existing weak tests.
+- `projects/kdp-puzzle-press/tests/test_sudoku.py` â€” replaces the existing weak tests.
 
 **New backend source files (Commit 2):**
 - `web.ui/backend/migrations/0002_puzzle_audit.sql`
@@ -102,7 +102,7 @@ Expected after Task 13: also includes `puzzle_audit_status, puzzle_audit_at, puz
 - `web.ui/backend/__tests__/migrations_0002.test.js`
 
 **Modified backend files:**
-- `web.ui/backend/server.js` — mount the new audit router.
+- `web.ui/backend/server.js` â€” mount the new audit router.
 
 **New frontend source files (Commit 2):**
 - `web.ui/frontend-react/src/components/PuzzleAuditCard.tsx`
@@ -112,8 +112,8 @@ Expected after Task 13: also includes `puzzle_audit_status, puzzle_audit_at, puz
 - `web.ui/frontend-react/src/__tests__/kdp_api_audit.test.ts`
 
 **Modified frontend files:**
-- `web.ui/frontend-react/src/api/kdp.ts` — extend `KdpBook`, add `auditPuzzles(slug)`.
-- `web.ui/frontend-react/src/pages/KdpDetail.tsx` — mount `<PuzzleAuditCard>`.
+- `web.ui/frontend-react/src/api/kdp.ts` â€” extend `KdpBook`, add `auditPuzzles(slug)`.
+- `web.ui/frontend-react/src/pages/KdpDetail.tsx` â€” mount `<PuzzleAuditCard>`.
 
 **Regenerated content (Commit 3):**
 - `projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparents/interior.pdf` + `puzzles.json`
@@ -122,23 +122,23 @@ Expected after Task 13: also includes `puzzle_audit_status, puzzle_audit_at, puz
 
 ---
 
-## Commit 1 — Generator rewrite
+## Commit 1 â€” Generator rewrite
 
-End-of-phase commit message: `feat(sudoku): rewrite generator with uniqueness + 180° symmetry + technique grader`
+End-of-phase commit message: `feat(sudoku): rewrite generator with uniqueness + 180Â° symmetry + technique grader`
 
 ### Task 1: Swap `py-sudoku` for `dlxsudoku` dep
 
 **Files:**
 - Modify: `projects/kdp-puzzle-press/pyproject.toml`
 
-- [ ] **Step 1: Confirm current state**
+- [x] **Step 1: Confirm current state**
 
 Run: `python -c "import dlxsudoku" 2>&1 | head -1`
 Expected: `ModuleNotFoundError: No module named 'dlxsudoku'`
 
-- [ ] **Step 2: Add `dlxsudoku` to dependencies**
+- [x] **Step 2: Add `dlxsudoku` to dependencies**
 
-Open `projects/kdp-puzzle-press/pyproject.toml`. In the `[project] dependencies = [ ... ]` block, **add** the line `    "dlxsudoku>=1.0,<2",`. **Leave `py-sudoku` in place for now** — we will remove it at the end of Task 9 once the new generator no longer imports it. The updated dependencies list should read:
+Open `projects/kdp-puzzle-press/pyproject.toml`. In the `[project] dependencies = [ ... ]` block, **add** the line `    "dlxsudoku>=1.0,<2",`. **Leave `py-sudoku` in place for now** â€” we will remove it at the end of Task 9 once the new generator no longer imports it. The updated dependencies list should read:
 
 ```toml
 dependencies = [
@@ -152,7 +152,7 @@ dependencies = [
 ]
 ```
 
-- [ ] **Step 3: Install & verify**
+- [x] **Step 3: Install & verify**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -161,14 +161,14 @@ python -c "from dlxsudoku import Sudoku as DLXSudoku; s = DLXSudoku('53007000060
 ```
 Expected: a single 81-character string of digits 1-9 (the known solved board for the famous "easy 1" puzzle).
 
-- [ ] **Step 4: Confirm `dlxsudoku` Sudoku constructor signature**
+- [x] **Step 4: Confirm `dlxsudoku` Sudoku constructor signature**
 
 `dlxsudoku.Sudoku` accepts either an 81-char string or a `9x9` list of lists. Solutions are read from `solver.solution_str` after `solver.solve()`. There is also `solver.solutions` (list of all completions; populated when more than one exists). The class name we will use in our code is `from dlxsudoku.sudoku import Sudoku as DLXSudoku`.
 
 Run: `python -c "from dlxsudoku.sudoku import Sudoku as DLXSudoku; print(DLXSudoku.__init__.__doc__)"`
 Expected: no error (the import resolves). If the import path differs in the installed version, run `python -c "import dlxsudoku; help(dlxsudoku)"` and adjust the import line everywhere it appears in Tasks 3 and 11; record the actual import path here before continuing.
 
-- [ ] **Step 5: Stage but do NOT commit yet**
+- [x] **Step 5: Stage but do NOT commit yet**
 
 ```bash
 git add projects/kdp-puzzle-press/pyproject.toml
@@ -177,13 +177,13 @@ The Commit 1 message lands at the end of Task 12.
 
 ---
 
-### Task 2: `sudoku_filled.py` — Las-Vegas backtracking filled grid
+### Task 2: `sudoku_filled.py` â€” Las-Vegas backtracking filled grid
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_filled.py`
 - Test: `projects/kdp-puzzle-press/tests/test_sudoku_filled.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # tests/test_sudoku_filled.py
@@ -229,7 +229,7 @@ def test_filled_grid_is_valid_sudoku():
 
 
 def test_filled_grid_seeded_determinism():
-    """Same seed → same grid. Different seeds → (almost certainly) different."""
+    """Same seed â†’ same grid. Different seeds â†’ (almost certainly) different."""
     g1 = filled_grid(random.Random(123))
     g2 = filled_grid(random.Random(123))
     g3 = filled_grid(random.Random(124))
@@ -246,12 +246,12 @@ def test_filled_grid_variety_across_seeds():
     assert len(seen) == 20
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_filled.py -q`
 Expected: `ModuleNotFoundError: No module named 'pocket_rooster_press.generators.sudoku_filled'` (4 errors).
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 ```python
 # src/pocket_rooster_press/generators/sudoku_filled.py
@@ -309,12 +309,12 @@ def filled_grid(rng: random.Random) -> list[list[int]]:
     return grid
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_filled.py -q`
 Expected: `4 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_filled.py \
@@ -329,7 +329,7 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_fil
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py`
 - Test: `projects/kdp-puzzle-press/tests/test_sudoku_solver.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # tests/test_sudoku_solver.py
@@ -385,12 +385,12 @@ def test_unique_solution_empty_grid_is_not_unique():
     assert checker.has_unique_solution(empty) is False
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `ModuleNotFoundError: No module named 'pocket_rooster_press.generators.sudoku_solver'`.
 
-- [ ] **Step 3: Write the implementation (UniquenessChecker only — grader follows in Tasks 4-6)**
+- [x] **Step 3: Write the implementation (UniquenessChecker only â€” grader follows in Tasks 4-6)**
 
 ```python
 # src/pocket_rooster_press/generators/sudoku_solver.py
@@ -420,7 +420,7 @@ class UniquenessChecker:
         solver = DLXSudoku(s)
         # dlxsudoku.solve() populates .solution_str on success and raises if
         # the puzzle is unsolvable. We additionally need "is the solution
-        # unique?" — checked via a second call to .solve() that, if the
+        # unique?" â€” checked via a second call to .solve() that, if the
         # underlying DLX search has a remaining alternative branch, will
         # find it. dlxsudoku exposes this through ``solver.solutions`` once
         # ``solve()`` has been invoked; for our purposes, a uniqueness
@@ -494,7 +494,7 @@ def _has_second_completion(grid: list[list[int]], first: str) -> bool:
                         work[r][c] = 0
                     return
         # Reached a fully-filled grid without using `target_grid[r][c]` at
-        # least once → it differs from `first`.
+        # least once â†’ it differs from `first`.
         for r in range(9):
             for c in range(9):
                 if work[r][c] != target_grid[r][c]:
@@ -505,12 +505,12 @@ def _has_second_completion(grid: list[list[int]], first: str) -> bool:
     return found[0]
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `3 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py \
@@ -525,7 +525,7 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_sol
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_sudoku_solver.py`
 
-- [ ] **Step 1: Add failing tests**
+- [x] **Step 1: Add failing tests**
 
 Append to `tests/test_sudoku_solver.py`:
 
@@ -568,12 +568,12 @@ def test_naked_singles_only_stalls_on_hard():
     assert blanks > 0
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `ImportError: cannot import name 'TechniqueGrader'`.
 
-- [ ] **Step 3: Add the class to `sudoku_solver.py`**
+- [x] **Step 3: Add the class to `sudoku_solver.py`**
 
 Append to `src/pocket_rooster_press/generators/sudoku_solver.py`:
 
@@ -633,12 +633,12 @@ class TechniqueGrader:
         return work, not _is_solved(work)
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `5 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py \
@@ -653,7 +653,7 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_sol
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_sudoku_solver.py`
 
-- [ ] **Step 1: Add failing tests**
+- [x] **Step 1: Add failing tests**
 
 Append to `tests/test_sudoku_solver.py`:
 
@@ -695,12 +695,12 @@ def test_locked_candidates_no_progress_on_easy():
     assert progress is False
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `AttributeError: 'TechniqueGrader' object has no attribute '_hidden_singles_pass'`.
 
-- [ ] **Step 3: Add the two pass methods to `TechniqueGrader`**
+- [x] **Step 3: Add the two pass methods to `TechniqueGrader`**
 
 Append inside the `TechniqueGrader` class in `sudoku_solver.py`:
 
@@ -805,12 +805,12 @@ Append inside the `TechniqueGrader` class in `sudoku_solver.py`:
         return progressed
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `7 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py \
@@ -825,7 +825,7 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_sol
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_sudoku_solver.py`
 
-- [ ] **Step 1: Add failing tests**
+- [x] **Step 1: Add failing tests**
 
 Append to `tests/test_sudoku_solver.py`:
 
@@ -853,18 +853,18 @@ def test_grade_known_unique_at_least_hidden_singles():
 def test_grade_unsolvable_returns_backtracking():
     """A pathological puzzle that the logic-only grader cannot complete."""
     grader = TechniqueGrader()
-    # An empty grid is the worst-case stall — no technique fills it.
+    # An empty grid is the worst-case stall â€” no technique fills it.
     empty = [[0] * 9 for _ in range(9)]
     tier = grader.grade(empty)
     assert tier == "backtracking"
 ```
 
-- [ ] **Step 2: Run tests to verify failure**
+- [x] **Step 2: Run tests to verify failure**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `AttributeError: 'TechniqueGrader' object has no attribute 'grade'`.
 
-- [ ] **Step 3: Add the remaining methods**
+- [x] **Step 3: Add the remaining methods**
 
 Append inside the `TechniqueGrader` class:
 
@@ -964,18 +964,18 @@ Append inside the `TechniqueGrader` class:
         """Return the highest tier required to solve `puzzle` with logic.
 
         If logic alone is insufficient (the cheapest 5 techniques stall while
-        the grid is still unsolved), returns ``"backtracking"`` — these
+        the grid is still unsolved), returns ``"backtracking"`` â€” these
         puzzles are dropped by the orchestrator.
         """
         grid = [row[:] for row in puzzle]
         highest = "naked_singles"
 
-        # Tier 1 — naked singles only.
+        # Tier 1 â€” naked singles only.
         grid, stalled = self._naked_singles_only(grid)
         if _is_solved(grid):
             return highest
 
-        # Tier 2 — + hidden singles.
+        # Tier 2 â€” + hidden singles.
         while not _is_solved(grid):
             advanced = self._hidden_singles_pass(grid)
             if advanced:
@@ -986,7 +986,7 @@ Append inside the `TechniqueGrader` class:
         if _is_solved(grid):
             return highest
 
-        # Tier 3 — + locked candidates.
+        # Tier 3 â€” + locked candidates.
         while not _is_solved(grid):
             advanced = self._locked_candidates_pass(grid)
             if advanced:
@@ -999,7 +999,7 @@ Append inside the `TechniqueGrader` class:
         if _is_solved(grid):
             return highest
 
-        # Tier 4 — + naked pairs.
+        # Tier 4 â€” + naked pairs.
         while not _is_solved(grid):
             advanced = self._naked_pairs_pass(grid)
             if advanced:
@@ -1014,7 +1014,7 @@ Append inside the `TechniqueGrader` class:
         if _is_solved(grid):
             return highest
 
-        # Tier 5 — + naked triples.
+        # Tier 5 â€” + naked triples.
         while not _is_solved(grid):
             advanced = self._naked_triples_pass(grid)
             if advanced:
@@ -1034,12 +1034,12 @@ Append inside the `TechniqueGrader` class:
         return "backtracking"
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku_solver.py -q`
 Expected: `11 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_solver.py \
@@ -1051,17 +1051,17 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku_sol
 ### Task 7: `sudoku.py::remove_symmetric`
 
 **Files:**
-- Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py` (full rewrite — we will start with just `remove_symmetric` and grow the file in Tasks 8-9)
+- Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py` (full rewrite â€” we will start with just `remove_symmetric` and grow the file in Tasks 8-9)
 - Test: `projects/kdp-puzzle-press/tests/test_sudoku.py` (will be overhauled in Task 10; for now we add a focused test for `remove_symmetric` here)
 
 The legacy `sudoku.py` is being **replaced**, not edited in place. Delete the existing contents and start from a blank file.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append (or create if currently re-using the old file) `tests/test_sudoku.py` with the following block; we will fully overhaul this file in Task 10, but we need at least one passing assertion for `remove_symmetric` now.
 
 ```python
-# tests/test_sudoku.py  (interim — Task 10 will replace this file)
+# tests/test_sudoku.py  (interim â€” Task 10 will replace this file)
 """Tests for sudoku.SudokuGenerator + remove_symmetric helper.
 
 (This file is fully overhauled in Task 10. Until then it carries the
@@ -1075,7 +1075,7 @@ from pocket_rooster_press.generators.sudoku_filled import filled_grid
 
 
 class _AlwaysUniqueSolver:
-    """Test double — claims every candidate puzzle is unique."""
+    """Test double â€” claims every candidate puzzle is unique."""
 
     def has_unique_solution(self, _grid: list[list[int]]) -> bool:
         return True
@@ -1103,12 +1103,12 @@ def test_remove_symmetric_respects_target_floor():
     assert clues <= 81  # sanity
 ```
 
-- [ ] **Step 2: Run test to verify fail**
+- [x] **Step 2: Run test to verify fail**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py -q`
 Expected: `ImportError: cannot import name 'remove_symmetric'` (the old `sudoku.py` doesn't export it).
 
-- [ ] **Step 3: Replace `sudoku.py` with the new file (only the `remove_symmetric` portion for now)**
+- [x] **Step 3: Replace `sudoku.py` with the new file (only the `remove_symmetric` portion for now)**
 
 Overwrite `src/pocket_rooster_press/generators/sudoku.py` with:
 
@@ -1133,7 +1133,7 @@ CLUE_RANGES: dict[Difficulty, tuple[int, int]] = {
     Difficulty.EXPERT: (22, 26),
 }
 
-# Tier → set of acceptable technique grades for that difficulty.
+# Tier â†’ set of acceptable technique grades for that difficulty.
 DIFFICULTY_TIER_MAP: dict[Difficulty, set[str]] = {
     Difficulty.EASY:    {"naked_singles"},
     Difficulty.MEDIUM:  {"naked_singles", "hidden_singles"},
@@ -1159,7 +1159,7 @@ def remove_symmetric(
     rng: random.Random,
     max_failed_attempts: int = 50,
 ) -> list[list[int]]:
-    """Iteratively blank 180°-symmetric cell pairs while preserving uniqueness.
+    """Iteratively blank 180Â°-symmetric cell pairs while preserving uniqueness.
 
     Args:
         grid: a fully-filled valid 9x9 grid.
@@ -1192,12 +1192,12 @@ def remove_symmetric(
     return puzzle
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py -q`
 Expected: `2 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py \
@@ -1212,7 +1212,7 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py 
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py`
 - Modify: `projects/kdp-puzzle-press/tests/test_sudoku.py`
 
-- [ ] **Step 1: Add the failing test**
+- [x] **Step 1: Add the failing test**
 
 Append to `tests/test_sudoku.py`:
 
@@ -1253,24 +1253,24 @@ def test_generate_solution_is_complete_9x9():
             assert 1 <= v <= 9
 ```
 
-- [ ] **Step 2: Run tests to verify fail**
+- [x] **Step 2: Run tests to verify fail**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py -q`
 Expected: `ImportError: cannot import name 'SudokuGenerator'`.
 
-- [ ] **Step 3: Add the orchestrator**
+- [x] **Step 3: Add the orchestrator**
 
 Append to `src/pocket_rooster_press/generators/sudoku.py`:
 
 ```python
 class SudokuGenerator(PuzzleGenerator):
-    """Hand-rolled sudoku generator with verified uniqueness, 180° symmetry,
+    """Hand-rolled sudoku generator with verified uniqueness, 180Â° symmetry,
     and technique-tiered difficulty.
 
     The orchestrator runs:
-      1. ``filled_grid(rng)``                — random valid filled 9x9.
-      2. ``remove_symmetric(grid, target)``  — blank cells in 180° pairs.
-      3. ``TechniqueGrader().grade(...)``    — confirm logic-only difficulty.
+      1. ``filled_grid(rng)``                â€” random valid filled 9x9.
+      2. ``remove_symmetric(grid, target)``  â€” blank cells in 180Â° pairs.
+      3. ``TechniqueGrader().grade(...)``    â€” confirm logic-only difficulty.
 
     Retries up to 20 times if the technique grade doesn't match the request.
     """
@@ -1318,12 +1318,12 @@ class SudokuGenerator(PuzzleGenerator):
         raise NotImplementedError("validate() ships in Task 9")
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py -q`
 Expected: `5 passed`. Wall-clock budget for this task: < 120 s (each `generate` call costs ~0.5-2 s).
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py \
@@ -1339,7 +1339,7 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py 
 - Modify: `projects/kdp-puzzle-press/tests/test_sudoku.py`
 - Modify: `projects/kdp-puzzle-press/pyproject.toml`
 
-- [ ] **Step 1: Add the failing test**
+- [x] **Step 1: Add the failing test**
 
 Append to `tests/test_sudoku.py`:
 
@@ -1370,7 +1370,7 @@ def test_validate_rejects_non_unique_puzzle():
     from pocket_rooster_press.generators.sudoku import _clue_count
     gen = SudokuGenerator()
     p = gen.generate(Difficulty.EASY)
-    # Remove 30 more clues in symmetric pairs — almost certainly non-unique.
+    # Remove 30 more clues in symmetric pairs â€” almost certainly non-unique.
     cells = [(r, c) for r in range(4) for c in range(9)]
     blanked_pairs = 0
     for r, c in cells:
@@ -1385,18 +1385,18 @@ def test_validate_rejects_non_unique_puzzle():
     assert gen.validate(p) is False
 ```
 
-- [ ] **Step 2: Run tests to verify fail**
+- [x] **Step 2: Run tests to verify fail**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py -q`
 Expected: `NotImplementedError: validate() ships in Task 9` (3 failures).
 
-- [ ] **Step 3: Implement `validate` and clean the file**
+- [x] **Step 3: Implement `validate` and clean the file**
 
 Replace the `validate` stub in `src/pocket_rooster_press/generators/sudoku.py` with:
 
 ```python
     def validate(self, puzzle: Puzzle) -> bool:
-        """Re-verify uniqueness + 180° rotational symmetry of `puzzle.content`.
+        """Re-verify uniqueness + 180Â° rotational symmetry of `puzzle.content`.
 
         Stronger than the old py-sudoku version: this confirms the puzzle has
         *exactly one* completion, not merely that one exists.
@@ -1404,7 +1404,7 @@ Replace the `validate` stub in `src/pocket_rooster_press/generators/sudoku.py` w
         board = puzzle.content
         if len(board) != 9 or any(len(row) != 9 for row in board):
             return False
-        # 180° symmetry
+        # 180Â° symmetry
         for r in range(9):
             for c in range(9):
                 is_blank = board[r][c] == 0
@@ -1415,7 +1415,7 @@ Replace the `validate` stub in `src/pocket_rooster_press/generators/sudoku.py` w
         return self.solver.has_unique_solution(board)
 ```
 
-- [ ] **Step 4: Remove the `py-sudoku` runtime dep**
+- [x] **Step 4: Remove the `py-sudoku` runtime dep**
 
 In `projects/kdp-puzzle-press/pyproject.toml`, **delete** the line `    "py-sudoku>=1.0,<2",` from the `[project] dependencies` block. The updated list:
 
@@ -1436,14 +1436,14 @@ cd projects/kdp-puzzle-press
 pip install -e ".[dev]"
 python -c "import pocket_rooster_press.generators.sudoku as m; print('ok:', m.SudokuGenerator)"
 ```
-Expected: `ok: <class '...SudokuGenerator'>` with no `py-sudoku` import errors. (The new module no longer references `py-sudoku`. Other generators in the repo do not import it either — verified via `Grep` for `py.sudoku|py_sudoku|from sudoku import` across `src/`.)
+Expected: `ok: <class '...SudokuGenerator'>` with no `py-sudoku` import errors. (The new module no longer references `py-sudoku`. Other generators in the repo do not import it either â€” verified via `Grep` for `py.sudoku|py_sudoku|from sudoku import` across `src/`.)
 
-- [ ] **Step 5: Run all sudoku tests to confirm**
+- [x] **Step 5: Run all sudoku tests to confirm**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py tests/test_sudoku_solver.py tests/test_sudoku_filled.py -q`
 Expected: `19 passed`.
 
-- [ ] **Step 6: Stage**
+- [x] **Step 6: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py \
@@ -1453,14 +1453,14 @@ git add projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py 
 
 ---
 
-### Task 10: Overhaul `tests/test_sudoku.py` — the full quality contract
+### Task 10: Overhaul `tests/test_sudoku.py` â€” the full quality contract
 
 **Files:**
 - Modify: `projects/kdp-puzzle-press/tests/test_sudoku.py` (replace the whole file)
 
-The interim test file from Tasks 7-9 carried 10 assertions. Now we replace it with the full quality contract per spec §6: 250 puzzles per difficulty × 4 difficulties = 1000 puzzles asserting uniqueness, symmetry, tier match, no backtracking, clue counts, round-trip serialization, and a perf test (marked `slow`).
+The interim test file from Tasks 7-9 carried 10 assertions. Now we replace it with the full quality contract per spec Â§6: 250 puzzles per difficulty Ã— 4 difficulties = 1000 puzzles asserting uniqueness, symmetry, tier match, no backtracking, clue counts, round-trip serialization, and a perf test (marked `slow`).
 
-- [ ] **Step 1: Overwrite the test file**
+- [x] **Step 1: Overwrite the test file**
 
 Replace `tests/test_sudoku.py` entirely with:
 
@@ -1623,7 +1623,7 @@ def test_full_thousand_puzzles_pass_all_contracts() -> None:
                     assert (p.content[r][c] == 0) == (p.content[8 - r][8 - c] == 0)
 ```
 
-- [ ] **Step 2: Register the `slow` marker in `pyproject.toml`**
+- [x] **Step 2: Register the `slow` marker in `pyproject.toml`**
 
 In `projects/kdp-puzzle-press/pyproject.toml`, replace the `[tool.pytest.ini_options]` section with:
 
@@ -1636,17 +1636,17 @@ markers = [
 ]
 ```
 
-- [ ] **Step 3: Run CI mode**
+- [x] **Step 3: Run CI mode**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py -q -m "not slow"`
-Expected: `7 passed` in < 60 s. (25 puzzles × 4 difficulties = 100 puzzles; the slow markers exclude 2 tests.)
+Expected: `7 passed` in < 60 s. (25 puzzles Ã— 4 difficulties = 100 puzzles; the slow markers exclude 2 tests.)
 
-- [ ] **Step 4: Run slow mode (optional, local-only)**
+- [x] **Step 4: Run slow mode (optional, local-only)**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_sudoku.py::test_full_thousand_puzzles_pass_all_contracts -q`
 Expected: `1 passed` in < 10 min on commodity hardware. If it fails, dig in: either the grader is mis-tiering puzzles (most likely cause) or the clue-range bands are too tight for what `remove_symmetric` can achieve.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/tests/test_sudoku.py \
@@ -1661,9 +1661,9 @@ git add projects/kdp-puzzle-press/tests/test_sudoku.py \
 - Create: `projects/kdp-puzzle-press/scripts/audit_puzzles.py`
 - Test: `projects/kdp-puzzle-press/tests/test_audit_puzzles_cli.py`
 
-The CLI reads `output/kdp-ready/<slug>/puzzles.json` (written by `rebuild_sudoku.py` in Task 12) and emits a JSON document matching spec §4 to stdout. **Exit 0 on success**, even if some puzzles fail the audit — failures are reflected in the JSON `totals`, not via the exit code. Reserve **non-zero exit** for hard errors (slug unknown, puzzles.json missing).
+The CLI reads `output/kdp-ready/<slug>/puzzles.json` (written by `rebuild_sudoku.py` in Task 12) and emits a JSON document matching spec Â§4 to stdout. **Exit 0 on success**, even if some puzzles fail the audit â€” failures are reflected in the JSON `totals`, not via the exit code. Reserve **non-zero exit** for hard errors (slug unknown, puzzles.json missing).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # tests/test_audit_puzzles_cli.py
@@ -1753,12 +1753,12 @@ def test_audit_rejects_unknown_book(tmp_path: Path) -> None:
     assert "does-not-exist" in result.stderr
 ```
 
-- [ ] **Step 2: Run tests to verify fail**
+- [x] **Step 2: Run tests to verify fail**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_audit_puzzles_cli.py -q`
 Expected: `FileNotFoundError` or `subprocess` exit-2 ("script not found"). Both tests fail.
 
-- [ ] **Step 3: Write the CLI**
+- [x] **Step 3: Write the CLI**
 
 ```python
 # scripts/audit_puzzles.py
@@ -1770,7 +1770,7 @@ Usage:
 
 Reads `<kdp-ready-root>/<slug>/puzzles.json` (written by rebuild_sudoku.py).
 Prints a JSON document to stdout matching the contract in
-docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md §4.
+docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md Â§4.
 Exits 0 on success (regardless of whether all puzzles passed); non-zero on
 hard errors (book not found, JSON malformed).
 """
@@ -1889,12 +1889,12 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_audit_puzzles_cli.py -q`
 Expected: `2 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/scripts/audit_puzzles.py \
@@ -1911,7 +1911,7 @@ git add projects/kdp-puzzle-press/scripts/audit_puzzles.py \
 
 This CLI re-runs a sudoku book module's `build()` (so the layout, cover, intro pages, etc. are all preserved) AND writes a `puzzles.json` next to the new `interior.pdf` so the audit CLI can read the puzzle data deterministically. To capture the puzzles, we patch the book module's `SudokuGenerator` import at runtime with a recording subclass; this avoids forking each book module.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # tests/test_rebuild_sudoku_cli.py
@@ -1977,12 +1977,12 @@ def test_rebuild_rejects_unknown_book() -> None:
     assert "does-not-exist" in result.stderr
 ```
 
-- [ ] **Step 2: Run tests to verify fail**
+- [x] **Step 2: Run tests to verify fail**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_rebuild_sudoku_cli.py -q`
 Expected: script not found / module not found. Both tests fail.
 
-- [ ] **Step 3: Write the CLI**
+- [x] **Step 3: Write the CLI**
 
 ```python
 # scripts/rebuild_sudoku.py
@@ -2014,7 +2014,7 @@ from pocket_rooster_press.generators.base import Puzzle  # noqa: E402
 
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
-# Map slug → fully-qualified module path. Add new sudoku books here when
+# Map slug â†’ fully-qualified module path. Add new sudoku books here when
 # they ship.
 BOOK_MODULES: dict[str, str] = {
     "large-print-sudoku-grandparents": "pocket_rooster_press.books.large_print_sudoku_grandparents",
@@ -2102,33 +2102,33 @@ if __name__ == "__main__":
     raise SystemExit(main())
 ```
 
-- [ ] **Step 4: Run the non-slow test (cheap unknown-book case)**
+- [x] **Step 4: Run the non-slow test (cheap unknown-book case)**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_rebuild_sudoku_cli.py::test_rebuild_rejects_unknown_book -q`
 Expected: `1 passed`.
 
-- [ ] **Step 5: Run one slow case as a smoke test**
+- [x] **Step 5: Run one slow case as a smoke test**
 
 Run: `cd projects/kdp-puzzle-press && pytest tests/test_rebuild_sudoku_cli.py::test_rebuild_emits_interior_and_puzzles_json -q -k "travel-sudoku-v2"`
 Expected: `1 passed` in ~3-5 minutes (120 puzzles for v2). If you want to skip it during plan execution and defer to Commit 3, you may; the parametrized slow tests are also explicitly re-run in Commit 3's Tasks 19-21.
 
-- [ ] **Step 6: Stage**
+- [x] **Step 6: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/scripts/rebuild_sudoku.py \
         projects/kdp-puzzle-press/tests/test_rebuild_sudoku_cli.py
 ```
 
-- [ ] **Step 7: COMMIT the full generator rewrite**
+- [x] **Step 7: COMMIT the full generator rewrite**
 
 ```bash
 git status   # sanity-check the staged set
 git commit -m "$(cat <<'EOF'
-feat(sudoku): rewrite generator with uniqueness + 180° symmetry + technique grader
+feat(sudoku): rewrite generator with uniqueness + 180Â° symmetry + technique grader
 
 Rewrites projects/kdp-puzzle-press/src/pocket_rooster_press/generators/sudoku.py
 to abandon py-sudoku in favor of a hand-rolled three-stage pipeline:
-filled-grid Las-Vegas backtracker, 180°-symmetric removal loop with
+filled-grid Las-Vegas backtracker, 180Â°-symmetric removal loop with
 dlxsudoku uniqueness checks, and a 5-tier technique grader. Difficulty
 now reflects the techniques required, not the clue count alone.
 
@@ -2139,7 +2139,7 @@ puzzles.json; scripts/audit_puzzles.py reads puzzles.json and emits
 the audit JSON contract from the design spec.
 
 Overhauls tests/test_sudoku.py to assert the real contract: uniqueness,
-180° symmetry, tier match, no backtracking, clue count, and round-trip
+180Â° symmetry, tier match, no backtracking, clue count, and round-trip
 serialization. Adds tests/test_sudoku_solver.py + test_sudoku_filled.py +
 test_audit_puzzles_cli.py + test_rebuild_sudoku_cli.py. The 1000-puzzle
 contract test and the perf test are marked `slow` and skipped in CI.
@@ -2153,30 +2153,30 @@ EOF
 )"
 ```
 
-- [ ] **Step 8: Verify commit landed**
+- [x] **Step 8: Verify commit landed**
 
 Run: `git log --oneline -1`
 Expected: a `feat(sudoku): ...` line at HEAD.
 
 ---
 
-## Commit 2 — Dashboard puzzle_audit extension
+## Commit 2 â€” Dashboard puzzle_audit extension
 
 End-of-phase commit message: `feat(audit): dashboard puzzle-audit extension`
 
-### Task 13: Migration 0002 — adds 3 columns to `kdp_books`
+### Task 13: Migration 0002 â€” adds 3 columns to `kdp_books`
 
 **Files:**
 - Create: `web.ui/backend/migrations/0002_puzzle_audit.sql`
 - Test: `web.ui/backend/__tests__/migrations_0002.test.js`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```javascript
 // __tests__/migrations_0002.test.js
 /**
  * Migration 0002 verification: after migration applies, kdp_books has the
- * three new columns and they accept the values from spec §4. Idempotency
+ * three new columns and they accept the values from spec Â§4. Idempotency
  * is exercised by re-opening the DB (db.js skips already-applied migrations).
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -2243,18 +2243,18 @@ describe('migration 0002_puzzle_audit', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify fail**
+- [x] **Step 2: Run test to verify fail**
 
 Run: `cd web.ui/backend && npx vitest run __tests__/migrations_0002.test.js`
-Expected: `migration 0002 ... fails` — `cols` does not contain the new column names.
+Expected: `migration 0002 ... fails` â€” `cols` does not contain the new column names.
 
-- [ ] **Step 3: Write the migration**
+- [x] **Step 3: Write the migration**
 
 Create `web.ui/backend/migrations/0002_puzzle_audit.sql`:
 
 ```sql
--- Migration 0002 — adds puzzle audit fields to kdp_books.
--- Source of truth: docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md §4
+-- Migration 0002 â€” adds puzzle audit fields to kdp_books.
+-- Source of truth: docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md Â§4
 
 ALTER TABLE kdp_books ADD COLUMN puzzle_audit_status TEXT
     CHECK (puzzle_audit_status IS NULL OR puzzle_audit_status IN ('unchecked','passed','failed'));
@@ -2264,12 +2264,12 @@ ALTER TABLE kdp_books ADD COLUMN puzzle_audit_at TEXT;
 ALTER TABLE kdp_books ADD COLUMN puzzle_audit_summary_json TEXT;
 ```
 
-- [ ] **Step 4: Run test to verify pass**
+- [x] **Step 4: Run test to verify pass**
 
 Run: `cd web.ui/backend && npx vitest run __tests__/migrations_0002.test.js`
 Expected: `4 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add web.ui/backend/migrations/0002_puzzle_audit.sql \
@@ -2278,15 +2278,15 @@ git add web.ui/backend/migrations/0002_puzzle_audit.sql \
 
 ---
 
-### Task 14: `audit_routes.js` — POST `/api/kdp/books/:slug/audit-puzzles`
+### Task 14: `audit_routes.js` â€” POST `/api/kdp/books/:slug/audit-puzzles`
 
 **Files:**
 - Create: `web.ui/backend/kdp/audit_routes.js`
 - Test: `web.ui/backend/__tests__/kdp/audit_routes.test.js`
 
-The route spawns a Python subprocess via an injectable factory so tests don't shell out. Inputs are validated against the spec §8 slug regex; output is the audit JSON written into the row plus an SSE `kdp:audit-complete` event.
+The route spawns a Python subprocess via an injectable factory so tests don't shell out. Inputs are validated against the spec Â§8 slug regex; output is the audit JSON written into the row plus an SSE `kdp:audit-complete` event.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```javascript
 // __tests__/kdp/audit_routes.test.js
@@ -2441,12 +2441,12 @@ describe('POST /api/kdp/books/:slug/audit-puzzles', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify fail**
+- [x] **Step 2: Run test to verify fail**
 
 Run: `cd web.ui/backend && npx vitest run __tests__/kdp/audit_routes.test.js`
 Expected: `Cannot find module '../../kdp/audit_routes.js'`.
 
-- [ ] **Step 3: Write the router**
+- [x] **Step 3: Write the router**
 
 Create `web.ui/backend/kdp/audit_routes.js`:
 
@@ -2461,7 +2461,7 @@ Create `web.ui/backend/kdp/audit_routes.js`:
  * `kdp:audit-started` + `kdp:audit-complete` over the SSE channel.
  *
  * The Python runner is injected so tests don't shell out. Default runner
- * uses node:child_process.spawn with a 5-minute timeout per spec §8.
+ * uses node:child_process.spawn with a 5-minute timeout per spec Â§8.
  *
  * @module kdp/audit_routes
  */
@@ -2475,10 +2475,10 @@ import { recordEvent } from '../events.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/** Slug whitelist per spec §8. */
+/** Slug whitelist per spec Â§8. */
 const SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
 
-/** Subprocess hard timeout (ms) — spec §8. */
+/** Subprocess hard timeout (ms) â€” spec Â§8. */
 const AUDIT_TIMEOUT_MS = 5 * 60 * 1000;
 
 /**
@@ -2626,12 +2626,12 @@ export const router = createAuditRouter();
 export default router;
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd web.ui/backend && npx vitest run __tests__/kdp/audit_routes.test.js`
 Expected: `7 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add web.ui/backend/kdp/audit_routes.js \
@@ -2646,7 +2646,7 @@ git add web.ui/backend/kdp/audit_routes.js \
 - Modify: `web.ui/backend/server.js`
 - Test: `web.ui/backend/__tests__/server_smoke.test.js` (extend existing)
 
-- [ ] **Step 1: Extend the smoke test**
+- [x] **Step 1: Extend the smoke test**
 
 Open `web.ui/backend/__tests__/server_smoke.test.js` and add this test inside the existing `describe` block (or, if the suite doesn't already cover route mounting at that level, append a new `describe('audit endpoint wiring', ...)`):
 
@@ -2665,18 +2665,18 @@ describe('audit endpoint wiring', () => {
     // route is reachable (returns 404 for a real-shaped slug, not 502/express-default).
     const res = await request(app).post('/api/kdp/books/nonexistent-slug/audit-puzzles').send();
     expect([400, 404, 500]).toContain(res.status);
-    // Critically, NOT 404 with "Cannot POST" body — that would mean it's unmounted.
+    // Critically, NOT 404 with "Cannot POST" body â€” that would mean it's unmounted.
     expect(String(res.text)).not.toMatch(/Cannot POST/i);
   });
 });
 ```
 
-- [ ] **Step 2: Run test to verify fail**
+- [x] **Step 2: Run test to verify fail**
 
 Run: `cd web.ui/backend && npx vitest run __tests__/server_smoke.test.js`
 Expected: the new test fails with "Cannot POST /api/kdp/books/..." (route unmounted).
 
-- [ ] **Step 3: Mount the router in `server.js`**
+- [x] **Step 3: Mount the router in `server.js`**
 
 Open `web.ui/backend/server.js`. Find the import block near the top that imports `kdpRoutes`. After the line:
 
@@ -2710,19 +2710,19 @@ grep -n "kdp/routes" web.ui/backend/server.js
 
 If multiple mount points exist, ensure `auditRoutes` is mounted alongside the one that uses `/api/kdp` as its base.
 
-- [ ] **Step 4: Add `export default app` if not present**
+- [x] **Step 4: Add `export default app` if not present**
 
 If `server.js` does not already `export default app;` at the bottom, add it. The supertest harness in the test relies on importing the express app instance.
 
 Run: `grep -n "export default app" web.ui/backend/server.js`
 If absent, append `export default app;` after the last `app.use(...)` and BEFORE the `app.listen(...)` call (the listen call must remain gated on `if (PORT !== 0)`).
 
-- [ ] **Step 5: Run test to verify pass**
+- [x] **Step 5: Run test to verify pass**
 
 Run: `cd web.ui/backend && npx vitest run __tests__/server_smoke.test.js`
 Expected: the new "mounts POST /api/kdp/books/:slug/audit-puzzles" test passes, alongside the existing smoke tests.
 
-- [ ] **Step 6: Stage**
+- [x] **Step 6: Stage**
 
 ```bash
 git add web.ui/backend/server.js \
@@ -2731,13 +2731,13 @@ git add web.ui/backend/server.js \
 
 ---
 
-### Task 16: Extend `api/kdp.ts` — KdpBook fields + `auditPuzzles(slug)`
+### Task 16: Extend `api/kdp.ts` â€” KdpBook fields + `auditPuzzles(slug)`
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/api/kdp.ts`
 - Test: `web.ui/frontend-react/src/__tests__/kdp_api_audit.test.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/frontend-react/src/__tests__/kdp_api_audit.test.ts`:
 
@@ -2797,12 +2797,12 @@ describe('api/kdp.auditPuzzles', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify fail**
+- [x] **Step 2: Run test to verify fail**
 
 Run: `cd web.ui/frontend-react && npx vitest run src/__tests__/kdp_api_audit.test.ts`
 Expected: `Module '"../api/kdp"' has no exported member 'auditPuzzles'.`
 
-- [ ] **Step 3: Extend `api/kdp.ts`**
+- [x] **Step 3: Extend `api/kdp.ts`**
 
 Open `web.ui/frontend-react/src/api/kdp.ts`. In the `export interface KdpBook { ... }` block, add three fields **before** `updated_at`:
 
@@ -2857,12 +2857,12 @@ export async function auditPuzzles(slug: string): Promise<KdpBook> {
 }
 ```
 
-- [ ] **Step 4: Run test to verify pass**
+- [x] **Step 4: Run test to verify pass**
 
 Run: `cd web.ui/frontend-react && npx vitest run src/__tests__/kdp_api_audit.test.ts`
 Expected: `2 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add web.ui/frontend-react/src/api/kdp.ts \
@@ -2879,7 +2879,7 @@ git add web.ui/frontend-react/src/api/kdp.ts \
 
 The card shows: status chip (`Passed` / `Failed` / `Unchecked`), last-audit timestamp, Re-audit button, and a collapsible per-puzzle breakdown.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `web.ui/frontend-react/src/__tests__/PuzzleAuditCard.test.tsx`:
 
@@ -2990,7 +2990,7 @@ describe('<PuzzleAuditCard>', () => {
       puzzle_audit_summary_json: SUMMARY_PASSED,
     });
     render(<PuzzleAuditCard book={book} onAudited={() => {}} />);
-    // Breakdown collapsed by default — clue_count not visible
+    // Breakdown collapsed by default â€” clue_count not visible
     expect(screen.queryByText(/clue_count: 42/i)).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /show details/i }));
     expect(screen.getByText(/42/)).toBeInTheDocument();
@@ -3000,18 +3000,18 @@ describe('<PuzzleAuditCard>', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify fail**
+- [x] **Step 2: Run test to verify fail**
 
 Run: `cd web.ui/frontend-react && npx vitest run src/__tests__/PuzzleAuditCard.test.tsx`
 Expected: `Cannot find module '../components/PuzzleAuditCard'`.
 
-- [ ] **Step 3: Write the component**
+- [x] **Step 3: Write the component**
 
 Create `web.ui/frontend-react/src/components/PuzzleAuditCard.tsx`:
 
 ```tsx
 /**
- * PuzzleAuditCard — surfaces the latest puzzle-audit state for a KDP book
+ * PuzzleAuditCard â€” surfaces the latest puzzle-audit state for a KDP book
  * and a Re-audit button. Mounted on /kdp/:slug below the metadata grid.
  *
  * - Shows a status chip: Passed / Failed / Unchecked.
@@ -3105,7 +3105,7 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
           disabled={busy}
           style={{ marginLeft: 'auto' }}
         >
-          {busy ? 'Auditing…' : 'Re-audit'}
+          {busy ? 'Auditingâ€¦' : 'Re-audit'}
         </button>
       </header>
 
@@ -3120,10 +3120,10 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
           {summary.totals.passed} / {summary.totals.checked} puzzles passed
           {summary.totals.failed > 0 && (
             <>
-              {' · '}
+              {' Â· '}
               <span style={{ color: '#b91c1c' }}>
-                {summary.totals.uniqueness_failures} uniqueness ·{' '}
-                {summary.totals.symmetry_failures} symmetry ·{' '}
+                {summary.totals.uniqueness_failures} uniqueness Â·{' '}
+                {summary.totals.symmetry_failures} symmetry Â·{' '}
                 {summary.totals.tier_mismatches} tier mismatches
               </span>
             </>
@@ -3148,7 +3148,7 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
                   <th align="left">Difficulty</th>
                   <th align="left">Clues</th>
                   <th align="left">Unique</th>
-                  <th align="left">180° sym</th>
+                  <th align="left">180Â° sym</th>
                   <th align="left">Tier</th>
                   <th align="left">Match</th>
                 </tr>
@@ -3159,10 +3159,10 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
                     <td>{p.index}</td>
                     <td>{p.difficulty}</td>
                     <td>{p.clue_count}</td>
-                    <td>{p.is_unique ? '✓' : '✗'}</td>
-                    <td>{p.symmetric_180 ? '✓' : '✗'}</td>
+                    <td>{p.is_unique ? 'âœ“' : 'âœ—'}</td>
+                    <td>{p.symmetric_180 ? 'âœ“' : 'âœ—'}</td>
                     <td>{p.technique_tier}</td>
-                    <td>{p.match_difficulty ? '✓' : '✗'}</td>
+                    <td>{p.match_difficulty ? 'âœ“' : 'âœ—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -3175,12 +3175,12 @@ export default function PuzzleAuditCard({ book, onAudited }: Props) {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `cd web.ui/frontend-react && npx vitest run src/__tests__/PuzzleAuditCard.test.tsx`
 Expected: `5 passed`.
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add web.ui/frontend-react/src/components/PuzzleAuditCard.tsx \
@@ -3193,11 +3193,11 @@ git add web.ui/frontend-react/src/components/PuzzleAuditCard.tsx \
 
 **Files:**
 - Modify: `web.ui/frontend-react/src/pages/KdpDetail.tsx`
-- Modify: `web.ui/frontend-react/src/__tests__/KdpDetail.test.tsx` (extend if it exists; otherwise the existing assertions still pass and we don't need a dedicated regression test — Task 17 already covers the card)
+- Modify: `web.ui/frontend-react/src/__tests__/KdpDetail.test.tsx` (extend if it exists; otherwise the existing assertions still pass and we don't need a dedicated regression test â€” Task 17 already covers the card)
 
-The card always renders (defaults to "Unchecked" when no audit has run). Per spec §4, books with no puzzle content keep `puzzle_audit_status = NULL`; even so the card is fine to render with "Unchecked" — the Re-audit button will simply return `failed` with `error: "no puzzles.json"` if the book has no puzzles. That's acceptable for v1; the user only clicks Re-audit on sudoku books.
+The card always renders (defaults to "Unchecked" when no audit has run). Per spec Â§4, books with no puzzle content keep `puzzle_audit_status = NULL`; even so the card is fine to render with "Unchecked" â€” the Re-audit button will simply return `failed` with `error: "no puzzles.json"` if the book has no puzzles. That's acceptable for v1; the user only clicks Re-audit on sudoku books.
 
-- [ ] **Step 1: Modify `KdpDetail.tsx`**
+- [x] **Step 1: Modify `KdpDetail.tsx`**
 
 Open `web.ui/frontend-react/src/pages/KdpDetail.tsx`. At the import block near the top, add:
 
@@ -3214,7 +3214,7 @@ Then find the closing of the right-column `<div>` containing the metadata grid (
           />
 ```
 
-The component is self-contained; it sits in the right column and styles itself with a top margin. If the layout looks cramped, move it OUTSIDE the right-column `<div>` and BEFORE `<section style={{ marginTop: '32px' }}>` for "Interior preview" — the card will then span both columns.
+The component is self-contained; it sits in the right column and styles itself with a top margin. If the layout looks cramped, move it OUTSIDE the right-column `<div>` and BEFORE `<section style={{ marginTop: '32px' }}>` for "Interior preview" â€” the card will then span both columns.
 
 The most readable placement: directly above the `<section style={{ marginTop: '32px' }}>` block that renders interior previews. Place it OUTSIDE the right-column wrapper, INSIDE the outer `<section>`:
 
@@ -3231,26 +3231,26 @@ The most readable placement: directly above the `<section style={{ marginTop: '3
         ...
 ```
 
-- [ ] **Step 2: Run the existing KdpDetail tests**
+- [x] **Step 2: Run the existing KdpDetail tests**
 
 Run: `cd web.ui/frontend-react && npx vitest run src/__tests__/KdpDetail.test.tsx`
-Expected: existing tests still pass. If `KdpDetail.test.tsx` does not exist in your tree, skip — the PuzzleAuditCard tests in Task 17 already cover the component, and the mount is a one-line addition.
+Expected: existing tests still pass. If `KdpDetail.test.tsx` does not exist in your tree, skip â€” the PuzzleAuditCard tests in Task 17 already cover the component, and the mount is a one-line addition.
 
-- [ ] **Step 3: Smoke-test in a browser (optional but recommended)**
+- [x] **Step 3: Smoke-test in a browser (optional but recommended)**
 
 ```bash
 cd web.ui/backend && npm start &
 cd web.ui/frontend-react && npm run dev
 ```
-Navigate to `http://localhost:5173/kdp/large-print-sudoku-grandparents`. Expected: a "Puzzle audit" card with an "Unchecked" chip and a "Re-audit" button. Do NOT click Re-audit yet — that happens in Commit 3.
+Navigate to `http://localhost:5173/kdp/large-print-sudoku-grandparents`. Expected: a "Puzzle audit" card with an "Unchecked" chip and a "Re-audit" button. Do NOT click Re-audit yet â€” that happens in Commit 3.
 
-- [ ] **Step 4: Stage**
+- [x] **Step 4: Stage**
 
 ```bash
 git add web.ui/frontend-react/src/pages/KdpDetail.tsx
 ```
 
-- [ ] **Step 5: COMMIT the dashboard puzzle-audit extension**
+- [x] **Step 5: COMMIT the dashboard puzzle-audit extension**
 
 ```bash
 git status
@@ -3264,7 +3264,7 @@ New POST /api/kdp/books/:slug/audit-puzzles route in
 web.ui/backend/kdp/audit_routes.js spawns the audit_puzzles.py CLI via an
 injectable pythonRunner factory, validates the slug against
 ^[a-z0-9][a-z0-9-]*$, enforces a 5-minute timeout, captures the JSON
-contract from spec §4, and persists it on the row. Emits
+contract from spec Â§4, and persists it on the row. Emits
 kdp:audit-started + kdp:audit-complete over SSE.
 
 Frontend: extends KdpBook with the three new fields plus PuzzleAuditEntry
@@ -3278,21 +3278,21 @@ timeout + non-zero exit + invalid slug), kdp_api_audit.test.ts,
 PuzzleAuditCard.test.tsx (5 cases including all three status chips).
 
 Spec: docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md
-§3.3, §4, §7, §8, §9
+Â§3.3, Â§4, Â§7, Â§8, Â§9
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
 )"
 ```
 
-- [ ] **Step 6: Verify commit landed**
+- [x] **Step 6: Verify commit landed**
 
 Run: `git log --oneline -2`
 Expected: a `feat(audit): ...` line at HEAD followed by the `feat(sudoku): ...` from Commit 1.
 
 ---
 
-## Commit 3 — Regenerate 3 live SKUs
+## Commit 3 â€” Regenerate 3 live SKUs
 
 End-of-phase commit message: `chore(sudoku): regenerate 3 live sudoku books with verified puzzles`
 
@@ -3304,15 +3304,15 @@ Each task in this phase runs a real `rebuild_sudoku.py` invocation. Wall-clock p
 - Modify (generated): `projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparents/interior.pdf`
 - Create (generated): `projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparents/puzzles.json`
 
-- [ ] **Step 1: Capture the old interior page count**
+- [x] **Step 1: Capture the old interior page count**
 
 Run:
 ```bash
 python -c "from pypdf import PdfReader; r = PdfReader('projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparents/interior.pdf'); print(len(r.pages))"
 ```
-Expected: a page count number (e.g., `188`). Record this number — the new interior must match within ±2 pages.
+Expected: a page count number (e.g., `188`). Record this number â€” the new interior must match within Â±2 pages.
 
-- [ ] **Step 2: Run the rebuild**
+- [x] **Step 2: Run the rebuild**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -3326,7 +3326,7 @@ wrote .../output/kdp-ready/large-print-sudoku-grandparents/puzzles.json
 ```
 Wall-clock: 5-10 minutes.
 
-- [ ] **Step 3: Verify the outputs**
+- [x] **Step 3: Verify the outputs**
 
 ```bash
 ls -lh projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparents/
@@ -3335,10 +3335,10 @@ python -c "import json; d = json.load(open('projects/kdp-puzzle-press/output/kdp
 ```
 Expected:
 - `interior.pdf` and `puzzles.json` both present and non-empty.
-- `pages: <within ±2 of the old count>`.
+- `pages: <within Â±2 of the old count>`.
 - `puzzles: 80` (40 Easy + 30 Medium + 10 Hard per the book module).
 
-- [ ] **Step 4: Stage but do NOT commit yet**
+- [x] **Step 4: Stage but do NOT commit yet**
 
 ```bash
 git add projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparents/interior.pdf \
@@ -3349,14 +3349,14 @@ git add projects/kdp-puzzle-press/output/kdp-ready/large-print-sudoku-grandparen
 
 ### Task 20: Rebuild `travel-sudoku-v1`
 
-- [ ] **Step 1: Capture the old page count**
+- [x] **Step 1: Capture the old page count**
 
 ```bash
 python -c "from pypdf import PdfReader; r = PdfReader('projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v1/interior.pdf'); print(len(r.pages))"
 ```
 Record this number.
 
-- [ ] **Step 2: Run the rebuild**
+- [x] **Step 2: Run the rebuild**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -3364,7 +3364,7 @@ python scripts/rebuild_sudoku.py --book=travel-sudoku-v1
 ```
 Wall-clock: 10-15 minutes (120 puzzles).
 
-- [ ] **Step 3: Verify the outputs**
+- [x] **Step 3: Verify the outputs**
 
 ```bash
 ls -lh projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v1/
@@ -3373,10 +3373,10 @@ python -c "import json; d = json.load(open('projects/kdp-puzzle-press/output/kdp
 ```
 Expected:
 - Both files present.
-- `pages: <within ±2 of the old count>`.
-- `puzzles: 120` (30 × 4 difficulties).
+- `pages: <within Â±2 of the old count>`.
+- `puzzles: 120` (30 Ã— 4 difficulties).
 
-- [ ] **Step 4: Stage**
+- [x] **Step 4: Stage**
 
 ```bash
 git add projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v1/interior.pdf \
@@ -3387,30 +3387,30 @@ git add projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v1/interior.pdf
 
 ### Task 21: Rebuild `travel-sudoku-v2` + audit all three via the dashboard
 
-- [ ] **Step 1: Capture the old page count for v2**
+- [x] **Step 1: Capture the old page count for v2**
 
 ```bash
 python -c "from pypdf import PdfReader; r = PdfReader('projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v2/interior.pdf'); print(len(r.pages))"
 ```
 Record this number.
 
-- [ ] **Step 2: Run the rebuild**
+- [x] **Step 2: Run the rebuild**
 
 ```bash
 cd projects/kdp-puzzle-press
 python scripts/rebuild_sudoku.py --book=travel-sudoku-v2
 ```
 
-- [ ] **Step 3: Verify the outputs**
+- [x] **Step 3: Verify the outputs**
 
 ```bash
 ls -lh projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v2/
 python -c "from pypdf import PdfReader; r = PdfReader('projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v2/interior.pdf'); print('pages:', len(r.pages))"
 python -c "import json; d = json.load(open('projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v2/puzzles.json')); print('puzzles:', len(d['puzzles']))"
 ```
-Expected: page count within ±2 of old; puzzles match the v2 book module's `generate_set` total.
+Expected: page count within Â±2 of old; puzzles match the v2 book module's `generate_set` total.
 
-- [ ] **Step 4: Start the dashboard backend (if not running)**
+- [x] **Step 4: Start the dashboard backend (if not running)**
 
 ```bash
 cd web.ui/backend
@@ -3424,7 +3424,7 @@ curl -X POST http://localhost:5000/api/kdp/scan
 ```
 If no such manual endpoint exists yet, restart the backend; the scanner runs once on boot.
 
-- [ ] **Step 5: Audit each of the 3 books via the new endpoint**
+- [x] **Step 5: Audit each of the 3 books via the new endpoint**
 
 ```bash
 for slug in large-print-sudoku-grandparents travel-sudoku-v1 travel-sudoku-v2; do
@@ -3438,9 +3438,9 @@ Expected output for each:
 audit_status: passed
 ```
 
-If any returns `failed`, open `/kdp/<slug>` in the dashboard, click "Show details" on the audit card, and inspect which puzzles failed. Most likely cause if a few fail: the `clue_count` band is too tight and `remove_symmetric` legitimately can't hit the target in some seeds — relax the band in `CLUE_RANGES` and rebuild that one book.
+If any returns `failed`, open `/kdp/<slug>` in the dashboard, click "Show details" on the audit card, and inspect which puzzles failed. Most likely cause if a few fail: the `clue_count` band is too tight and `remove_symmetric` legitimately can't hit the target in some seeds â€” relax the band in `CLUE_RANGES` and rebuild that one book.
 
-- [ ] **Step 6: Stage the v2 outputs**
+- [x] **Step 6: Stage the v2 outputs**
 
 ```bash
 git add projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v2/interior.pdf \
@@ -3451,21 +3451,21 @@ git add projects/kdp-puzzle-press/output/kdp-ready/travel-sudoku-v2/interior.pdf
 
 ### Task 22: Commit the rebuilds + record status in memory
 
-- [ ] **Step 1: Verify all three books are staged**
+- [x] **Step 1: Verify all three books are staged**
 
 ```bash
 git status --short | grep -E "(interior.pdf|puzzles.json)"
 ```
-Expected: 6 modified/added lines (3 × `interior.pdf` + 3 × `puzzles.json`).
+Expected: 6 modified/added lines (3 Ã— `interior.pdf` + 3 Ã— `puzzles.json`).
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
 chore(sudoku): regenerate 3 live sudoku books with verified puzzles
 
 Re-runs scripts/rebuild_sudoku.py for the three live sudoku SKUs using
-the new generator with verified uniqueness + 180° symmetry + technique-
+the new generator with verified uniqueness + 180Â° symmetry + technique-
 tier difficulty:
 
   - large-print-sudoku-grandparents (80 puzzles: 40 E + 30 M + 10 H)
@@ -3474,50 +3474,50 @@ tier difficulty:
 
 Each rebuild updates interior.pdf and writes a new puzzles.json
 capturing every generated puzzle for downstream audit. Page counts
-preserved within ±2 pages of the prior interior. All three audited via
+preserved within Â±2 pages of the prior interior. All three audited via
 POST /api/kdp/books/<slug>/audit-puzzles and confirmed `passed`.
 
 Next step (manual, no API): user uploads each new interior.pdf to KDP
 via "Edit paperback content" -> "Upload manuscript" on the live ASIN.
 If KDP rejects the swap as a major change, fall back to a v2 ASIN per
-spec §2 / §7.
+spec Â§2 / Â§7.
 
-Spec: docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md §10
+Spec: docs/superpowers/specs/2026-05-26-sudoku-quality-rework-design.md Â§10
 
 Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
 EOF
 )"
 ```
 
-- [ ] **Step 3: Verify**
+- [x] **Step 3: Verify**
 
 Run: `git log --oneline -3`
-Expected (HEAD → older):
+Expected (HEAD â†’ older):
 ```
 <hash> chore(sudoku): regenerate 3 live sudoku books with verified puzzles
 <hash> feat(audit): dashboard puzzle-audit extension
-<hash> feat(sudoku): rewrite generator with uniqueness + 180° symmetry + technique grader
+<hash> feat(sudoku): rewrite generator with uniqueness + 180Â° symmetry + technique grader
 ```
 
-- [ ] **Step 4: Update the KDP catalog status memory (optional follow-up)**
+- [x] **Step 4: Update the KDP catalog status memory (optional follow-up)**
 
 Open `C:/Users/marts/.claude/projects/c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management/memory/kdp-catalog-status-2026-05-17.md` and append a note under the sudoku SKUs:
 
 ```
-2026-05-26: Interior rebuilt with new generator (verified unique, 180° symmetric,
+2026-05-26: Interior rebuilt with new generator (verified unique, 180Â° symmetric,
 technique-graded). Awaiting manual KDP "Edit content -> Upload manuscript" by user
 on each live ASIN. If KDP rejects as a major change, fall back to v2 ASIN.
 ```
 
-This memory edit is **not** committed in git (memory lives outside the repo), so no `git add` needed. If you forget this step it is non-blocking — the catalog status memory has a follow-up update window and this can be deferred.
+This memory edit is **not** committed in git (memory lives outside the repo), so no `git add` needed. If you forget this step it is non-blocking â€” the catalog status memory has a follow-up update window and this can be deferred.
 
-- [ ] **Step 5: Hand off**
+- [x] **Step 5: Hand off**
 
 The plan is complete on this branch. Inform the user:
 
 > "All three commits landed:
-> 1. `feat(sudoku): rewrite generator …`
+> 1. `feat(sudoku): rewrite generator â€¦`
 > 2. `feat(audit): dashboard puzzle-audit extension`
-> 3. `chore(sudoku): regenerate 3 live sudoku books …`
+> 3. `chore(sudoku): regenerate 3 live sudoku books â€¦`
 >
-> The dashboard now reports `passed` for all three sudoku SKUs. The next step is manual on your side: open KDP, go to each live ASIN's "Edit paperback content" page, upload the rebuilt `interior.pdf` under `projects/kdp-puzzle-press/output/kdp-ready/<slug>/interior.pdf`, and submit for review. The dashboard's audit card will let you click 'Re-audit' anytime to confirm the puzzles still pass after future regeneration. If KDP rejects the swap as a major change, see spec §7 for the v2-ASIN fallback playbook."
+> The dashboard now reports `passed` for all three sudoku SKUs. The next step is manual on your side: open KDP, go to each live ASIN's "Edit paperback content" page, upload the rebuilt `interior.pdf` under `projects/kdp-puzzle-press/output/kdp-ready/<slug>/interior.pdf`, and submit for review. The dashboard's audit card will let you click 'Re-audit' anytime to confirm the puzzles still pass after future regeneration. If KDP rejects the swap as a major change, see spec Â§7 for the v2-ASIN fallback playbook."

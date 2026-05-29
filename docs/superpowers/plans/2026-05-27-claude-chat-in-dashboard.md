@@ -1,4 +1,4 @@
-# Claude Chat in Dashboard Implementation Plan
+﻿# Claude Chat in Dashboard Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -12,27 +12,27 @@
 
 ---
 
-## Phase 1 — CLI spike
+## Phase 1 â€” CLI spike
 
 Goal: prove (or disprove) that `claude --print --session-id <uuid>` can drive a multi-turn, headless, streaming conversation with parseable tool-call markers and no interactive prompts. Commit one report + one go/no-go decision before any production code lands.
 
 ### Task 1: Write the spike script
 
-- [ ] Create `scripts/spike_claude_cli.mjs` — Node ESM script (no test harness; manual probe).
+- [x] Create `scripts/spike_claude_cli.mjs` â€” Node ESM script (no test harness; manual probe).
 
-Contents (skeleton — keep prose to commit-friendly minimum):
+Contents (skeleton â€” keep prose to commit-friendly minimum):
 
 ```js
 #!/usr/bin/env node
 /**
- * Spike — verifies the 5 risks in spec §8 against the local Claude Code CLI.
+ * Spike â€” verifies the 5 risks in spec Â§8 against the local Claude Code CLI.
  *
  * Runs TWO turns inside a single --session-id to test:
- *   (a) session-id resume — turn 2 must remember turn 1
- *   (b) streaming granularity — measures chunk count + inter-chunk gaps
- *   (c) tool-call markers — turn 2 prompt forces a Read; we grep stdout
- *   (d) permission-prompt headless behavior — no TTY; does it block?
- *   (e) startup latency — wall-time from spawn → first stdout byte
+ *   (a) session-id resume â€” turn 2 must remember turn 1
+ *   (b) streaming granularity â€” measures chunk count + inter-chunk gaps
+ *   (c) tool-call markers â€” turn 2 prompt forces a Read; we grep stdout
+ *   (d) permission-prompt headless behavior â€” no TTY; does it block?
+ *   (e) startup latency â€” wall-time from spawn â†’ first stdout byte
  *
  * Prints a markdown report to stdout. Pipe into the report file.
  */
@@ -137,33 +137,33 @@ ${turn2.stderr}
 `);
 ```
 
-- [ ] Make the script idempotent and runnable as `node scripts/spike_claude_cli.mjs`.
-- [ ] Verify the script lints cleanly under the repo's eslint config (no commit yet).
+- [x] Make the script idempotent and runnable as `node scripts/spike_claude_cli.mjs`.
+- [x] Verify the script lints cleanly under the repo's eslint config (no commit yet).
 
 ### Task 2: Run the spike + capture report
 
-- [ ] Run: `node scripts/spike_claude_cli.mjs > docs/superpowers/specs/2026-05-27-claude-chat-spike-report.md`.
-- [ ] Open the report. Verify all 5 risk lines are populated. If any risk row reads FAIL, **do not delete it** — the failure becomes input to Task 3.
-- [ ] If the script itself crashes (claude binary missing, etc.), commit the report nonetheless with a section "## Spike could not run" describing the failure. That counts as a no-go.
-- [ ] No commit yet; this is intermediate.
+- [x] Run: `node scripts/spike_claude_cli.mjs > docs/superpowers/specs/2026-05-27-claude-chat-spike-report.md`.
+- [x] Open the report. Verify all 5 risk lines are populated. If any risk row reads FAIL, **do not delete it** â€” the failure becomes input to Task 3.
+- [x] If the script itself crashes (claude binary missing, etc.), commit the report nonetheless with a section "## Spike could not run" describing the failure. That counts as a no-go.
+- [x] No commit yet; this is intermediate.
 
 ### Task 3: Decision memo + commit (Phase 1 commit)
 
-- [ ] Append a "## Decision" section to `docs/superpowers/specs/2026-05-27-claude-chat-spike-report.md`:
-  - If **all 5 risks PASS** (or risk (b) is PARTIAL but everything else passes): write `Decision: GO — proceed with Path C (CLI subprocess) per spec §1.` Note any flags needed (`--dangerously-skip-permissions`, `--permission-mode`, etc.) discovered during the spike. Continue to Phase 2.
-  - If **any risk FAILs**: write `Decision: NO-GO — pivot to Path B (Anthropic Agent SDK in-process) per spec §1. STOP this plan; open a follow-up spec for Path B.` Do not proceed past Phase 1.
-- [ ] Stage `scripts/spike_claude_cli.mjs` and `docs/superpowers/specs/2026-05-27-claude-chat-spike-report.md`.
-- [ ] Commit: `docs(chat): CLI spike report + path C go/no-go decision`.
+- [x] Append a "## Decision" section to `docs/superpowers/specs/2026-05-27-claude-chat-spike-report.md`:
+  - If **all 5 risks PASS** (or risk (b) is PARTIAL but everything else passes): write `Decision: GO â€” proceed with Path C (CLI subprocess) per spec Â§1.` Note any flags needed (`--dangerously-skip-permissions`, `--permission-mode`, etc.) discovered during the spike. Continue to Phase 2.
+  - If **any risk FAILs**: write `Decision: NO-GO â€” pivot to Path B (Anthropic Agent SDK in-process) per spec Â§1. STOP this plan; open a follow-up spec for Path B.` Do not proceed past Phase 1.
+- [x] Stage `scripts/spike_claude_cli.mjs` and `docs/superpowers/specs/2026-05-27-claude-chat-spike-report.md`.
+- [x] Commit: `docs(chat): CLI spike report + path C go/no-go decision`.
 
 ---
 
-## Phase 2 — Backend chat module
+## Phase 2 â€” Backend chat module
 
-Goal: a fully tested backend that persists conversations, spawns the CLI per turn, and streams output to clients over SSE. No UI yet — verified via supertest + curl.
+Goal: a fully tested backend that persists conversations, spawns the CLI per turn, and streams output to clients over SSE. No UI yet â€” verified via supertest + curl.
 
 ### Task 4: Migration 0003 + db test
 
-- [ ] Write **failing** test in `web.ui/backend/__tests__/db.test.js` — add a new `describe('chat schema', ...)` block:
+- [x] Write **failing** test in `web.ui/backend/__tests__/db.test.js` â€” add a new `describe('chat schema', ...)` block:
 
 ```js
 describe('chat schema (0003_chat.sql)', () => {
@@ -202,12 +202,12 @@ describe('chat schema (0003_chat.sql)', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure (tables don't exist yet).
-- [ ] Create `web.ui/backend/migrations/0003_chat.sql`:
+- [x] Run vitest; confirm failure (tables don't exist yet).
+- [x] Create `web.ui/backend/migrations/0003_chat.sql`:
 
 ```sql
--- Migration 0003 — chat (conversations + messages) for the in-dashboard Claude chat.
--- Source of truth: docs/superpowers/specs/2026-05-27-claude-chat-in-dashboard-design.md §4
+-- Migration 0003 â€” chat (conversations + messages) for the in-dashboard Claude chat.
+-- Source of truth: docs/superpowers/specs/2026-05-27-claude-chat-in-dashboard-design.md Â§4
 
 CREATE TABLE IF NOT EXISTS conversations (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -229,11 +229,11 @@ CREATE TABLE IF NOT EXISTS messages (
 CREATE INDEX IF NOT EXISTS idx_messages_conv ON messages(conversation_id, created_at);
 ```
 
-- [ ] Re-run vitest; both new tests pass. No commit yet.
+- [x] Re-run vitest; both new tests pass. No commit yet.
 
-### Task 5: persistence.js — SQL helpers
+### Task 5: persistence.js â€” SQL helpers
 
-- [ ] Write **failing** tests in `web.ui/backend/chat/__tests__/persistence.test.js` covering each export. Sample skeleton:
+- [x] Write **failing** tests in `web.ui/backend/chat/__tests__/persistence.test.js` covering each export. Sample skeleton:
 
 ```js
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -317,8 +317,8 @@ describe('chat/persistence.js', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/backend/chat/persistence.js`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/backend/chat/persistence.js`:
 
 ```js
 /**
@@ -431,11 +431,11 @@ export function setClaudeSessionId({ db, conversationId, claudeSessionId }) {
 }
 ```
 
-- [ ] Re-run vitest; all 6 persistence tests pass.
+- [x] Re-run vitest; all 6 persistence tests pass.
 
-### Task 6: session_state.js — in-memory cache
+### Task 6: session_state.js â€” in-memory cache
 
-- [ ] Write **failing** tests in `web.ui/backend/chat/__tests__/session_state.test.js`:
+- [x] Write **failing** tests in `web.ui/backend/chat/__tests__/session_state.test.js`:
 
 ```js
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -472,16 +472,16 @@ describe('chat/session_state.js', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/backend/chat/session_state.js`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/backend/chat/session_state.js`:
 
 ```js
 /**
- * In-memory map: conversationId → { claudeSessionId, subprocess?, lastActivityAt }.
+ * In-memory map: conversationId â†’ { claudeSessionId, subprocess?, lastActivityAt }.
  * Used to (a) resume the same --session-id across turns, (b) optionally hold a
  * warm subprocess per conversation, (c) detect idle conversations for cleanup.
  *
- * NOT persisted — process restart re-reads claude_session_id from SQL.
+ * NOT persisted â€” process restart re-reads claude_session_id from SQL.
  */
 
 /**
@@ -527,11 +527,11 @@ export function _resetForTests() {
 }
 ```
 
-- [ ] Re-run vitest; all 4 tests pass.
+- [x] Re-run vitest; all 4 tests pass.
 
-### Task 7: cli_runner.js — subprocess wrapper
+### Task 7: cli_runner.js â€” subprocess wrapper
 
-- [ ] Write **failing** tests in `web.ui/backend/chat/__tests__/cli_runner.test.js` using a fake `spawnFn` that returns an `EventEmitter` with `stdout`/`stderr` sub-emitters:
+- [x] Write **failing** tests in `web.ui/backend/chat/__tests__/cli_runner.test.js` using a fake `spawnFn` that returns an `EventEmitter` with `stdout`/`stderr` sub-emitters:
 
 ```js
 import { describe, it, expect, vi } from 'vitest';
@@ -636,13 +636,13 @@ describe('chat/cli_runner.js', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/backend/chat/cli_runner.js`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/backend/chat/cli_runner.js`:
 
 ```js
 /**
  * Spawns `claude --print --session-id <id> "<prompt>"` and streams its
- * output to caller-supplied callbacks. Pure wrapper — does NOT touch SQL or
+ * output to caller-supplied callbacks. Pure wrapper â€” does NOT touch SQL or
  * SSE. Routes glue the two together.
  *
  * The `spawnFn` parameter is injectable for unit tests; default is
@@ -650,7 +650,7 @@ describe('chat/cli_runner.js', () => {
  *
  * Tool-call markers in stdout: lines prefixed with `__TOOL__` carry a JSON
  * payload like `{"tool":"Read","args":{...},"status":"started"|"completed","ms":N}`.
- * The exact prefix is confirmed during Phase 1 spike — if the real CLI uses
+ * The exact prefix is confirmed during Phase 1 spike â€” if the real CLI uses
  * a different marker, update TOOL_MARKER + parser here.
  */
 
@@ -722,7 +722,7 @@ export function runClaudeTurn(args) {
             toolCalls.push(call);
             onToolCall(call);
           } catch (err) {
-            onError(new Error(`bad tool marker: ${line} — ${err.message}`));
+            onError(new Error(`bad tool marker: ${line} â€” ${err.message}`));
           }
         } else if (line.length > 0) {
           textParts.push(line + '\n');
@@ -775,11 +775,11 @@ export function runClaudeTurn(args) {
 }
 ```
 
-- [ ] Re-run vitest; all 4 cli_runner tests pass.
+- [x] Re-run vitest; all 4 cli_runner tests pass.
 
-### Task 8: routes.js — REST endpoints
+### Task 8: routes.js â€” REST endpoints
 
-- [ ] Write **failing** tests in `web.ui/backend/chat/__tests__/routes.test.js` using supertest + a fresh test DB:
+- [x] Write **failing** tests in `web.ui/backend/chat/__tests__/routes.test.js` using supertest + a fresh test DB:
 
 ```js
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -844,8 +844,8 @@ describe('chat REST', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failures.
-- [ ] Create `web.ui/backend/chat/routes.js`:
+- [x] Run vitest; confirm failures.
+- [x] Create `web.ui/backend/chat/routes.js`:
 
 ```js
 /**
@@ -1011,11 +1011,11 @@ export function mountChatRoutes(app, deps) {
 }
 ```
 
-- [ ] Re-run vitest; all 5 REST tests pass.
+- [x] Re-run vitest; all 5 REST tests pass.
 
 ### Task 9: SSE message endpoint test
 
-- [ ] Add SSE test to `web.ui/backend/chat/__tests__/routes.test.js`:
+- [x] Add SSE test to `web.ui/backend/chat/__tests__/routes.test.js`:
 
 ```js
 describe('POST /api/chat/conversations/:id/messages (SSE)', () => {
@@ -1091,11 +1091,11 @@ describe('POST /api/chat/conversations/:id/messages (SSE)', () => {
 });
 ```
 
-- [ ] Run vitest; both SSE tests pass.
+- [x] Run vitest; both SSE tests pass.
 
 ### Task 10: Wire into server.js
 
-- [ ] Write **failing** wiring test in `web.ui/backend/__tests__/server_chat_wiring.test.js`:
+- [x] Write **failing** wiring test in `web.ui/backend/__tests__/server_chat_wiring.test.js`:
 
 ```js
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -1125,19 +1125,19 @@ describe('server.js chat wiring', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure (route not mounted).
-- [ ] Edit `web.ui/backend/server.js`:
+- [x] Run vitest; confirm failure (route not mounted).
+- [x] Edit `web.ui/backend/server.js`:
   - Add import near the other module imports: `import { mountChatRoutes } from './chat/routes.js';`
   - Mount near the other `mountXRoutes` calls (after `mountReminderActionRoutes` is fine):
     ```js
-    // ── /api/chat/* — Claude Code chat (conversations + SSE-streamed turns) ──
+    // â”€â”€ /api/chat/* â€” Claude Code chat (conversations + SSE-streamed turns) â”€â”€
     mountChatRoutes(app, { db: openDb() });
     ```
-- [ ] Re-run vitest; wiring test passes.
+- [x] Re-run vitest; wiring test passes.
 
 ### Task 11: Commit Phase 2
 
-- [ ] Stage all Phase 2 files:
+- [x] Stage all Phase 2 files:
   - `web.ui/backend/migrations/0003_chat.sql`
   - `web.ui/backend/chat/persistence.js`
   - `web.ui/backend/chat/session_state.js`
@@ -1150,18 +1150,18 @@ describe('server.js chat wiring', () => {
   - `web.ui/backend/__tests__/db.test.js` (extended)
   - `web.ui/backend/__tests__/server_chat_wiring.test.js`
   - `web.ui/backend/server.js`
-- [ ] Run full vitest suite from repo root; all green.
-- [ ] Commit: `feat(chat): backend persistence + CLI runner + REST/SSE routes`.
+- [x] Run full vitest suite from repo root; all green.
+- [x] Commit: `feat(chat): backend persistence + CLI runner + REST/SSE routes`.
 
 ---
 
-## Phase 3 — Frontend chat shell
+## Phase 3 â€” Frontend chat shell
 
-Goal: a working `/chat` page plus a slide-in `ChatDrawer` reachable from every page, both driven by one `useChat` hook. Real SSE wiring against the Phase 2 backend. Blob is a static placeholder div this phase — Phase 4 replaces it.
+Goal: a working `/chat` page plus a slide-in `ChatDrawer` reachable from every page, both driven by one `useChat` hook. Real SSE wiring against the Phase 2 backend. Blob is a static placeholder div this phase â€” Phase 4 replaces it.
 
-### Task 12: api/chat.ts — typed client
+### Task 12: api/chat.ts â€” typed client
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/api/__tests__/chat.test.ts`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/api/__tests__/chat.test.ts`:
 
 ```ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -1221,8 +1221,8 @@ describe('api/chat.ts', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/frontend-react/src/api/chat.ts`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/frontend-react/src/api/chat.ts`:
 
 ```ts
 import { ApiError } from './kdp';
@@ -1308,7 +1308,7 @@ export interface SendHandle {
 /**
  * Posts a user message and returns a handle subscribed to the SSE stream.
  * Uses `fetch` to POST (so we send the body) and a manual ReadableStream
- * reader to parse SSE — EventSource doesn't support POST bodies.
+ * reader to parse SSE â€” EventSource doesn't support POST bodies.
  */
 export function sendMessage(conversationId: number, content: string): SendHandle {
   const chunkCbs: Array<(text: string) => void> = [];
@@ -1372,11 +1372,11 @@ export function sendMessage(conversationId: number, content: string): SendHandle
 }
 ```
 
-- [ ] Re-run vitest; all 5 client tests pass.
+- [x] Re-run vitest; all 5 client tests pass.
 
 ### Task 13: useChat hook
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/hooks/__tests__/useChat.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/hooks/__tests__/useChat.test.tsx`:
 
 ```tsx
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -1414,8 +1414,8 @@ describe('useChat', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/frontend-react/src/hooks/useChat.ts`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/frontend-react/src/hooks/useChat.ts`:
 
 ```ts
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -1615,11 +1615,11 @@ export function useChat(): UseChatResult {
 }
 ```
 
-- [ ] Re-run vitest; both useChat tests pass.
+- [x] Re-run vitest; both useChat tests pass.
 
 ### Task 14: ChatMessages.tsx
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatMessages.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatMessages.test.tsx`:
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -1652,8 +1652,8 @@ describe('ChatMessages', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatMessages.tsx`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatMessages.tsx`:
 
 ```tsx
 import ReactMarkdown from 'react-markdown';
@@ -1699,7 +1699,7 @@ export default function ChatMessages({ messages, sendInFlight }: Props) {
             </div>
           )}
           {m.error_text && (
-            <div className="chat-msg-error">⚠ {m.error_text}</div>
+            <div className="chat-msg-error">âš  {m.error_text}</div>
           )}
         </div>
       ))}
@@ -1713,12 +1713,12 @@ export default function ChatMessages({ messages, sendInFlight }: Props) {
 }
 ```
 
-- [ ] Create `web.ui/frontend-react/src/components/chat/chat.css` with minimal class skeletons (`.chat-messages`, `.chat-msg`, `.chat-msg-user`, `.chat-msg-assistant`, `.chat-tool-call`, `.chat-loading-dots`, `.chat-drawer`, `.chat-composer`, `.chat-conversation-list`). One color per role, fixed line-height, no fancy CSS — Phase 4/5 polish later.
-- [ ] Re-run vitest; all 3 tests pass.
+- [x] Create `web.ui/frontend-react/src/components/chat/chat.css` with minimal class skeletons (`.chat-messages`, `.chat-msg`, `.chat-msg-user`, `.chat-msg-assistant`, `.chat-tool-call`, `.chat-loading-dots`, `.chat-drawer`, `.chat-composer`, `.chat-conversation-list`). One color per role, fixed line-height, no fancy CSS â€” Phase 4/5 polish later.
+- [x] Re-run vitest; all 3 tests pass.
 
 ### Task 15: ChatComposer.tsx
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatComposer.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatComposer.test.tsx`:
 
 ```tsx
 import { describe, it, expect, vi } from 'vitest';
@@ -1752,8 +1752,8 @@ describe('ChatComposer', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatComposer.tsx`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatComposer.tsx`:
 
 ```tsx
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -1817,18 +1817,18 @@ export default function ChatComposer({ onSend, onFocusChange, disabled }: Props)
           setValue('');
         }}
       >
-        ↵
+        â†µ
       </button>
     </div>
   );
 }
 ```
 
-- [ ] Re-run vitest; all 3 composer tests pass.
+- [x] Re-run vitest; all 3 composer tests pass.
 
 ### Task 16: ChatConversationList.tsx
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatConversationList.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatConversationList.test.tsx`:
 
 ```tsx
 import { describe, it, expect, vi } from 'vitest';
@@ -1868,8 +1868,8 @@ describe('ChatConversationList', () => {
 });
 ```
 
-- [ ] Run vitest; confirm failure.
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatConversationList.tsx`:
+- [x] Run vitest; confirm failure.
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatConversationList.tsx`:
 
 ```tsx
 import { useState } from 'react';
@@ -1946,7 +1946,7 @@ export default function ChatConversationList({
               aria-label={`Delete ${c.title}`}
               onClick={() => setConfirmDeleteId(c.id)}
             >
-              ×
+              Ã—
             </button>
           </li>
         ))}
@@ -1965,11 +1965,11 @@ export default function ChatConversationList({
 }
 ```
 
-- [ ] Re-run vitest; all 3 tests pass.
+- [x] Re-run vitest; all 3 tests pass.
 
 ### Task 17: Chat.tsx page
 
-- [ ] Create `web.ui/frontend-react/src/pages/Chat.tsx`:
+- [x] Create `web.ui/frontend-react/src/pages/Chat.tsx`:
 
 ```tsx
 import { useChat } from '../hooks/useChat';
@@ -2007,12 +2007,12 @@ export default function Chat() {
 }
 ```
 
-- [ ] Add layout rules to `chat.css`: `.chat-page { display: flex; gap: 16px; }`, `.chat-conversation-list { width: 250px; }`, `.chat-page-main { flex: 1; display: flex; flex-direction: column; }`, `.chat-page-blob { width: 250px; }`.
-- [ ] No new tests needed yet — covered indirectly by Task 21.
+- [x] Add layout rules to `chat.css`: `.chat-page { display: flex; gap: 16px; }`, `.chat-conversation-list { width: 250px; }`, `.chat-page-main { flex: 1; display: flex; flex-direction: column; }`, `.chat-page-blob { width: 250px; }`.
+- [x] No new tests needed yet â€” covered indirectly by Task 21.
 
 ### Task 18: ChatDrawer.tsx
 
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatDrawer.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatDrawer.tsx`:
 
 ```tsx
 import { useEffect } from 'react';
@@ -2062,13 +2062,13 @@ export default function ChatDrawer({ isOpen, onClose }: Props) {
               else if (v) void chat.selectConversation(Number(v));
             }}
           >
-            <option value="">— select a conversation —</option>
+            <option value="">â€” select a conversation â€”</option>
             <option value="__new__">+ New conversation</option>
             {chat.conversations.map((c) => (
               <option key={c.id} value={c.id}>{c.title}</option>
             ))}
           </select>
-          <button type="button" onClick={onClose} aria-label="Close chat">×</button>
+          <button type="button" onClick={onClose} aria-label="Close chat">Ã—</button>
         </header>
         <div className="chat-drawer-body">
           <ChatMessages messages={chat.messages} sendInFlight={chat.sendInFlight} />
@@ -2084,11 +2084,11 @@ export default function ChatDrawer({ isOpen, onClose }: Props) {
 }
 ```
 
-- [ ] Add drawer CSS in `chat.css`: `.chat-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 400px; background: var(--surface); box-shadow: -4px 0 16px rgba(0,0,0,.2); }`, `.chat-drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3); }`.
+- [x] Add drawer CSS in `chat.css`: `.chat-drawer { position: fixed; top: 0; right: 0; height: 100vh; width: 400px; background: var(--surface); box-shadow: -4px 0 16px rgba(0,0,0,.2); }`, `.chat-drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3); }`.
 
-### Task 19: Header — Blob placeholder + drawer toggle
+### Task 19: Header â€” Blob placeholder + drawer toggle
 
-- [ ] Edit `web.ui/frontend-react/src/components/Header.tsx`:
+- [x] Edit `web.ui/frontend-react/src/components/Header.tsx`:
   - Add `useChatDrawer` import (created in Task 20).
   - In the right-side cluster, between the `<ThemeToggle />` and the `<button className="bell">`, insert:
     ```tsx
@@ -2105,11 +2105,11 @@ export default function ChatDrawer({ isOpen, onClose }: Props) {
     </button>
     ```
   - Pull `openDrawer` via `const { open: openDrawer } = useChatDrawer();`.
-- [ ] Add `.chat-blob-trigger { background: none; border: none; cursor: pointer; padding: 4px; }` and `.chat-blob-trigger-placeholder { display: inline-block; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(#CAA457, #1F4F66); }` to `chat.css`.
+- [x] Add `.chat-blob-trigger { background: none; border: none; cursor: pointer; padding: 4px; }` and `.chat-blob-trigger-placeholder { display: inline-block; width: 36px; height: 36px; border-radius: 50%; background: radial-gradient(#CAA457, #1F4F66); }` to `chat.css`.
 
 ### Task 20: App-level drawer context + /chat route
 
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatDrawerContext.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatDrawerContext.tsx`:
 
 ```tsx
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
@@ -2143,7 +2143,7 @@ export function useChatDrawer(): ChatDrawerContextValue {
 }
 ```
 
-- [ ] Edit `web.ui/frontend-react/src/App.tsx`:
+- [x] Edit `web.ui/frontend-react/src/App.tsx`:
   - Add imports: `import Chat from './pages/Chat';`, `import ChatDrawer from './components/chat/ChatDrawer';`, `import { ChatDrawerProvider, useChatDrawer } from './components/chat/ChatDrawerContext';`.
   - Wrap `<BrowserRouter>` body in `<ChatDrawerProvider>`.
   - Add `<Route path="/chat" element={<Chat />} />` to the Routes list.
@@ -2157,18 +2157,18 @@ export function useChatDrawer(): ChatDrawerContextValue {
 
 ### Task 21: Tests for Chat.tsx + ChatDrawer.tsx
 
-- [ ] Write `web.ui/frontend-react/src/pages/__tests__/Chat.test.tsx` with a `vi.mock('../hooks/useChat', ...)` returning a static hook value; assert that the conversation list, messages, composer, and blob placeholder all render.
-- [ ] Write `web.ui/frontend-react/src/components/chat/__tests__/ChatDrawer.test.tsx`:
+- [x] Write `web.ui/frontend-react/src/pages/__tests__/Chat.test.tsx` with a `vi.mock('../hooks/useChat', ...)` returning a static hook value; assert that the conversation list, messages, composer, and blob placeholder all render.
+- [x] Write `web.ui/frontend-react/src/components/chat/__tests__/ChatDrawer.test.tsx`:
   - Renders nothing when `isOpen={false}`.
   - Renders messages + composer when `isOpen={true}`.
   - Pressing Escape calls `onClose`.
   - Clicking the overlay calls `onClose`.
-- [ ] Write `web.ui/frontend-react/src/components/chat/__tests__/ChatDrawerContext.test.tsx` — `open()` → `isOpen=true`; persists to `localStorage`.
-- [ ] Run vitest; all pass.
+- [x] Write `web.ui/frontend-react/src/components/chat/__tests__/ChatDrawerContext.test.tsx` â€” `open()` â†’ `isOpen=true`; persists to `localStorage`.
+- [x] Run vitest; all pass.
 
 ### Task 22: Commit Phase 3
 
-- [ ] Stage:
+- [x] Stage:
   - `web.ui/frontend-react/src/api/chat.ts`
   - `web.ui/frontend-react/src/api/__tests__/chat.test.ts`
   - `web.ui/frontend-react/src/hooks/useChat.ts`
@@ -2184,18 +2184,18 @@ export function useChatDrawer(): ChatDrawerContextValue {
   - `web.ui/frontend-react/src/pages/__tests__/Chat.test.tsx`
   - `web.ui/frontend-react/src/components/Header.tsx`
   - `web.ui/frontend-react/src/App.tsx`
-- [ ] Run vitest + the React lint config; all green.
-- [ ] Commit: `feat(chat): frontend shell — /chat page + drawer + composer + SSE wiring`.
+- [x] Run vitest + the React lint config; all green.
+- [x] Commit: `feat(chat): frontend shell â€” /chat page + drawer + composer + SSE wiring`.
 
 ---
 
-## Phase 4 — The Blob
+## Phase 4 â€” The Blob
 
 Goal: replace the three placeholder circles (header / drawer / page) with one `<ChatBlob size>` component driven by a shared context, animating in sync.
 
 ### Task 23: useChatBlob hook
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/hooks/__tests__/useChatBlob.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/hooks/__tests__/useChatBlob.test.tsx`:
 
 ```tsx
 import { describe, it, expect, vi } from 'vitest';
@@ -2231,7 +2231,7 @@ describe('useChatBlobState', () => {
 });
 ```
 
-- [ ] Create `web.ui/frontend-react/src/hooks/useChatBlob.ts`:
+- [x] Create `web.ui/frontend-react/src/hooks/useChatBlob.ts`:
 
 ```ts
 import { useMemo } from 'react';
@@ -2254,11 +2254,11 @@ export function useChatBlobState({
 }
 ```
 
-- [ ] Run vitest; tests pass.
+- [x] Run vitest; tests pass.
 
 ### Task 24: ChatBlobContext
 
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatBlobContext.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatBlobContext.tsx`:
 
 ```tsx
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -2294,12 +2294,12 @@ export function useChatBlobContext(): ChatBlobState {
 }
 ```
 
-- [ ] Wrap `<App>` body in `<ChatBlobProvider>` (alongside `<ChatDrawerProvider>`).
+- [x] Wrap `<App>` body in `<ChatBlobProvider>` (alongside `<ChatDrawerProvider>`).
 
 ### Task 25: blob_engine.ts
 
-- [ ] Install `simplex-noise`: run `npm install simplex-noise --workspace web.ui/frontend-react`.
-- [ ] Write **failing** snapshot test in `web.ui/frontend-react/src/components/chat/__tests__/blob_engine.test.ts`:
+- [x] Install `simplex-noise`: run `npm install simplex-noise --workspace web.ui/frontend-react`.
+- [x] Write **failing** snapshot test in `web.ui/frontend-react/src/components/chat/__tests__/blob_engine.test.ts`:
 
 ```ts
 import { describe, it, expect } from 'vitest';
@@ -2322,7 +2322,7 @@ describe('blob_engine', () => {
 });
 ```
 
-- [ ] Create `web.ui/frontend-react/src/components/chat/blob_engine.ts`:
+- [x] Create `web.ui/frontend-react/src/components/chat/blob_engine.ts`:
 
 ```ts
 import { createNoise2D } from 'simplex-noise';
@@ -2383,7 +2383,7 @@ export function computeBlobPath({
     const radius = r + offset;
     pts.push([cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius]);
   }
-  // Build a Catmull-Rom→cubic Bézier closed path so the silhouette is smooth.
+  // Build a Catmull-Româ†’cubic BÃ©zier closed path so the silhouette is smooth.
   return catmullRomToBezier(pts);
 }
 
@@ -2405,11 +2405,11 @@ function catmullRomToBezier(pts: Array<[number, number]>): string {
 }
 ```
 
-- [ ] Re-run vitest; both blob_engine tests pass.
+- [x] Re-run vitest; both blob_engine tests pass.
 
 ### Task 26: ChatBlob.tsx component
 
-- [ ] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatBlob.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/ChatBlob.test.tsx`:
 
 ```tsx
 import { describe, it, expect } from 'vitest';
@@ -2433,7 +2433,7 @@ describe('ChatBlob', () => {
 });
 ```
 
-- [ ] Create `web.ui/frontend-react/src/components/chat/ChatBlob.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/chat/ChatBlob.tsx`:
 
 ```tsx
 import { useEffect, useRef } from 'react';
@@ -2502,21 +2502,21 @@ export default function ChatBlob({ size, onClick }: Props) {
 }
 ```
 
-- [ ] Re-run vitest; both ChatBlob tests pass. (rAF is stubbed by jsdom — the path's `d` may stay empty initially; the test only checks for `M ` prefix, so we set an initial `d=""` and the first rAF tick fills it. If jsdom doesn't tick rAF, switch the test to call `act(() => { jest.advanceTimersByTime(20); })` after enabling fake timers. Adjust as needed.)
+- [x] Re-run vitest; both ChatBlob tests pass. (rAF is stubbed by jsdom â€” the path's `d` may stay empty initially; the test only checks for `M ` prefix, so we set an initial `d=""` and the first rAF tick fills it. If jsdom doesn't tick rAF, switch the test to call `act(() => { jest.advanceTimersByTime(20); })` after enabling fake timers. Adjust as needed.)
 
 ### Task 27: Replace the 3 placeholders
 
-- [ ] In `web.ui/frontend-react/src/components/Header.tsx`, replace the `<span className="chat-blob-trigger-placeholder" />` inside `<button className="chat-blob-trigger">` with `<ChatBlob size="sm" />` (drop the onClick — let the wrapping button own it). Add `import ChatBlob from './chat/ChatBlob';`.
-- [ ] In `web.ui/frontend-react/src/components/chat/ChatDrawer.tsx`, replace the `chat-drawer-blob-placeholder` div with `<ChatBlob size="md" />`.
-- [ ] In `web.ui/frontend-react/src/pages/Chat.tsx`, replace the `chat-blob-placeholder` div with `<ChatBlob size="lg" />`.
-- [ ] Manual verification: open the drawer mid-turn; the header and drawer blobs animate in the same phase (both share `noiseRef` seeded at `1` and the same `ctx.mood`).
+- [x] In `web.ui/frontend-react/src/components/Header.tsx`, replace the `<span className="chat-blob-trigger-placeholder" />` inside `<button className="chat-blob-trigger">` with `<ChatBlob size="sm" />` (drop the onClick â€” let the wrapping button own it). Add `import ChatBlob from './chat/ChatBlob';`.
+- [x] In `web.ui/frontend-react/src/components/chat/ChatDrawer.tsx`, replace the `chat-drawer-blob-placeholder` div with `<ChatBlob size="md" />`.
+- [x] In `web.ui/frontend-react/src/pages/Chat.tsx`, replace the `chat-blob-placeholder` div with `<ChatBlob size="lg" />`.
+- [x] Manual verification: open the drawer mid-turn; the header and drawer blobs animate in the same phase (both share `noiseRef` seeded at `1` and the same `ctx.mood`).
 
 ### Task 28: Transition polish
 
-- [ ] Add to `useChat.ts` (already in Task 13): the `done → idle` after 1s + `error` brief tint are handled via the `setState((s) => s === 'done' ? 'idle' : s)` timeout. Verify with a vitest fake-timer test in `web.ui/frontend-react/src/hooks/__tests__/useChat.test.tsx`:
+- [x] Add to `useChat.ts` (already in Task 13): the `done â†’ idle` after 1s + `error` brief tint are handled via the `setState((s) => s === 'done' ? 'idle' : s)` timeout. Verify with a vitest fake-timer test in `web.ui/frontend-react/src/hooks/__tests__/useChat.test.tsx`:
 
 ```tsx
-it('settles done → idle after 1 second', async () => {
+it('settles done â†’ idle after 1 second', async () => {
   vi.useFakeTimers();
   // ... mock fetches + SSE so a turn completes;
   // after onComplete callback, advance timers 1100ms,
@@ -2525,7 +2525,7 @@ it('settles done → idle after 1 second', async () => {
 });
 ```
 
-- [ ] Add a CSS keyframe to `chat.css` for the error shake:
+- [x] Add a CSS keyframe to `chat.css` for the error shake:
   ```css
   .chat-blob-error { animation: chat-blob-shake 200ms ease-in-out 2; }
   @keyframes chat-blob-shake {
@@ -2537,7 +2537,7 @@ it('settles done → idle after 1 second', async () => {
 
 ### Task 29: Commit Phase 4
 
-- [ ] Stage:
+- [x] Stage:
   - `web.ui/frontend-react/package.json` (simplex-noise added)
   - `web.ui/frontend-react/package-lock.json`
   - `web.ui/frontend-react/src/hooks/useChatBlob.ts`
@@ -2552,19 +2552,19 @@ it('settles done → idle after 1 second', async () => {
   - `web.ui/frontend-react/src/pages/Chat.tsx`
   - `web.ui/frontend-react/src/App.tsx`
   - `web.ui/frontend-react/src/components/chat/chat.css`
-- [ ] Run vitest; all green.
-- [ ] Commit: `feat(chat): morphing blob avatar synced across header / drawer / page`.
+- [x] Run vitest; all green.
+- [x] Commit: `feat(chat): morphing blob avatar synced across header / drawer / page`.
 
 ---
 
-## Phase 5 — Polish
+## Phase 5 â€” Polish
 
 Goal: markdown polish + keyboard shortcuts + rename UX + session restore. No new backend code; pure frontend.
 
 ### Task 30: Syntax highlighting in ChatMessages
 
-- [ ] Install `prism-react-renderer`: `npm install prism-react-renderer --workspace web.ui/frontend-react`.
-- [ ] Edit `ChatMessages.tsx` — pass a `components` prop to `<ReactMarkdown>`:
+- [x] Install `prism-react-renderer`: `npm install prism-react-renderer --workspace web.ui/frontend-react`.
+- [x] Edit `ChatMessages.tsx` â€” pass a `components` prop to `<ReactMarkdown>`:
   ```tsx
   import { Highlight, themes } from 'prism-react-renderer';
 
@@ -2594,7 +2594,7 @@ Goal: markdown polish + keyboard shortcuts + rename UX + session restore. No new
     },
   };
   ```
-- [ ] Write **failing** snapshot test in `web.ui/frontend-react/src/components/chat/__tests__/ChatMessages.snapshot.test.tsx`:
+- [x] Write **failing** snapshot test in `web.ui/frontend-react/src/components/chat/__tests__/ChatMessages.snapshot.test.tsx`:
   ```tsx
   it('renders a fenced code block with syntax classes', () => {
     const m: Message[] = [{
@@ -2607,11 +2607,11 @@ Goal: markdown polish + keyboard shortcuts + rename UX + session restore. No new
     expect(container.innerHTML).toMatch(/class="[^"]*token/);
   });
   ```
-- [ ] Run vitest; test passes after the edit.
+- [x] Run vitest; test passes after the edit.
 
 ### Task 31: Copy-to-clipboard button on code blocks
 
-- [ ] Extend the `code` component override:
+- [x] Extend the `code` component override:
   ```tsx
   function CopyButton({ text }: { text: string }) {
     const [copied, setCopied] = useState(false);
@@ -2631,7 +2631,7 @@ Goal: markdown polish + keyboard shortcuts + rename UX + session restore. No new
   }
   ```
   Render `<CopyButton text={code} />` next to each `<pre>`.
-- [ ] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/CopyButton.test.tsx`:
+- [x] Write **failing** test in `web.ui/frontend-react/src/components/chat/__tests__/CopyButton.test.tsx`:
   ```tsx
   it('writes to clipboard and shows Copied!', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
@@ -2642,11 +2642,11 @@ Goal: markdown polish + keyboard shortcuts + rename UX + session restore. No new
     expect(await screen.findByText('Copied!')).toBeInTheDocument();
   });
   ```
-- [ ] Run vitest; passes.
+- [x] Run vitest; passes.
 
 ### Task 32: Global keyboard shortcuts
 
-- [ ] Create `web.ui/frontend-react/src/hooks/useChatKeyboard.ts`:
+- [x] Create `web.ui/frontend-react/src/hooks/useChatKeyboard.ts`:
 
 ```ts
 import { useEffect } from 'react';
@@ -2676,8 +2676,8 @@ export function useChatKeyboard() {
 }
 ```
 
-- [ ] Call `useChatKeyboard()` from inside `<ChatDrawerHost>` in `App.tsx`.
-- [ ] Write **failing** test in `web.ui/frontend-react/src/hooks/__tests__/useChatKeyboard.test.tsx`:
+- [x] Call `useChatKeyboard()` from inside `<ChatDrawerHost>` in `App.tsx`.
+- [x] Write **failing** test in `web.ui/frontend-react/src/hooks/__tests__/useChatKeyboard.test.tsx`:
   ```tsx
   it('Ctrl+K toggles drawer', async () => {
     // Render <ChatDrawerProvider><Harness /></ChatDrawerProvider>
@@ -2686,11 +2686,11 @@ export function useChatKeyboard() {
     expect(harness.isOpen).toBe(true);
   });
   ```
-- [ ] Run vitest; tests pass.
+- [x] Run vitest; tests pass.
 
 ### Task 33: Rename + delete UX is already in ChatConversationList (Task 16); add tests
 
-- [ ] Extend `ChatConversationList.test.tsx`:
+- [x] Extend `ChatConversationList.test.tsx`:
   ```tsx
   it('double-click title enters edit mode; Enter fires onRename', async () => {
     const onRename = vi.fn();
@@ -2711,11 +2711,11 @@ export function useChatKeyboard() {
     expect(onDelete).toHaveBeenCalledWith(1);
   });
   ```
-- [ ] Run vitest; passes (logic already exists; this just locks the contract).
+- [x] Run vitest; passes (logic already exists; this just locks the contract).
 
 ### Task 34: Session restore tests
 
-- [ ] Add to `useChat.test.tsx`:
+- [x] Add to `useChat.test.tsx`:
   ```tsx
   it('restores last conversation from localStorage on mount', async () => {
     localStorage.setItem('last_chat_conversation_id', '42');
@@ -2728,7 +2728,7 @@ export function useChatKeyboard() {
     await waitFor(() => expect(result.current.currentConversation?.id).toBe(42));
   });
   ```
-- [ ] Add to `ChatDrawerContext.test.tsx`:
+- [x] Add to `ChatDrawerContext.test.tsx`:
   ```tsx
   it('initial open state reads from localStorage', () => {
     localStorage.setItem('chat_drawer_open', '1');
@@ -2738,11 +2738,11 @@ export function useChatKeyboard() {
     expect(result.current.isOpen).toBe(true);
   });
   ```
-- [ ] Run vitest; passes.
+- [x] Run vitest; passes.
 
 ### Task 35: Commit Phase 5
 
-- [ ] Stage:
+- [x] Stage:
   - `web.ui/frontend-react/package.json` (prism-react-renderer added)
   - `web.ui/frontend-react/package-lock.json`
   - `web.ui/frontend-react/src/components/chat/ChatMessages.tsx` (updated with code-block override + CopyButton)
@@ -2755,9 +2755,9 @@ export function useChatKeyboard() {
   - `web.ui/frontend-react/src/hooks/__tests__/useChat.test.tsx` (extended)
   - `web.ui/frontend-react/src/components/chat/__tests__/ChatDrawerContext.test.tsx` (extended)
   - `web.ui/frontend-react/src/components/chat/chat.css` (any code-block / copy-button styles)
-- [ ] Run full vitest suite (backend + frontend); all green.
-- [ ] Run lint; clean.
-- [ ] Commit: `feat(chat): polish — syntax highlighting, keyboard shortcuts, conversation rename, session restore`.
+- [x] Run full vitest suite (backend + frontend); all green.
+- [x] Run lint; clean.
+- [x] Commit: `feat(chat): polish â€” syntax highlighting, keyboard shortcuts, conversation rename, session restore`.
 
 ---
 
@@ -2775,10 +2775,10 @@ export function useChatKeyboard() {
 
 ## Spec coverage check
 
-- §3 architecture — backend module map (Tasks 5-9), frontend module map (Tasks 12-18), routes (Task 8), SSE format (Task 9). ✓
-- §4 data model — migration 0003 (Task 4). ✓
-- §5 the blob — context (Task 24), engine (Task 25), component (Task 26), 3 sizes (Task 27), state machine driven by useChat (Tasks 13, 23). ✓
-- §6 backend CLI spawn flow — cli_runner (Task 7) + routes (Task 8). ✓
-- §7 UI placement — drawer (Task 18), header trigger (Tasks 19, 27), /chat page (Task 17, 27). ✓
-- §8 risks — resolved by Phase 1 spike (Tasks 1-3); GO gate in Task 3. ✓
-- §9 phasing — 5 phases matching the spec exactly. ✓
+- Â§3 architecture â€” backend module map (Tasks 5-9), frontend module map (Tasks 12-18), routes (Task 8), SSE format (Task 9). âœ“
+- Â§4 data model â€” migration 0003 (Task 4). âœ“
+- Â§5 the blob â€” context (Task 24), engine (Task 25), component (Task 26), 3 sizes (Task 27), state machine driven by useChat (Tasks 13, 23). âœ“
+- Â§6 backend CLI spawn flow â€” cli_runner (Task 7) + routes (Task 8). âœ“
+- Â§7 UI placement â€” drawer (Task 18), header trigger (Tasks 19, 27), /chat page (Task 17, 27). âœ“
+- Â§8 risks â€” resolved by Phase 1 spike (Tasks 1-3); GO gate in Task 3. âœ“
+- Â§9 phasing â€” 5 phases matching the spec exactly. âœ“

@@ -1,4 +1,4 @@
-# Etsy Rooster Shop — Plan 2c (Posters via Nano Banana Pro) Implementation Plan
+﻿# Etsy Rooster Shop â€” Plan 2c (Posters via Nano Banana Pro) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -12,17 +12,17 @@
 
 ---
 
-## Repo layout — read once
+## Repo layout â€” read once
 
 Two nested git repos:
 - **Outer**: `c:\Sandbox\AIProjectManagement\Rooster-AI-Project-Management` (this plan file + `web.ui/backend/` lives here).
-- **Inner**: `projects/etsy-rooster-shop/` — separate git repo (outer repo `.gitignore`s `projects/`). All Python code, tests, and Python-side commits happen here. Use `git -C projects/etsy-rooster-shop ...` or `cd projects/etsy-rooster-shop` first.
+- **Inner**: `projects/etsy-rooster-shop/` â€” separate git repo (outer repo `.gitignore`s `projects/`). All Python code, tests, and Python-side commits happen here. Use `git -C projects/etsy-rooster-shop ...` or `cd projects/etsy-rooster-shop` first.
 
-Both are on `main` — the user's chosen workflow. Do not branch, pull, or push.
+Both are on `main` â€” the user's chosen workflow. Do not branch, pull, or push.
 
 **Pre-existing uncommitted state may exist. Stage only the specific files for each task. Never use `git add .` or `git add -A`.**
 
-A third project lives at `projects/kdp-puzzle-press/` and stores the asset prompts + generated PNGs. Its git repo is separate too — do not commit data files there casually; the `assets/generated/` and `data/poster_prompts/` paths may or may not be tracked, check with `git -C projects/kdp-puzzle-press check-ignore <path>` before committing.
+A third project lives at `projects/kdp-puzzle-press/` and stores the asset prompts + generated PNGs. Its git repo is separate too â€” do not commit data files there casually; the `assets/generated/` and `data/poster_prompts/` paths may or may not be tracked, check with `git -C projects/kdp-puzzle-press check-ignore <path>` before committing.
 
 ## File Structure
 
@@ -32,9 +32,9 @@ A third project lives at `projects/kdp-puzzle-press/` and stores the asset promp
 |---|---|
 | `projects/etsy-rooster-shop/src/etsy_rooster/posters/__init__.py` | Package marker (empty). |
 | `projects/etsy-rooster-shop/src/etsy_rooster/posters/niche.py` | `PosterNiche` frozen dataclass + validation in `__post_init__`. |
-| `projects/etsy-rooster-shop/src/etsy_rooster/posters/kdp_importer.py` | `load_poster_niche(kdp_root, poster_id) → PosterNiche`. Reads JSON prompt + verifies master.png. Raises `PosterAssetError`. |
-| `projects/etsy-rooster-shop/src/etsy_rooster/posters/bundle_builder.py` | `build_buyer_zip(niche, output_dir) → Path` — 5 JPGs + 1 PDF, packaged. |
-| `projects/etsy-rooster-shop/src/etsy_rooster/posters/preview_builder.py` | `build_previews(niche, output_dir) → list[Path]` — 3 preview JPGs. |
+| `projects/etsy-rooster-shop/src/etsy_rooster/posters/kdp_importer.py` | `load_poster_niche(kdp_root, poster_id) â†’ PosterNiche`. Reads JSON prompt + verifies master.png. Raises `PosterAssetError`. |
+| `projects/etsy-rooster-shop/src/etsy_rooster/posters/bundle_builder.py` | `build_buyer_zip(niche, output_dir) â†’ Path` â€” 5 JPGs + 1 PDF, packaged. |
+| `projects/etsy-rooster-shop/src/etsy_rooster/posters/preview_builder.py` | `build_previews(niche, output_dir) â†’ list[Path]` â€” 3 preview JPGs. |
 | `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/poster-prompt.md` | LLM prompt template for `niche="poster"`. |
 | `projects/etsy-rooster-shop/tests/test_poster_niche.py` | Validation tests (mirror `test_coloring_niche.py`). |
 | `projects/etsy-rooster-shop/tests/test_poster_kdp_importer.py` | Cross-project loader tests. |
@@ -56,15 +56,15 @@ A third project lives at `projects/kdp-puzzle-press/` and stores the asset promp
 | Path | Change |
 |---|---|
 | `projects/etsy-rooster-shop/src/etsy_rooster/cli.py` | Add `generate poster --poster=<id>` subcommand; add `"poster": 2078` to `_TAXONOMY_BY_NICHE`. |
-| `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py` | Line ~52: change `f["kind"] in ("svg", "pdf")` → `f["kind"] in ("svg", "pdf", "zip")`. |
+| `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py` | Line ~52: change `f["kind"] in ("svg", "pdf")` â†’ `f["kind"] in ("svg", "pdf", "zip")`. |
 | `projects/etsy-rooster-shop/tests/test_publish_orchestrator.py` | Add `test_publish_accepts_zip_primary_file`. |
 | `projects/etsy-rooster-shop/tests/test_listing_authoring.py` | Add test that `LLMListingAuthor` resolves `poster-prompt.md` for `niche="poster"`. |
 
 ## Conventions (read once)
 
 - Inside `projects/etsy-rooster-shop/`, run `python -m pytest tests/ -v` for unit tests; live tests are deselected via `addopts = -m 'not live'` in `pyproject.toml` and need `-m live` to run.
-- Frozen dataclasses use `object.__setattr__` for defaulting fields inside `__post_init__` — see `ColoringNiche._default_hero_indices` for the pattern.
-- Cross-project JSON loads are literal JSON, not AST — posters are pure data files unlike KDP book modules.
+- Frozen dataclasses use `object.__setattr__` for defaulting fields inside `__post_init__` â€” see `ColoringNiche._default_hero_indices` for the pattern.
+- Cross-project JSON loads are literal JSON, not AST â€” posters are pure data files unlike KDP book modules.
 - Commit message style: conventional (`feat(posters):`, `test(posters):`, `chore:`). Footer: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`.
 
 ---
@@ -74,7 +74,7 @@ A third project lives at `projects/kdp-puzzle-press/` and stores the asset promp
 **Files:**
 - Create: `projects/kdp-puzzle-press/data/poster_prompts/cottagecore-mushroom-poster-v1.json`
 
-- [ ] **Step 1: Verify the directory exists**
+- [x] **Step 1: Verify the directory exists**
 
 ```bash
 ls projects/kdp-puzzle-press/data/coloring_prompts/ 2>&1 | head -3
@@ -82,7 +82,7 @@ ls projects/kdp-puzzle-press/data/coloring_prompts/ 2>&1 | head -3
 
 Expected: shows existing coloring-book prompt files (proving the `data/` parent is the right home for prompt banks). If `data/poster_prompts/` doesn't exist yet, create it: `mkdir -p projects/kdp-puzzle-press/data/poster_prompts/`.
 
-- [ ] **Step 2: Write the JSON**
+- [x] **Step 2: Write the JSON**
 
 Create `projects/kdp-puzzle-press/data/poster_prompts/cottagecore-mushroom-poster-v1.json`:
 
@@ -112,7 +112,7 @@ Create `projects/kdp-puzzle-press/data/poster_prompts/cottagecore-mushroom-poste
 }
 ```
 
-- [ ] **Step 3: Validate JSON shape**
+- [x] **Step 3: Validate JSON shape**
 
 ```bash
 python -c "import json; d=json.load(open('projects/kdp-puzzle-press/data/poster_prompts/cottagecore-mushroom-poster-v1.json')); assert d['poster_id']=='cottagecore-mushroom-poster-v1'; assert len(d['theme_tags'])==13; print('OK', d['poster_id'])"
@@ -120,7 +120,7 @@ python -c "import json; d=json.load(open('projects/kdp-puzzle-press/data/poster_
 
 Expected: `OK cottagecore-mushroom-poster-v1`.
 
-- [ ] **Step 4: Commit (kdp-puzzle-press repo)**
+- [x] **Step 4: Commit (kdp-puzzle-press repo)**
 
 Check if `data/poster_prompts/` is gitignored first:
 
@@ -128,14 +128,14 @@ Check if `data/poster_prompts/` is gitignored first:
 git -C projects/kdp-puzzle-press check-ignore data/poster_prompts/cottagecore-mushroom-poster-v1.json
 ```
 
-If output is empty (not ignored) — commit:
+If output is empty (not ignored) â€” commit:
 
 ```bash
 git -C projects/kdp-puzzle-press add data/poster_prompts/cottagecore-mushroom-poster-v1.json
 git -C projects/kdp-puzzle-press commit -m "$(cat <<'EOF'
 feat(posters): first poster prompt bank (cottagecore mushroom)
 
-JSON prompt bank for Plan 2c Task 1 — feeds the new
+JSON prompt bank for Plan 2c Task 1 â€” feeds the new
 generate_posters.mjs Nano Banana Pro generator. Single subject
 (cottagecore woodland composition), 13 theme tags ready to feed
 the LLM listing author.
@@ -145,7 +145,7 @@ EOF
 )"
 ```
 
-If output shows the path (ignored), skip the commit — the file is local-only by design.
+If output shows the path (ignored), skip the commit â€” the file is local-only by design.
 
 ---
 
@@ -154,15 +154,15 @@ If output shows the path (ignored), skip the commit — the file is local-only b
 **Files:**
 - Create: `web.ui/backend/scripts/generate_posters.mjs`
 
-- [ ] **Step 1: Confirm the Node side has everything needed**
+- [x] **Step 1: Confirm the Node side has everything needed**
 
 ```bash
 ls web.ui/backend/agents/ImageGenerationService.js && grep -l "@google/genai" web.ui/backend/package.json
 ```
 
-Expected: the service file exists and `package.json` already depends on `@google/genai`. (Both true after Plan 2a — coloring interiors use the same path.)
+Expected: the service file exists and `package.json` already depends on `@google/genai`. (Both true after Plan 2a â€” coloring interiors use the same path.)
 
-- [ ] **Step 2: Write the generator script**
+- [x] **Step 2: Write the generator script**
 
 Create `web.ui/backend/scripts/generate_posters.mjs`:
 
@@ -247,14 +247,14 @@ async function main() {
   fs.mkdirSync(outDir, { recursive: true });
   const outPath = path.join(outDir, 'master.png');
   if (skipExisting && fs.existsSync(outPath)) {
-    console.log(`⏭️  ${posterId} master.png exists, skipping`);
+    console.log(`â­ï¸  ${posterId} master.png exists, skipping`);
     return;
   }
 
   const bank = loadPromptBank(posterId);
   const prompt = buildPrompt(bank);
 
-  console.log(`🎨 Generating master for ${posterId}`);
+  console.log(`ðŸŽ¨ Generating master for ${posterId}`);
   console.log(`   prompt length: ${prompt.length} chars`);
 
   const svc = new ImageGenerationService({
@@ -274,7 +274,7 @@ async function main() {
   fs.renameSync(path.join(outDir, result.filename), outPath);
   const ms = Date.now() - t0;
   const kb = Math.round(result.bytes / 1024);
-  console.log(`   ✅ ${kb} KB in ${(ms / 1000).toFixed(1)}s → ${path.relative(REPO_ROOT, outPath)}`);
+  console.log(`   âœ… ${kb} KB in ${(ms / 1000).toFixed(1)}s â†’ ${path.relative(REPO_ROOT, outPath)}`);
 }
 
 main().catch((err) => {
@@ -283,7 +283,7 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Step 3: Smoke-test help/usage path (no API call)**
+- [x] **Step 3: Smoke-test help/usage path (no API call)**
 
 ```bash
 cd web.ui/backend && node scripts/generate_posters.mjs 2>&1 | head -3
@@ -291,7 +291,7 @@ cd web.ui/backend && node scripts/generate_posters.mjs 2>&1 | head -3
 
 Expected: `Usage: node scripts/generate_posters.mjs <poster-id> [--skip-existing]` and exit code 2.
 
-- [ ] **Step 4: Commit (outer repo)**
+- [x] **Step 4: Commit (outer repo)**
 
 ```bash
 cd ../..
@@ -315,37 +315,37 @@ EOF
 
 **Files:** none (this task runs the generator; no code changes).
 
-- [ ] **Step 1: Run the generator**
+- [x] **Step 1: Run the generator**
 
 ```bash
 cd web.ui/backend && node scripts/generate_posters.mjs cottagecore-mushroom-poster-v1 2>&1 | tail -5
 ```
 
-Expected: `✅ <N> KB in <T>s → projects/kdp-puzzle-press/assets/generated/posters/cottagecore-mushroom-poster-v1/master.png`. The exit code is 0.
+Expected: `âœ… <N> KB in <T>s â†’ projects/kdp-puzzle-press/assets/generated/posters/cottagecore-mushroom-poster-v1/master.png`. The exit code is 0.
 
-If the Gemini billing returns 429 RESOURCE_EXHAUSTED, stop and report BLOCKED — the user needs to top up. If 404 NOT_FOUND, the model id changed; check `web.ui/backend/agents/ImageGenerationService.js` for the current default.
+If the Gemini billing returns 429 RESOURCE_EXHAUSTED, stop and report BLOCKED â€” the user needs to top up. If 404 NOT_FOUND, the model id changed; check `web.ui/backend/agents/ImageGenerationService.js` for the current default.
 
-- [ ] **Step 2: Verify the file exists and is plausible**
+- [x] **Step 2: Verify the file exists and is plausible**
 
 ```bash
 python -c "from PIL import Image; im = Image.open('projects/kdp-puzzle-press/assets/generated/posters/cottagecore-mushroom-poster-v1/master.png'); print(im.size, im.mode)"
 ```
 
-Expected: `(3072, 4096) RGB` (or similar 3:4 dimensions; tolerate ±200 px on each axis). The image must be RGB (not grayscale or palette).
+Expected: `(3072, 4096) RGB` (or similar 3:4 dimensions; tolerate Â±200 px on each axis). The image must be RGB (not grayscale or palette).
 
-- [ ] **Step 3: Eyeball the result (optional but recommended)**
+- [x] **Step 3: Eyeball the result (optional but recommended)**
 
 Open the PNG in an image viewer and confirm: portrait orientation, cottagecore-mushroom subject, no visible text/letters, breathing room on all sides. If the composition is bad, re-run the generator (don't pass `--skip-existing`) for a different seed.
 
-- [ ] **Step 4: No commit needed**
+- [x] **Step 4: No commit needed**
 
-The master.png lives under `assets/generated/posters/` which is gitignored by convention (see Plan 2a — coloring interiors are also gitignored at `assets/generated/coloring/`). Confirm with:
+The master.png lives under `assets/generated/posters/` which is gitignored by convention (see Plan 2a â€” coloring interiors are also gitignored at `assets/generated/coloring/`). Confirm with:
 
 ```bash
 git -C projects/kdp-puzzle-press check-ignore projects/kdp-puzzle-press/assets/generated/posters/cottagecore-mushroom-poster-v1/master.png 2>&1
 ```
 
-If the path is shown, it's ignored — proceed without committing. If empty, commit the file with `git -C projects/kdp-puzzle-press add ... && git commit -m "feat(posters): cottagecore mushroom master.png"`.
+If the path is shown, it's ignored â€” proceed without committing. If empty, commit the file with `git -C projects/kdp-puzzle-press add ... && git commit -m "feat(posters): cottagecore mushroom master.png"`.
 
 ---
 
@@ -356,7 +356,7 @@ If the path is shown, it's ignored — proceed without committing. If empty, com
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/posters/niche.py`
 - Create: `projects/etsy-rooster-shop/tests/test_poster_niche.py`
 
-- [ ] **Step 1: Create the package marker**
+- [x] **Step 1: Create the package marker**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/__init__.py` with a single line:
 
@@ -364,7 +364,7 @@ Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/__init__.py` with a 
 """Etsy poster pipeline (Plan 2c)."""
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_niche.py`:
 
@@ -443,7 +443,7 @@ def test_master_png_must_exist(tmp_path: Path) -> None:
         PosterNiche(**args)
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_niche.py -v 2>&1 | tail -5
@@ -451,12 +451,12 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_niche.py -v 
 
 Expected: collection fails with `ImportError: cannot import name 'PosterNiche' from 'etsy_rooster.posters.niche'`.
 
-- [ ] **Step 4: Implement `PosterNiche`**
+- [x] **Step 4: Implement `PosterNiche`**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/niche.py`:
 
 ```python
-"""PosterNiche — data Plan 2c's pipeline needs about one printable poster."""
+"""PosterNiche â€” data Plan 2c's pipeline needs about one printable poster."""
 
 from __future__ import annotations
 
@@ -468,7 +468,7 @@ from pathlib import Path
 class PosterNiche:
     """Everything the Etsy poster pipeline needs about one master illustration.
 
-    All fields are required. Validation runs in __post_init__ — a niche
+    All fields are required. Validation runs in __post_init__ â€” a niche
     object is either fully valid or construction fails.
     """
 
@@ -496,7 +496,7 @@ class PosterNiche:
             )
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_niche.py -v 2>&1 | tail -10
@@ -504,7 +504,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_niche.py -v 
 
 Expected: 7 tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/posters/__init__.py src/etsy_rooster/posters/niche.py tests/test_poster_niche.py
@@ -528,7 +528,7 @@ EOF
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/posters/kdp_importer.py`
 - Create: `projects/etsy-rooster-shop/tests/test_poster_kdp_importer.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_kdp_importer.py`:
 
@@ -600,7 +600,7 @@ def test_prompt_json_missing_required_field_raises(tmp_path: Path) -> None:
         load_poster_niche(kdp_root=kdp, poster_id="demo-poster")
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_kdp_importer.py -v 2>&1 | tail -5
@@ -608,7 +608,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_kdp_importer
 
 Expected: collection fails with `ImportError: cannot import name 'load_poster_niche'`.
 
-- [ ] **Step 3: Implement the importer**
+- [x] **Step 3: Implement the importer**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/kdp_importer.py`:
 
@@ -667,7 +667,7 @@ def load_poster_niche(*, kdp_root: Path, poster_id: str) -> PosterNiche:
     )
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_kdp_importer.py -v 2>&1 | tail -8
@@ -675,14 +675,14 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_kdp_importer
 
 Expected: 4 tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/posters/kdp_importer.py tests/test_poster_kdp_importer.py
 git -C projects/etsy-rooster-shop commit -m "$(cat <<'EOF'
 feat(posters): kdp_importer.load_poster_niche reads JSON prompt + master PNG
 
-Cross-project bridge mirrors coloring/kdp_importer.py — literal
+Cross-project bridge mirrors coloring/kdp_importer.py â€” literal
 JSON load (not AST since these are pure data files), required-field
 guard, master.png existence check. Raises PosterAssetError on any
 mismatch.
@@ -694,13 +694,13 @@ EOF
 
 ---
 
-## Task 6: `bundle_builder.build_buyer_zip()` — 5 JPGs + 1 PDF in a ZIP
+## Task 6: `bundle_builder.build_buyer_zip()` â€” 5 JPGs + 1 PDF in a ZIP
 
 **Files:**
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/posters/bundle_builder.py`
 - Create: `projects/etsy-rooster-shop/tests/test_poster_bundle_builder.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_bundle_builder.py`:
 
@@ -794,7 +794,7 @@ def test_output_zip_named_by_poster_id(tmp_path: Path) -> None:
     assert zip_path.name == "test-poster.zip"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_bundle_builder.py -v 2>&1 | tail -5
@@ -802,7 +802,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_bundle_build
 
 Expected: collection fails with `ImportError: cannot import name 'build_buyer_zip'`.
 
-- [ ] **Step 3: Implement the bundle builder**
+- [x] **Step 3: Implement the bundle builder**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/bundle_builder.py`:
 
@@ -827,7 +827,7 @@ POSTER_SIZES: dict[str, tuple[int, int]] = {
     "8x10":  (2400, 3000),   # 4:5
     "11x14": (3300, 4200),   # ~11:14
     "16x20": (4800, 6000),   # 4:5
-    "18x24": (5400, 7200),   # 3:4 — matches master aspect
+    "18x24": (5400, 7200),   # 3:4 â€” matches master aspect
     "A4":    (2480, 3508),   # ~3:4.24 (slightly taller than 3:4)
 }
 
@@ -841,11 +841,11 @@ def _center_crop_to_aspect(im: Image.Image, target_w: int, target_h: int) -> Ima
     if abs(src_ratio - target_ratio) < 1e-4:
         return im  # same aspect already
     if src_ratio > target_ratio:
-        # source is wider — crop horizontally
+        # source is wider â€” crop horizontally
         new_w = int(round(im.height * target_ratio))
         x0 = (im.width - new_w) // 2
         return im.crop((x0, 0, x0 + new_w, im.height))
-    # source is taller — crop vertically
+    # source is taller â€” crop vertically
     new_h = int(round(im.width / target_ratio))
     y0 = (im.height - new_h) // 2
     return im.crop((0, y0, im.width, y0 + new_h))
@@ -868,7 +868,7 @@ def _render_instructions_pdf() -> bytes:
     cy = height - margin
 
     c.setFont("Helvetica-Bold", 18)
-    c.drawString(margin, cy, "Thank you for your purchase — Pocket Rooster Press")
+    c.drawString(margin, cy, "Thank you for your purchase â€” Pocket Rooster Press")
     cy -= 28
 
     c.setFont("Helvetica-Bold", 12)
@@ -938,20 +938,20 @@ def build_buyer_zip(niche: PosterNiche, output_dir: Path) -> Path:
     return zip_path
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_bundle_builder.py -v 2>&1 | tail -10
 ```
 
-Expected: 5 tests PASS. If the 16x20 or 18x24 tests are slow (Pillow LANCZOS upscale on the 6000×something canvas takes a moment), that's fine — they should finish within a few seconds.
+Expected: 5 tests PASS. If the 16x20 or 18x24 tests are slow (Pillow LANCZOS upscale on the 6000Ã—something canvas takes a moment), that's fine â€” they should finish within a few seconds.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/posters/bundle_builder.py tests/test_poster_bundle_builder.py
 git -C projects/etsy-rooster-shop commit -m "$(cat <<'EOF'
-feat(posters): bundle_builder.build_buyer_zip — 5 JPGs + instructions PDF
+feat(posters): bundle_builder.build_buyer_zip â€” 5 JPGs + instructions PDF
 
 Center-crops the 3:4 master to each target aspect, upscales via
 LANCZOS, saves at 300 DPI JPG quality=92. Static one-page
@@ -965,13 +965,13 @@ EOF
 
 ---
 
-## Task 7: `preview_builder.build_previews()` — 3 Etsy preview JPGs
+## Task 7: `preview_builder.build_previews()` â€” 3 Etsy preview JPGs
 
 **Files:**
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/posters/preview_builder.py`
 - Create: `projects/etsy-rooster-shop/tests/test_poster_preview_builder.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_preview_builder.py`:
 
@@ -1040,7 +1040,7 @@ def test_sizes_infographic_is_landscape_or_square(tmp_path: Path) -> None:
         assert im.width >= im.height
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_preview_builder.py -v 2>&1 | tail -5
@@ -1048,7 +1048,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_preview_buil
 
 Expected: collection fails with `ImportError: cannot import name 'build_previews' from 'etsy_rooster.posters.preview_builder'`.
 
-- [ ] **Step 3: Implement the preview builder**
+- [x] **Step 3: Implement the preview builder**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/posters/preview_builder.py`:
 
@@ -1150,7 +1150,7 @@ def _build_center_crop(master: Image.Image, output_dir: Path) -> Path:
 
 
 def _load_font(size: int) -> ImageFont.FreeTypeFont:
-    """Best-effort font load — falls back to Pillow's default if no TTF found."""
+    """Best-effort font load â€” falls back to Pillow's default if no TTF found."""
     # Try a small set of likely Windows / cross-platform fonts.
     for candidate in ("arial.ttf", "DejaVuSans.ttf", "LiberationSans-Regular.ttf"):
         try:
@@ -1160,9 +1160,9 @@ def _load_font(size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.load_default()
 ```
 
-Note: the font fallback to `load_default()` returns a tiny bitmap font — the infographic will be ugly without a real TTF available, but the test only asserts the file exists with the right name + landscape orientation, so this is fine for v1. In production, the user's Windows machine has `arial.ttf` available at the system path Pillow searches by default.
+Note: the font fallback to `load_default()` returns a tiny bitmap font â€” the infographic will be ugly without a real TTF available, but the test only asserts the file exists with the right name + landscape orientation, so this is fine for v1. In production, the user's Windows machine has `arial.ttf` available at the system path Pillow searches by default.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_preview_builder.py -v 2>&1 | tail -8
@@ -1170,12 +1170,12 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_preview_buil
 
 Expected: 4 tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/posters/preview_builder.py tests/test_poster_preview_builder.py
 git -C projects/etsy-rooster-shop commit -m "$(cat <<'EOF'
-feat(posters): preview_builder.build_previews — 3 Etsy preview JPGs
+feat(posters): preview_builder.build_previews â€” 3 Etsy preview JPGs
 
 Hero (resized master), sizes infographic (5 rows labelled), center
 crop (detail shot). All 92-quality JPG. Font load is best-effort
@@ -1194,9 +1194,9 @@ EOF
 - Create: `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/poster-prompt.md`
 - Modify: `projects/etsy-rooster-shop/tests/test_listing_authoring.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
-Open `projects/etsy-rooster-shop/tests/test_listing_authoring.py` and append (or add a new test in the same style as existing ones — look for `def test_` with `niche="coloring"` for the closest mirror):
+Open `projects/etsy-rooster-shop/tests/test_listing_authoring.py` and append (or add a new test in the same style as existing ones â€” look for `def test_` with `niche="coloring"` for the closest mirror):
 
 ```python
 def test_loads_poster_prompt_when_niche_is_poster(tmp_path: Path) -> None:
@@ -1249,7 +1249,7 @@ def test_loads_poster_prompt_when_niche_is_poster(tmp_path: Path) -> None:
 
 If `tests/test_listing_authoring.py` doesn't import `Path`, add `from pathlib import Path` at the top alongside other imports.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_listing_authoring.py::test_loads_poster_prompt_when_niche_is_poster -v 2>&1 | tail -5
@@ -1257,7 +1257,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_listing_authoring.p
 
 Expected: FAIL with `assert poster_prompt.is_file()` (the template file doesn't exist yet).
 
-- [ ] **Step 3: Create the prompt template**
+- [x] **Step 3: Create the prompt template**
 
 Create `projects/etsy-rooster-shop/src/etsy_rooster/listing_authoring/prompts/poster-prompt.md`:
 
@@ -1291,7 +1291,7 @@ Niche: {niche}
 Artifact summary: {artifact_summary_json}
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_listing_authoring.py::test_loads_poster_prompt_when_niche_is_poster -v 2>&1 | tail -5
@@ -1299,7 +1299,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_listing_authoring.p
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/listing_authoring/prompts/poster-prompt.md tests/test_listing_authoring.py
@@ -1324,7 +1324,7 @@ EOF
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py:52`
 - Modify: `projects/etsy-rooster-shop/tests/test_publish_orchestrator.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `projects/etsy-rooster-shop/tests/test_publish_orchestrator.py`:
 
@@ -1367,7 +1367,7 @@ def test_publish_accepts_zip_primary_file(
 
 The `import sqlite3` line should already be at the top of the file; if not, add it. The `Path` and `MagicMock` imports are also already there.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_publish_orchestrator.py::test_publish_accepts_zip_primary_file -v 2>&1 | tail -5
@@ -1375,7 +1375,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_publish_orchestrato
 
 Expected: FAIL with `RuntimeError: sku N missing primary artifact (svg or pdf) or preview_png`.
 
-- [ ] **Step 3: Widen the allowlist**
+- [x] **Step 3: Widen the allowlist**
 
 Open `projects/etsy-rooster-shop/src/etsy_rooster/publish/orchestrator.py` and find line 52 (the `primary_files = [...]` filter). Change:
 
@@ -1405,7 +1405,7 @@ to:
             )
 ```
 
-- [ ] **Step 4: Run all orchestrator tests to verify pass + no regression**
+- [x] **Step 4: Run all orchestrator tests to verify pass + no regression**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_publish_orchestrator.py -v 2>&1 | tail -10
@@ -1413,14 +1413,14 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_publish_orchestrato
 
 Expected: ALL orchestrator tests PASS (the pre-existing ones plus the new zip test).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/publish/orchestrator.py tests/test_publish_orchestrator.py
 git -C projects/etsy-rooster-shop commit -m "$(cat <<'EOF'
 feat(publish): orchestrator accepts zip as primary digital file (posters)
 
-One-line allowlist extension — ("svg", "pdf") becomes ("svg",
+One-line allowlist extension â€” ("svg", "pdf") becomes ("svg",
 "pdf", "zip"). Error message updated to match. Regression test
 covers the zip path; existing svg + pdf tests still pass.
 
@@ -1437,7 +1437,7 @@ EOF
 - Modify: `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`
 - Create: `projects/etsy-rooster-shop/tests/test_poster_cli.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `projects/etsy-rooster-shop/tests/test_poster_cli.py`:
 
@@ -1516,7 +1516,7 @@ def test_generate_poster_fails_clearly_for_unknown_id(
     assert "prompt JSON not found" in result.output or "PosterAssetError" in repr(result.exception)
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_cli.py -v 2>&1 | tail -10
@@ -1524,7 +1524,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_cli.py -v 2>
 
 Expected: collection or first test FAILS with either `KeyError: 'poster'` (taxonomy) or `Click usage error: No such command 'poster'`.
 
-- [ ] **Step 3: Wire taxonomy + sub-command into cli.py**
+- [x] **Step 3: Wire taxonomy + sub-command into cli.py**
 
 Open `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`.
 
@@ -1534,10 +1534,10 @@ Open `projects/etsy-rooster-shop/src/etsy_rooster/cli.py`.
 _TAXONOMY_BY_NICHE: dict[str, int] = {
     # Craft Supplies & Tools > Patterns & How To > Patterns & Blueprints
     "mandala": 6343,
-    # Same leaf as mandala — confirmed via live taxonomy walk; no more
+    # Same leaf as mandala â€” confirmed via live taxonomy walk; no more
     # specific coloring/printables leaf exists in Etsy's current taxonomy.
     "coloring": 6343,
-    # Art & Collectibles > Prints > Digital Prints — distinct leaf for posters.
+    # Art & Collectibles > Prints > Digital Prints â€” distinct leaf for posters.
     "poster": 2078,
 }
 ```
@@ -1583,7 +1583,7 @@ def generate_poster(poster_id: str) -> None:
     click.echo(f"sku_id={sku_id} poster={poster_id} zip={zip_path}")
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_cli.py -v 2>&1 | tail -10
@@ -1591,7 +1591,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/test_poster_cli.py -v 2>
 
 Expected: 4 tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add src/etsy_rooster/cli.py tests/test_poster_cli.py
@@ -1615,7 +1615,7 @@ EOF
 **Files:**
 - Create: `projects/etsy-rooster-shop/tests/integration/test_e2e_poster.py`
 
-- [ ] **Step 1: Write the live test**
+- [x] **Step 1: Write the live test**
 
 Create `projects/etsy-rooster-shop/tests/integration/test_e2e_poster.py`:
 
@@ -1764,7 +1764,7 @@ def test_end_to_end_one_poster_to_etsy_draft(tmp_path: Path) -> None:
     print(f"View at: https://www.etsy.com/your/shops/PocketRoosterPress/tools/listings/state:draft")
 ```
 
-- [ ] **Step 2: Confirm it's skipped by default**
+- [x] **Step 2: Confirm it's skipped by default**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/integration/test_e2e_poster.py -v 2>&1 | tail -5
@@ -1772,7 +1772,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/integration/test_e2e_pos
 
 Expected: `1 deselected` (or `1 skipped`) because the default `addopts` filters out `live`-marked tests. If pytest collects + tries to run it, check `pyproject.toml`'s `addopts` setting.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git -C projects/etsy-rooster-shop add tests/integration/test_e2e_poster.py
@@ -1791,11 +1791,11 @@ EOF
 
 ---
 
-## Task 12: Full regression — pytest suite + audit + live run
+## Task 12: Full regression â€” pytest suite + audit + live run
 
 **Files:** none (this task is end-to-end verification + bundle).
 
-- [ ] **Step 1: Run the entire unit test suite**
+- [x] **Step 1: Run the entire unit test suite**
 
 ```bash
 cd projects/etsy-rooster-shop && python -m pytest tests/ -v 2>&1 | tail -15
@@ -1803,7 +1803,7 @@ cd projects/etsy-rooster-shop && python -m pytest tests/ -v 2>&1 | tail -15
 
 Expected: ALL non-live tests PASS. The total count should be ~110 (87 pre-existing + 22-23 new from this plan). Live tests are deselected.
 
-- [ ] **Step 2: Run the live integration test (requires real credentials)**
+- [x] **Step 2: Run the live integration test (requires real credentials)**
 
 This step uses real Etsy + Gemini APIs; it creates a real Etsy DRAFT listing and uses ~$0.04 of Gemini credit if the master.png isn't already on disk.
 
@@ -1815,7 +1815,7 @@ Expected: PASS. The test prints the new draft listing's id and a dashboard URL. 
 
 If the test fails with a missing-credentials skip, ensure `.env.local` has all four env vars and that `~/.etsy-rooster/token.json` exists (run `scripts/etsy_oauth_setup.py` if not).
 
-- [ ] **Step 3: Open the draft in the Etsy dashboard**
+- [x] **Step 3: Open the draft in the Etsy dashboard**
 
 Visit the URL printed in Step 2. Manually verify:
 - ZIP file is attached as the digital download
@@ -1824,14 +1824,14 @@ Visit the URL printed in Step 2. Manually verify:
 - Description mentions all 5 size names + 300 DPI + AI disclosure
 - Price is between $7.00 and $12.00
 
-- [ ] **Step 4: Manually assign the listing to the "Printable Posters" section**
+- [x] **Step 4: Manually assign the listing to the "Printable Posters" section**
 
 Etsy `shops_w` scope is not yet in our OAuth token, so section assignment is dashboard-only:
 1. Click the draft listing
-2. Scroll to "Shop section" → select "Printable Posters"
-3. Save (still as draft — do not publish until you're ready)
+2. Scroll to "Shop section" â†’ select "Printable Posters"
+3. Save (still as draft â€” do not publish until you're ready)
 
-- [ ] **Step 5: Update the checkpoint memory**
+- [x] **Step 5: Update the checkpoint memory**
 
 Open `C:\Users\marts\.claude\projects\c--Sandbox-AIProjectManagement-Rooster-AI-Project-Management\memory\etsy-rooster-shop-checkpoint.md` and:
 
@@ -1841,7 +1841,7 @@ Open `C:\Users\marts\.claude\projects\c--Sandbox-AIProjectManagement-Rooster-AI-
 
 No git commit needed for the memory file (the memory directory is not a git repo).
 
-- [ ] **Step 6: Final commit (kdp-puzzle-press has no changes; only inner repo needed)**
+- [x] **Step 6: Final commit (kdp-puzzle-press has no changes; only inner repo needed)**
 
 If `git -C projects/etsy-rooster-shop status -s` shows untracked or modified files unrelated to this plan, leave them alone (pre-existing user WIP). All Plan 2c commits were made per-task above; nothing else to commit at the end of this plan.
 
@@ -1849,21 +1849,21 @@ If `git -C projects/etsy-rooster-shop status -s` shows untracked or modified fil
 
 ## Done criteria
 
-- [ ] All 12 tasks checked off
-- [ ] Full pytest suite green (~110 tests), no regressions in pre-existing tests
-- [ ] Live integration test passes — real Etsy draft listing exists
-- [ ] Listing manually assigned to "Printable Posters" shop section
-- [ ] Checkpoint memory updated with Plan 2c shipped status
-- [ ] Shop now has 3 product types live: coloring books + SVG cut files + posters
+- [x] All 12 tasks checked off
+- [x] Full pytest suite green (~110 tests), no regressions in pre-existing tests
+- [x] Live integration test passes â€” real Etsy draft listing exists
+- [x] Listing manually assigned to "Printable Posters" shop section
+- [x] Checkpoint memory updated with Plan 2c shipped status
+- [x] Shop now has 3 product types live: coloring books + SVG cut files + posters
 
 ## Post-plan opportunities (out of scope for this plan)
 
 - Plan 2c' fast-follow: ship 2-3 more posters using the same pipeline (~5 min each once the prompt JSON is written)
 - Add `shops_w` OAuth scope so the section assignment can be programmatic (item 7 of Plan 2a deferred-debt list)
-- 24×36 size in the buyer ZIP (requires a second Nano Banana Pro render with tighter framing)
-- Lifestyle mockups (poster-in-frame Etsy shots) — manual photography or a future Nano Banana Pro composition prompt
+- 24Ã—36 size in the buyer ZIP (requires a second Nano Banana Pro render with tighter framing)
+- Lifestyle mockups (poster-in-frame Etsy shots) â€” manual photography or a future Nano Banana Pro composition prompt
 
 ## Related memories
 
-- [[etsy-rooster-shop-checkpoint]] — current shop state; update at Task 12 Step 5
-- [[kdp-catalog-status-2026-05-17]] — KDP catalog isn't touched by this plan but shares the kdp-puzzle-press asset tree
+- [[etsy-rooster-shop-checkpoint]] â€” current shop state; update at Task 12 Step 5
+- [[kdp-catalog-status-2026-05-17]] â€” KDP catalog isn't touched by this plan but shares the kdp-puzzle-press asset tree

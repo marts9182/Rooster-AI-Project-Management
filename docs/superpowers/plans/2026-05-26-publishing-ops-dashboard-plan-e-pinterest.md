@@ -1,12 +1,12 @@
-# Publishing Ops Dashboard — Plan E: Pinterest desktop automation
+﻿# Publishing Ops Dashboard â€” Plan E: Pinterest desktop automation
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Prerequisites:** Plans A and B merged. Plans C and D can be merged in any order.
 
-**Goal:** Generate cover-hero and interior-preview pin images, queue them on a jittered 3–5/day schedule, and post them to Pinterest via a Playwright persistent-profile session. Surface queue/history/settings + a re-login button at `/pinterest`.
+**Goal:** Generate cover-hero and interior-preview pin images, queue them on a jittered 3â€“5/day schedule, and post them to Pinterest via a Playwright persistent-profile session. Surface queue/history/settings + a re-login button at `/pinterest`.
 
-**Architecture:** Pin image generation is pure (templates + generator); the scheduler is pure (queue insertion math); the poster is the only impure part — Playwright `launchPersistentContext` against pinterest.com, with login-state detection that pauses the queue and fires a reminder if the session expires.
+**Architecture:** Pin image generation is pure (templates + generator); the scheduler is pure (queue insertion math); the poster is the only impure part â€” Playwright `launchPersistentContext` against pinterest.com, with login-state detection that pauses the queue and fires a reminder if the session expires.
 
 **Tech Stack:** Playwright (chromium), sharp (image composition), @napi-rs/canvas (text fallback), better-sqlite3, Express, Vitest, supertest.
 
@@ -14,17 +14,17 @@
 
 ## Pre-flight context (read once)
 
-- Spec: `docs/superpowers/specs/2026-05-26-publishing-ops-dashboard-design.md` §3.2 (pinterest module), §4 (`pinterest_queue` / `pinterest_history` tables), §5.4 (posting flow), §5.6 (`pinterest:*` SSE channels), §6.8 (UI), §7.2 (poster failure modes).
+- Spec: `docs/superpowers/specs/2026-05-26-publishing-ops-dashboard-design.md` Â§3.2 (pinterest module), Â§4 (`pinterest_queue` / `pinterest_history` tables), Â§5.4 (posting flow), Â§5.6 (`pinterest:*` SSE channels), Â§6.8 (UI), Â§7.2 (poster failure modes).
 - Brand palette (KDP playful theme): cream `#FBF3E2` background, deep teal `#1F4F66` title, brass `#CAA457` accent, coral `#D86C5C` accent. Memory: `kdp-cover-design-playful-theme`.
-- Pinterest pin spec: 1000 × 1500 (2:3 ratio).
-- Cadence: 3–5 pins/day, jittered between 09:00 and 21:00 local in `profile.time_zone`.
+- Pinterest pin spec: 1000 Ã— 1500 (2:3 ratio).
+- Cadence: 3â€“5 pins/day, jittered between 09:00 and 21:00 local in `profile.time_zone`.
 - Persistent profile path: `web.ui/backend/.pinterest-profile/` (must be gitignored).
 - Output PNG path: `output/pinterest/<slug>/<pin_type>-<idx>.png` (repo-root `output/`, gitignored).
 - Plan B already (1) creates SQLite schema via Plan A migrations, (2) inserts six rows into `pinterest_queue` via `planSixPinsForBook` + the `/api/kdp/books/:slug/mark-published` route. Plan E replaces the placeholder image paths in those rows by materialising real PNGs and exposing the `enqueuePinsForBook(bookId)` helper that the mark-published route will call instead of its inline planner.
 
 ## Image-library choice (rationale)
 
-- **`sharp`** for all raster composition (resize, composite, PNG encode). Native (`libvips`), fast, handles 1000 × 1500 in <100 ms per pin.
+- **`sharp`** for all raster composition (resize, composite, PNG encode). Native (`libvips`), fast, handles 1000 Ã— 1500 in <100 ms per pin.
 - **`@napi-rs/canvas`** for text rendering (title wrapping, font metrics, kerning). `sharp` cannot render arbitrary text on top of an image, and SVG-text via `sharp` lacks line-wrap. We pre-render captions to a transparent PNG with `@napi-rs/canvas` and then composite onto the cream background with `sharp`.
 - A single bundled font is shipped at `web.ui/backend/pinterest/assets/Inter-Bold.ttf` (free SIL OFL, included in the repo).
 
@@ -35,12 +35,12 @@ web.ui/backend/
   pinterest/
     palette.js                      Brand palette constants + font registration
     templates/
-      cover_hero.js                 Pure: book + caption → 1000×1500 PNG buffer
-      interior_preview.js           Pure: page preview + caption → 1000×1500 PNG buffer
+      cover_hero.js                 Pure: book + caption â†’ 1000Ã—1500 PNG buffer
+      interior_preview.js           Pure: page preview + caption â†’ 1000Ã—1500 PNG buffer
     generator.js                    Materialises PNG files for a book row
-    scheduler.js                    Pure: assign scheduled_for to queue rows (jittered 3–5/day)
+    scheduler.js                    Pure: assign scheduled_for to queue rows (jittered 3â€“5/day)
     queue.js                        DB helpers: enqueue / dequeue / mark / pause / resume
-    poster.js                       Worker — playwright driver, retries, login detection
+    poster.js                       Worker â€” playwright driver, retries, login detection
     login.js                        One-time visible-Chromium login helper
     routes.js                       Express router for /api/pinterest/*
     index.js                        Module surface: installPinterestModule, startPosterWorker
@@ -78,7 +78,7 @@ web.ui/frontend-react/src/
 
 ## Task 1: Install backend dependencies + register assets directory
 
-- [ ] Add dependencies to `web.ui/backend/package.json`. Run from `web.ui/backend/`:
+- [x] Add dependencies to `web.ui/backend/package.json`. Run from `web.ui/backend/`:
 
   ```bash
   npm install --save sharp@^0.33.5 @napi-rs/canvas@^0.1.56 playwright@^1.49.0
@@ -86,7 +86,7 @@ web.ui/frontend-react/src/
 
   Expected: `package.json` shows the three new `dependencies` entries. Playwright Chromium binary is downloaded as part of postinstall.
 
-- [ ] If Playwright's Chromium download was skipped (e.g. in offline CI), force it:
+- [x] If Playwright's Chromium download was skipped (e.g. in offline CI), force it:
 
   ```bash
   npx playwright install chromium
@@ -94,7 +94,7 @@ web.ui/frontend-react/src/
 
   Expected: `Chromium <version> downloaded` or `is already installed`.
 
-- [ ] Create the assets directory and download the bundled font:
+- [x] Create the assets directory and download the bundled font:
 
   ```bash
   mkdir -p web.ui/backend/pinterest/assets
@@ -102,7 +102,7 @@ web.ui/frontend-react/src/
     https://github.com/rsms/inter/raw/master/docs/font-files/Inter-Bold.ttf
   ```
 
-  Expected: a ~330 KB TTF file. (If curl is unavailable, manually drop `Inter-Bold.ttf` into that path — any bold sans-serif TTF licensed for redistribution works.)
+  Expected: a ~330 KB TTF file. (If curl is unavailable, manually drop `Inter-Bold.ttf` into that path â€” any bold sans-serif TTF licensed for redistribution works.)
 
   Verify:
 
@@ -112,10 +112,10 @@ web.ui/frontend-react/src/
 
   Expected: `True`.
 
-- [ ] Append to `.gitignore` (root):
+- [x] Append to `.gitignore` (root):
 
   ```
-  # Plan E — Pinterest automation
+  # Plan E â€” Pinterest automation
   web.ui/backend/.pinterest-profile/
   output/pinterest/
   ```
@@ -128,7 +128,7 @@ web.ui/frontend-react/src/
 
   Expected: both paths shown with their `.gitignore` rule lines.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/package.json web.ui/backend/package-lock.json \
@@ -141,7 +141,7 @@ web.ui/frontend-react/src/
 
 ## Task 2: Brand palette constants + font registration
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/palette.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/palette.test.js`:
 
   ```javascript
   import { describe, it, expect } from 'vitest';
@@ -166,7 +166,7 @@ web.ui/frontend-react/src/
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/palette.test.js
@@ -174,7 +174,7 @@ web.ui/frontend-react/src/
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/palette.js`:
+- [x] Implement `web.ui/backend/pinterest/palette.js`:
 
   ```javascript
   /**
@@ -204,7 +204,7 @@ web.ui/frontend-react/src/
   let registered = false;
 
   /**
-   * Register the bundled Inter-Bold font with @napi-rs/canvas. Idempotent —
+   * Register the bundled Inter-Bold font with @napi-rs/canvas. Idempotent â€”
    * safe to call from every template invocation.
    */
   export function registerFonts() {
@@ -218,7 +218,7 @@ web.ui/frontend-react/src/
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/palette.test.js
@@ -226,7 +226,7 @@ web.ui/frontend-react/src/
 
   Expected: 3 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/palette.js web.ui/backend/__tests__/pinterest/palette.test.js
@@ -235,16 +235,16 @@ web.ui/frontend-react/src/
 
 ---
 
-## Task 3: cover_hero template — pure 1000×1500 composition
+## Task 3: cover_hero template â€” pure 1000Ã—1500 composition
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/cover_hero.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/cover_hero.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeAll } from 'vitest';
   import sharp from 'sharp';
   import { renderCoverHero } from '../../pinterest/templates/cover_hero.js';
 
-  /** A tiny 100×150 cream-colored PNG used as a stand-in cover. */
+  /** A tiny 100Ã—150 cream-colored PNG used as a stand-in cover. */
   async function makeFakeCoverBuffer() {
     return sharp({
       create: {
@@ -264,7 +264,7 @@ web.ui/frontend-react/src/
       cover = await makeFakeCoverBuffer();
     });
 
-    it('returns a PNG buffer that is exactly 1000×1500', async () => {
+    it('returns a PNG buffer that is exactly 1000Ã—1500', async () => {
       const out = await renderCoverHero({
         coverPng: cover,
         title: 'Kakuro for Quiet Minds',
@@ -300,7 +300,7 @@ web.ui/frontend-react/src/
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/cover_hero.test.js
@@ -308,15 +308,15 @@ web.ui/frontend-react/src/
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/templates/cover_hero.js`:
+- [x] Implement `web.ui/backend/pinterest/templates/cover_hero.js`:
 
   ```javascript
   /**
-   * Pure pin template — composes a 1000×1500 "cover hero" PNG.
+   * Pure pin template â€” composes a 1000Ã—1500 "cover hero" PNG.
    *
    * Layout:
    *   - Cream background.
-   *   - Cover image centered in upper 60% (max ~520×780).
+   *   - Cover image centered in upper 60% (max ~520Ã—780).
    *   - Title under cover, wrapped, teal #1F4F66, Inter-Bold.
    *   - Subtitle below title, smaller, brass #CAA457.
    *   - Thin coral underline accent.
@@ -334,13 +334,13 @@ web.ui/frontend-react/src/
   /**
    * @typedef {Object} CoverHeroInput
    * @property {Buffer} coverPng         PNG buffer of the source cover.
-   * @property {string} title            Pin title (1–80 chars).
+   * @property {string} title            Pin title (1â€“80 chars).
    * @property {string} [subtitle]       Optional subtitle line.
    */
 
   /**
    * @param {CoverHeroInput} input
-   * @returns {Promise<Buffer>}  1000×1500 PNG.
+   * @returns {Promise<Buffer>}  1000Ã—1500 PNG.
    */
   export async function renderCoverHero({ coverPng, title, subtitle }) {
     registerFonts();
@@ -364,7 +364,7 @@ web.ui/frontend-react/src/
     const coverLeft = Math.round((WIDTH - (coverMeta.width ?? 520)) / 2);
     const coverTop = 90;
 
-    // 3. Caption canvas (transparent), 1000×500, drawn under the cover.
+    // 3. Caption canvas (transparent), 1000Ã—500, drawn under the cover.
     const captionTop = coverTop + (coverMeta.height ?? 780) + 60;
     const captionPng = renderCaptionBlock({
       width: WIDTH,
@@ -394,7 +394,7 @@ web.ui/frontend-react/src/
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
-    // Title — teal, bold, wrapped to max 3 lines.
+    // Title â€” teal, bold, wrapped to max 3 lines.
     ctx.fillStyle = PALETTE.teal;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
@@ -409,13 +409,13 @@ web.ui/frontend-react/src/
       y += lineHeight;
     }
 
-    // Coral underline accent — 4px thick, 160 wide, centered, 24px below title.
+    // Coral underline accent â€” 4px thick, 160 wide, centered, 24px below title.
     y += 24;
     ctx.fillStyle = PALETTE.coral;
     ctx.fillRect(Math.round(width / 2 - 80), y, 160, 4);
     y += 32;
 
-    // Subtitle — brass, smaller.
+    // Subtitle â€” brass, smaller.
     if (subtitle) {
       ctx.fillStyle = PALETTE.brass;
       ctx.font = `36px ${FONT_FAMILY}`;
@@ -471,10 +471,10 @@ web.ui/frontend-react/src/
       const consumed = lines.join(' ').split(/\s+/).length;
       if (consumed < words.length) {
         let last = lines[maxLines - 1];
-        while (ctx.measureText(last + '…').width > maxWidth && last.length > 1) {
+        while (ctx.measureText(last + 'â€¦').width > maxWidth && last.length > 1) {
           last = last.slice(0, -1);
         }
-        lines[maxLines - 1] = last + '…';
+        lines[maxLines - 1] = last + 'â€¦';
       }
     }
     return lines;
@@ -492,7 +492,7 @@ web.ui/frontend-react/src/
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/cover_hero.test.js
@@ -500,7 +500,7 @@ web.ui/frontend-react/src/
 
   Expected: 3 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/templates/cover_hero.js \
@@ -510,9 +510,9 @@ web.ui/frontend-react/src/
 
 ---
 
-## Task 4: interior_preview template — page preview on top, caption on bottom
+## Task 4: interior_preview template â€” page preview on top, caption on bottom
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/interior_preview.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/interior_preview.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeAll } from 'vitest';
@@ -538,7 +538,7 @@ web.ui/frontend-react/src/
       page = await makeFakePagePreview();
     });
 
-    it('returns a 1000×1500 PNG with the page in the top 2/3', async () => {
+    it('returns a 1000Ã—1500 PNG with the page in the top 2/3', async () => {
       const out = await renderInteriorPreview({
         pagePng: page,
         title: 'Inside Kakuro: a peek',
@@ -566,7 +566,7 @@ web.ui/frontend-react/src/
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/interior_preview.test.js
@@ -574,15 +574,15 @@ web.ui/frontend-react/src/
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/templates/interior_preview.js`:
+- [x] Implement `web.ui/backend/pinterest/templates/interior_preview.js`:
 
   ```javascript
   /**
-   * Pure pin template — composes a 1000×1500 "interior page preview" PNG.
+   * Pure pin template â€” composes a 1000Ã—1500 "interior page preview" PNG.
    *
    * Layout (different from cover_hero):
-   *   - Top 2/3 (≈ 1000×1000): page preview, scaled to fit, centered, on cream.
-   *   - Bottom 1/3 (≈ 1000×500): caption block (title + subtitle) on teal panel.
+   *   - Top 2/3 (â‰ˆ 1000Ã—1000): page preview, scaled to fit, centered, on cream.
+   *   - Bottom 1/3 (â‰ˆ 1000Ã—500): caption block (title + subtitle) on teal panel.
    *
    * @module pinterest/templates/interior_preview
    */
@@ -605,7 +605,7 @@ web.ui/frontend-react/src/
 
   /**
    * @param {InteriorPreviewInput} input
-   * @returns {Promise<Buffer>}  1000×1500 PNG.
+   * @returns {Promise<Buffer>}  1000Ã—1500 PNG.
    */
   export async function renderInteriorPreview({ pagePng, title, subtitle }) {
     if (!pagePng || !Buffer.isBuffer(pagePng)) {
@@ -623,7 +623,7 @@ web.ui/frontend-react/src/
       },
     });
 
-    // Resize page preview to fit a 880×920 box inside the top 1000px region.
+    // Resize page preview to fit a 880Ã—920 box inside the top 1000px region.
     const pageResized = await sharp(pagePng)
       .resize({ width: 880, height: 920, fit: 'inside' })
       .png()
@@ -729,10 +729,10 @@ web.ui/frontend-react/src/
       const consumed = lines.join(' ').split(/\s+/).length;
       if (consumed < words.length) {
         let last = lines[maxLines - 1];
-        while (ctx.measureText(last + '…').width > maxWidth && last.length > 1) {
+        while (ctx.measureText(last + 'â€¦').width > maxWidth && last.length > 1) {
           last = last.slice(0, -1);
         }
-        lines[maxLines - 1] = last + '…';
+        lines[maxLines - 1] = last + 'â€¦';
       }
     }
     return lines;
@@ -750,7 +750,7 @@ web.ui/frontend-react/src/
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/interior_preview.test.js
@@ -758,19 +758,19 @@ web.ui/frontend-react/src/
 
   Expected: 3 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/templates/interior_preview.js \
           web.ui/backend/__tests__/pinterest/interior_preview.test.js
-  git commit -m "feat(pinterest): interior_preview template — page on top, teal caption panel"
+  git commit -m "feat(pinterest): interior_preview template â€” page on top, teal caption panel"
   ```
 
 ---
 
-## Task 5: Generator — materialise PNG files to `output/pinterest/<slug>/`
+## Task 5: Generator â€” materialise PNG files to `output/pinterest/<slug>/`
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/generator.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/generator.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -852,7 +852,7 @@ web.ui/frontend-react/src/
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/generator.test.js
@@ -860,12 +860,12 @@ web.ui/frontend-react/src/
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/generator.js`:
+- [x] Implement `web.ui/backend/pinterest/generator.js`:
 
   ```javascript
   /**
-   * Pin image generator — given a slug, pin type, source PNG path on disk,
-   * and caption text, render and persist a 1000×1500 pin PNG.
+   * Pin image generator â€” given a slug, pin type, source PNG path on disk,
+   * and caption text, render and persist a 1000Ã—1500 pin PNG.
    *
    * Output location: <PINTEREST_OUTPUT_ROOT or repo-root/output/pinterest>/<slug>/<pin_type>-<index>.png
    *
@@ -930,7 +930,7 @@ web.ui/frontend-react/src/
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/generator.test.js
@@ -938,7 +938,7 @@ web.ui/frontend-react/src/
 
   Expected: 3 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/generator.js \
@@ -948,9 +948,9 @@ web.ui/frontend-react/src/
 
 ---
 
-## Task 6: Scheduler — pure 3–5/day jittered slot assignment
+## Task 6: Scheduler â€” pure 3â€“5/day jittered slot assignment
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/scheduler.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/scheduler.test.js`:
 
   ```javascript
   import { describe, it, expect } from 'vitest';
@@ -1013,7 +1013,7 @@ web.ui/frontend-react/src/
       }
     });
 
-    it('respects perDayMax — never puts >5 slots on any one local date', () => {
+    it('respects perDayMax â€” never puts >5 slots on any one local date', () => {
       const slots = assignSlots({
         count: 20,
         existingQueue: [],
@@ -1068,7 +1068,7 @@ web.ui/frontend-react/src/
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/scheduler.test.js
@@ -1076,15 +1076,15 @@ web.ui/frontend-react/src/
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/scheduler.js`:
+- [x] Implement `web.ui/backend/pinterest/scheduler.js`:
 
   ```javascript
   /**
-   * Pure scheduler — given the existing queue and a target cadence, compute
+   * Pure scheduler â€” given the existing queue and a target cadence, compute
    * jittered scheduled_for timestamps for new pins.
    *
    * Cadence: 3..5 pins per local date, only within the [windowStartHour,
-   * windowEndHour] window. Slot positions are jittered (≥ 25 minutes apart).
+   * windowEndHour] window. Slot positions are jittered (â‰¥ 25 minutes apart).
    *
    * @module pinterest/scheduler
    */
@@ -1275,7 +1275,7 @@ web.ui/frontend-react/src/
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/scheduler.test.js
@@ -1283,19 +1283,19 @@ web.ui/frontend-react/src/
 
   Expected: 8 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/scheduler.js \
           web.ui/backend/__tests__/pinterest/scheduler.test.js
-  git commit -m "feat(pinterest): pure scheduler — jittered 3-5/day in [09:00,21:00] local"
+  git commit -m "feat(pinterest): pure scheduler â€” jittered 3-5/day in [09:00,21:00] local"
   ```
 
 ---
 
-## Task 7: Queue helpers — enqueuePinsForBook + dequeueNext + mark + pause/resume
+## Task 7: Queue helpers â€” enqueuePinsForBook + dequeueNext + mark + pause/resume
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/queue.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/queue.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -1384,7 +1384,7 @@ web.ui/frontend-react/src/
         `)
         .run();
       const rows = await enqueuePinsForBook(info.lastInsertRowid);
-      // Only rows with valid source images are produced; cover & interiors missing → 0.
+      // Only rows with valid source images are produced; cover & interiors missing â†’ 0.
       expect(rows).toHaveLength(0);
     });
   });
@@ -1519,7 +1519,7 @@ web.ui/frontend-react/src/
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/queue.test.js
@@ -1527,11 +1527,11 @@ web.ui/frontend-react/src/
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/queue.js`:
+- [x] Implement `web.ui/backend/pinterest/queue.js`:
 
   ```javascript
   /**
-   * Queue helpers — DB-facing operations on pinterest_queue and pinterest_history.
+   * Queue helpers â€” DB-facing operations on pinterest_queue and pinterest_history.
    *
    * Public API used by Plan B (mark-published flow): enqueuePinsForBook(bookId).
    * Public API used by Plan E poster + routes: dequeueNext / markPosted /
@@ -1598,13 +1598,13 @@ web.ui/frontend-react/src/
         FROM kdp_books WHERE id = ?
     `).get(bookId);
     if (!book) throw new Error(`kdp_book ${bookId} not found`);
-    if (!book.asin) throw new Error(`kdp_book ${bookId} has no ASIN — cannot build link_url`);
+    if (!book.asin) throw new Error(`kdp_book ${bookId} has no ASIN â€” cannot build link_url`);
 
     // Six pin specs: 1 cover_hero + 5 interior_preview.
     const linkUrl = `https://www.amazon.com/dp/${book.asin}`;
     const baseDesc = book.blurb
       ? String(book.blurb).replace(/<[^>]+>/g, '').slice(0, 480)
-      : `${book.title} — available now on Amazon.`;
+      : `${book.title} â€” available now on Amazon.`;
 
     const candidates = [
       {
@@ -1715,10 +1715,10 @@ web.ui/frontend-react/src/
   function interiorTitle(bookTitle, i) {
     const variants = [
       `Inside ${bookTitle}: a peek`,
-      `${bookTitle} — sample pages`,
-      `${bookTitle} — large-print layout`,
-      `${bookTitle} — what's inside`,
-      `${bookTitle} — bonus pages`,
+      `${bookTitle} â€” sample pages`,
+      `${bookTitle} â€” large-print layout`,
+      `${bookTitle} â€” what's inside`,
+      `${bookTitle} â€” bonus pages`,
     ];
     return variants[i - 1] ?? variants[0];
   }
@@ -1878,7 +1878,7 @@ web.ui/frontend-react/src/
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/queue.test.js
@@ -1886,7 +1886,7 @@ web.ui/frontend-react/src/
 
   Expected: 9 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/queue.js \
@@ -1898,11 +1898,11 @@ web.ui/frontend-react/src/
 
 ## Task 8: Refactor Plan B's mark-published route to call `enqueuePinsForBook`
 
-Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts six placeholder rows via `planSixPinsForBook` (no real PNGs on disk). Replace that with `enqueuePinsForBook(book.id)` so pins exist as actual 1000×1500 PNGs ready for the poster.
+Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts six placeholder rows via `planSixPinsForBook` (no real PNGs on disk). Replace that with `enqueuePinsForBook(book.id)` so pins exist as actual 1000Ã—1500 PNGs ready for the poster.
 
-- [ ] Open `web.ui/backend/kdp/routes.js`. Locate the `router.post('/books/:slug/mark-published', ...)` handler installed by Plan B Task 6.
+- [x] Open `web.ui/backend/kdp/routes.js`. Locate the `router.post('/books/:slug/mark-published', ...)` handler installed by Plan B Task 6.
 
-- [ ] Replace the body of that handler with:
+- [x] Replace the body of that handler with:
 
   ```javascript
   router.post('/books/:slug/mark-published', async (req, res) => {
@@ -1935,7 +1935,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
       book.id,
     );
 
-    // Plan E — materialise PNG pins + insert pinterest_queue rows.
+    // Plan E â€” materialise PNG pins + insert pinterest_queue rows.
     let pinsQueued = 0;
     try {
       const { enqueuePinsForBook } = await import('../pinterest/queue.js');
@@ -1954,9 +1954,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-- [ ] Remove the now-obsolete `planSixPinsForBook` import from the top of `web.ui/backend/kdp/routes.js` if it is no longer used elsewhere in the file. Keep `web.ui/backend/kdp/pinterestPlanner.js` and its test on disk — they're still valid as a pure function but not wired into the live route.
+- [x] Remove the now-obsolete `planSixPinsForBook` import from the top of `web.ui/backend/kdp/routes.js` if it is no longer used elsewhere in the file. Keep `web.ui/backend/kdp/pinterestPlanner.js` and its test on disk â€” they're still valid as a pure function but not wired into the live route.
 
-- [ ] Update the existing Plan B routes test `web.ui/backend/__tests__/kdp/routes.test.js`. Find the `describe('POST /api/kdp/books/:slug/mark-published', ...)` block and adjust the assertion that counts inserted rows. It previously expected exactly 6; now expect "between 0 and 6 inclusive" because pin generation depends on source PNG presence:
+- [x] Update the existing Plan B routes test `web.ui/backend/__tests__/kdp/routes.test.js`. Find the `describe('POST /api/kdp/books/:slug/mark-published', ...)` block and adjust the assertion that counts inserted rows. It previously expected exactly 6; now expect "between 0 and 6 inclusive" because pin generation depends on source PNG presence:
 
   ```javascript
   it('inserts up to 6 pinterest_queue rows', async () => {
@@ -1972,9 +1972,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-  (Plan B's test fixture seeds a `book-a` with no real cover/interior PNGs on disk, so the live count is 0. If your local Plan B fixture happens to seed PNGs, the count will be higher — the inclusive range covers both.)
+  (Plan B's test fixture seeds a `book-a` with no real cover/interior PNGs on disk, so the live count is 0. If your local Plan B fixture happens to seed PNGs, the count will be higher â€” the inclusive range covers both.)
 
-- [ ] Re-run the routes test, confirm pass:
+- [x] Re-run the routes test, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/routes.test.js
@@ -1982,7 +1982,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: all tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/kdp/routes.js web.ui/backend/__tests__/kdp/routes.test.js
@@ -1993,7 +1993,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ## Task 9: One-time visible Playwright login helper
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/login.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/login.test.js`:
 
   ```javascript
   import { describe, it, expect, vi } from 'vitest';
@@ -2045,7 +2045,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/login.test.js
@@ -2053,7 +2053,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/login.js`:
+- [x] Implement `web.ui/backend/pinterest/login.js`:
 
   ```javascript
   /**
@@ -2118,7 +2118,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/login.test.js
@@ -2126,7 +2126,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: 1 test passes.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/login.js \
@@ -2136,9 +2136,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 10: Poster worker — driver injection + login detection + retries
+## Task 10: Poster worker â€” driver injection + login detection + retries
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/poster.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/poster.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -2189,7 +2189,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
     return Number(info.lastInsertRowid);
   }
 
-  describe('runOnce — happy path', () => {
+  describe('runOnce â€” happy path', () => {
     it('posts via the fake driver and marks the row posted', async () => {
       const img = path.join(tmpRoot, 'pin.png');
       await fakeImage(img);
@@ -2209,7 +2209,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
     });
   });
 
-  describe('runOnce — logged out', () => {
+  describe('runOnce â€” logged out', () => {
     it('pauses the queue and fires a reminder when isLoggedIn=false', async () => {
       const img = path.join(tmpRoot, 'pin.png');
       await fakeImage(img);
@@ -2228,7 +2228,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
     });
   });
 
-  describe('runOnce — error path', () => {
+  describe('runOnce â€” error path', () => {
     it('records pinterest_history failure and marks queue row failed', async () => {
       const img = path.join(tmpRoot, 'pin.png');
       await fakeImage(img);
@@ -2246,7 +2246,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
     });
   });
 
-  describe('runOnce — nothing due', () => {
+  describe('runOnce â€” nothing due', () => {
     it('returns idle when no rows are due', async () => {
       const result = await runOnce({
         driverFactory: () => ({ isLoggedIn: vi.fn(), postPin: vi.fn() }),
@@ -2256,7 +2256,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/poster.test.js
@@ -2264,7 +2264,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/poster.js`:
+- [x] Implement `web.ui/backend/pinterest/poster.js`:
 
   ```javascript
   /**
@@ -2285,7 +2285,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
    *   - Compute msUntilNext from the earliest pending scheduled_for.
    *   - If nothing pending, sleep 5 minutes and re-check.
    *   - If paused, sleep 5 minutes and re-check (pause toggles flip status).
-   *   - Exponential backoff on consecutive failures: 1m → 5m → 30m → pause.
+   *   - Exponential backoff on consecutive failures: 1m â†’ 5m â†’ 30m â†’ pause.
    *
    * @module pinterest/poster
    */
@@ -2516,7 +2516,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/poster.test.js
@@ -2524,7 +2524,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: 4 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/poster.js \
@@ -2534,9 +2534,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 11: Express routes — queue / history / pause / resume / login / edit / cancel
+## Task 11: Express routes â€” queue / history / pause / resume / login / edit / cancel
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/routes.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/routes.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -2663,7 +2663,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-- [ ] Run, confirm failure:
+- [x] Run, confirm failure:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
@@ -2671,7 +2671,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/pinterest/routes.js`:
+- [x] Implement `web.ui/backend/pinterest/routes.js`:
 
   ```javascript
   /**
@@ -2745,7 +2745,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-- [ ] Implement `web.ui/backend/pinterest/index.js`:
+- [x] Implement `web.ui/backend/pinterest/index.js`:
 
   ```javascript
   /**
@@ -2766,7 +2766,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
@@ -2774,7 +2774,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: 6 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/pinterest/routes.js web.ui/backend/pinterest/index.js \
@@ -2786,19 +2786,19 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ## Task 12: Wire Pinterest module + poster worker into `server.js`
 
-- [ ] Open `web.ui/backend/server.js`. Add the import near other module imports added by Plans A/B/C/D:
+- [x] Open `web.ui/backend/server.js`. Add the import near other module imports added by Plans A/B/C/D:
 
   ```javascript
   import { installPinterestModule, startPosterWorker } from './pinterest/index.js';
   ```
 
-- [ ] After the other `install*Module(app)` calls (KDP from Plan B, Etsy/Calendar from Plan C, Reminders/Plans from Plan D), add:
+- [x] After the other `install*Module(app)` calls (KDP from Plan B, Etsy/Calendar from Plan C, Reminders/Plans from Plan D), add:
 
   ```javascript
   installPinterestModule(app);
   ```
 
-- [ ] Inside the `app.listen` callback (where Plan A wires `startTray()` and `startBackupCron()`), add — guarded so tests can skip:
+- [x] Inside the `app.listen` callback (where Plan A wires `startTray()` and `startBackupCron()`), add â€” guarded so tests can skip:
 
   ```javascript
   if (process.env.ROOSTER_SKIP_PINTEREST_POSTER !== '1') {
@@ -2806,7 +2806,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Verify the server still boots without exceptions:
+- [x] Verify the server still boots without exceptions:
 
   ```bash
   cd web.ui/backend && \
@@ -2816,7 +2816,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: process exits 0 with no thrown errors.
 
-- [ ] Smoke-test the new endpoints against a real running server (separate terminal):
+- [x] Smoke-test the new endpoints against a real running server (separate terminal):
 
   ```bash
   cd web.ui/backend && \
@@ -2830,7 +2830,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: each curl prints `{"queue":[]}` / `{"history":[]}`.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/server.js
@@ -2839,9 +2839,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 13: Frontend — typed API client + types
+## Task 13: Frontend â€” typed API client + types
 
-- [ ] Create `web.ui/frontend-react/src/services/pinterest.ts`:
+- [x] Create `web.ui/frontend-react/src/services/pinterest.ts`:
 
   ```typescript
   /**
@@ -2922,7 +2922,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Build to verify TypeScript is happy:
+- [x] Build to verify TypeScript is happy:
 
   ```bash
   cd web.ui/frontend-react && npm run build
@@ -2930,7 +2930,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: build succeeds.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/frontend-react/src/services/pinterest.ts
@@ -2939,9 +2939,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 14: Frontend — `PinterestQueueTable` component
+## Task 14: Frontend â€” `PinterestQueueTable` component
 
-- [ ] Create `web.ui/frontend-react/src/components/PinterestQueueTable.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/PinterestQueueTable.tsx`:
 
   ```typescript
   import { useState } from 'react';
@@ -3048,7 +3048,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/frontend-react/src/components/PinterestQueueTable.tsx
@@ -3057,9 +3057,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 15: Frontend — `PinterestHistoryTable` + `PinPreviewModal`
+## Task 15: Frontend â€” `PinterestHistoryTable` + `PinPreviewModal`
 
-- [ ] Create `web.ui/frontend-react/src/components/PinterestHistoryTable.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/PinterestHistoryTable.tsx`:
 
   ```typescript
   import { PinterestHistoryRow } from '../services/pinterest';
@@ -3115,7 +3115,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Create `web.ui/frontend-react/src/components/PinPreviewModal.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/PinPreviewModal.tsx`:
 
   ```typescript
   import { PinterestQueueRow } from '../services/pinterest';
@@ -3126,21 +3126,21 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
 
   /**
-   * Show the 1000×1500 pin PNG full-size in a modal. The backend serves these
+   * Show the 1000Ã—1500 pin PNG full-size in a modal. The backend serves these
    * via the `/files` static route (Plan B Task 16); we request the path with
-   * `/files/<absolute-or-relative>` after the route's allow-list — and since
+   * `/files/<absolute-or-relative>` after the route's allow-list â€” and since
    * pin PNGs live under `output/pinterest/`, Plan E Task 17 extends `/files`
    * to include that prefix.
    */
   export default function PinPreviewModal({ row, onClose }: Props) {
     if (!row) return null;
-    // Convert "C:/.../output/pinterest/<slug>/<file>" → "/files/output/pinterest/<slug>/<file>"
+    // Convert "C:/.../output/pinterest/<slug>/<file>" â†’ "/files/output/pinterest/<slug>/<file>"
     const m = row.image_path.replace(/\\/g, '/').match(/output\/pinterest\/[^?#]+$/);
     const src = m ? `/files/${m[0]}` : row.image_path;
     return (
       <div className="modal-backdrop" onClick={onClose}>
         <div className="modal pin-preview-modal" onClick={(e) => e.stopPropagation()}>
-          <button className="modal-close" onClick={onClose} aria-label="Close">×</button>
+          <button className="modal-close" onClick={onClose} aria-label="Close">Ã—</button>
           <h2>{row.title}</h2>
           <img src={src} alt={row.title} style={{ maxWidth: '500px', maxHeight: '750px' }} />
           <dl>
@@ -3154,7 +3154,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/frontend-react/src/components/PinterestHistoryTable.tsx \
@@ -3164,9 +3164,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 16: Frontend — `PinterestSettings` component (pause/resume + re-login)
+## Task 16: Frontend â€” `PinterestSettings` component (pause/resume + re-login)
 
-- [ ] Create `web.ui/frontend-react/src/components/PinterestSettings.tsx`:
+- [x] Create `web.ui/frontend-react/src/components/PinterestSettings.tsx`:
 
   ```typescript
   import { useState } from 'react';
@@ -3192,7 +3192,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
       onChanged();
     }
     async function handleLogin() {
-      setStatus('Opening Pinterest login window… complete the login in the new Chromium window that just appeared.');
+      setStatus('Opening Pinterest login windowâ€¦ complete the login in the new Chromium window that just appeared.');
       try {
         await triggerLogin();
       } catch (err) {
@@ -3205,7 +3205,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
         <h2>Settings</h2>
         <div className="pin-settings-row">
           <div>
-            <strong>{pendingCount}</strong> pending · <strong>{pausedCount}</strong> paused
+            <strong>{pendingCount}</strong> pending Â· <strong>{pausedCount}</strong> paused
           </div>
           <div className="pin-settings-actions">
             {pendingCount > 0 && <button onClick={handlePause}>Pause queue</button>}
@@ -3216,7 +3216,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
           </div>
         </div>
         <p className="muted">
-          Posting cadence is 3–5 pins per day, jittered between 09:00 and 21:00 in your profile time zone.
+          Posting cadence is 3â€“5 pins per day, jittered between 09:00 and 21:00 in your profile time zone.
           Edit the time zone on /profile if you want a different window.
         </p>
         {status && <p className="pin-settings-status">{status}</p>}
@@ -3225,7 +3225,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/frontend-react/src/components/PinterestSettings.tsx
@@ -3234,9 +3234,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 17: Frontend — `/pinterest` page + SSE live refresh + `/files` route extension
+## Task 17: Frontend â€” `/pinterest` page + SSE live refresh + `/files` route extension
 
-- [ ] Extend the backend `/files` route (added by Plan B Task 16) so it also serves pin PNGs from `output/pinterest/`. Open `web.ui/backend/kdp/routes.js` and locate the `/files` handler that whitelists `data/cache/...` and `output/kdp-ready/...`. Add `output/pinterest/...` to the allowed prefix list. If Plan B's implementation uses a single regex, extend it to match `output/pinterest/**`.
+- [x] Extend the backend `/files` route (added by Plan B Task 16) so it also serves pin PNGs from `output/pinterest/`. Open `web.ui/backend/kdp/routes.js` and locate the `/files` handler that whitelists `data/cache/...` and `output/kdp-ready/...`. Add `output/pinterest/...` to the allowed prefix list. If Plan B's implementation uses a single regex, extend it to match `output/pinterest/**`.
 
   Example shape (paste into the handler if Plan B's pattern matches; otherwise adapt to the exact code Plan B Task 16 wrote):
 
@@ -3244,13 +3244,13 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   const ALLOWED_PREFIXES = [
     'data/cache/previews/',
     'output/kdp-ready/',
-    'output/pinterest/',     // ← Plan E addition
+    'output/pinterest/',     // â† Plan E addition
   ];
   ```
 
   Save the file.
 
-- [ ] Replace `web.ui/frontend-react/src/pages/Pinterest.tsx` (Plan A scaffolded a placeholder):
+- [x] Replace `web.ui/frontend-react/src/pages/Pinterest.tsx` (Plan A scaffolded a placeholder):
 
   ```typescript
   import { useCallback, useEffect, useState } from 'react';
@@ -3311,10 +3311,10 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   }
   ```
 
-- [ ] Add minimal styles to `web.ui/frontend-react/src/styles/shell.css` (append to the file):
+- [x] Add minimal styles to `web.ui/frontend-react/src/styles/shell.css` (append to the file):
 
   ```css
-  /* Plan E — Pinterest page */
+  /* Plan E â€” Pinterest page */
   .pin-queue-table, .pin-history-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1.5rem; }
   .pin-queue-table th, .pin-history-table th { text-align: left; padding: 0.5rem; border-bottom: 1px solid var(--border); font-weight: 600; }
   .pin-queue-table td, .pin-history-table td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
@@ -3342,7 +3342,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   .empty { color: var(--muted); font-style: italic; }
   ```
 
-- [ ] Build to verify:
+- [x] Build to verify:
 
   ```bash
   cd web.ui/frontend-react && npm run build
@@ -3350,7 +3350,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: build succeeds with no TS errors.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/frontend-react/src/pages/Pinterest.tsx \
@@ -3361,16 +3361,16 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 18: Help content — `pinterest_first_login.md`
+## Task 18: Help content â€” `pinterest_first_login.md`
 
-- [ ] Create `web.ui/backend/help/pinterest_first_login.md`:
+- [x] Create `web.ui/backend/help/pinterest_first_login.md`:
 
   ```markdown
   # First-time Pinterest login
 
   The dashboard posts pins by automating a real Chromium browser. It uses a
   persistent profile stored at `web.ui/backend/.pinterest-profile/`, so you
-  only need to log in once — Pinterest's session cookie persists on disk
+  only need to log in once â€” Pinterest's session cookie persists on disk
   and subsequent posts run silently in the background.
 
   ## Steps
@@ -3378,7 +3378,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   1. Open the `/pinterest` page in the dashboard.
   2. In the **Settings** panel at the top, click **Sign in to Pinterest**.
   3. A new Chromium window opens at `https://www.pinterest.com/login/`.
-  4. Complete the login normally — email + password, Google sign-in, or
+  4. Complete the login normally â€” email + password, Google sign-in, or
      "Continue with Apple". Two-factor codes work the same as a normal
      browser login.
   5. Once Pinterest redirects you to the main feed (URL becomes
@@ -3388,7 +3388,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   ## What gets stored
 
   - Pinterest session cookies live inside `web.ui/backend/.pinterest-profile/`.
-  - This directory is gitignored — nothing is uploaded.
+  - This directory is gitignored â€” nothing is uploaded.
   - Backup of this directory is included in the nightly SQLite backup tarball
     (`data/.backups/`).
 
@@ -3416,7 +3416,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   - **Chromium window does not appear:** check the dashboard logs at
     `data/logs/dashboard-<date>.log`. Most commonly Playwright's bundled
-    Chromium is missing — run `npx playwright install chromium` from the
+    Chromium is missing â€” run `npx playwright install chromium` from the
     `web.ui/backend/` directory.
   - **"Login required" reminder fires immediately after sign-in:** Pinterest
     may have flagged the session as suspicious. Open a normal browser, log
@@ -3428,7 +3428,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
     page.
   ```
 
-- [ ] Verify the help endpoint serves it:
+- [x] Verify the help endpoint serves it:
 
   ```bash
   cd web.ui/backend && \
@@ -3441,7 +3441,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: the first 80 chars of the markdown file are printed (starts with `# First-time Pinterest login`).
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/help/pinterest_first_login.md
@@ -3450,9 +3450,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ---
 
-## Task 19: E2E test — fake driver runs end-to-end through the poster
+## Task 19: E2E test â€” fake driver runs end-to-end through the poster
 
-- [ ] Write `web.ui/backend/__tests__/pinterest/e2e_fake_driver.test.js`:
+- [x] Write `web.ui/backend/__tests__/pinterest/e2e_fake_driver.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -3543,26 +3543,26 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   });
   ```
 
-- [ ] Run, confirm pass:
+- [x] Run, confirm pass:
 
   ```bash
   cd web.ui/backend && npx vitest run __tests__/pinterest/e2e_fake_driver.test.js
   ```
 
-  Expected: 1 test passes (may take a few seconds — 6 PNG renders × 6 fake posts).
+  Expected: 1 test passes (may take a few seconds â€” 6 PNG renders Ã— 6 fake posts).
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/__tests__/pinterest/e2e_fake_driver.test.js
-  git commit -m "test(pinterest): end-to-end fake-driver smoke (enqueue → 6 posts → empty queue)"
+  git commit -m "test(pinterest): end-to-end fake-driver smoke (enqueue â†’ 6 posts â†’ empty queue)"
   ```
 
 ---
 
 ## Task 20: Manual live-test script (gated by `PINTEREST_LIVE=1`)
 
-- [ ] Create `web.ui/backend/scripts/test-pinterest-live.mjs`:
+- [x] Create `web.ui/backend/scripts/test-pinterest-live.mjs`:
 
   ```javascript
   #!/usr/bin/env node
@@ -3603,7 +3603,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   process.exit(0);
   ```
 
-- [ ] Add a script alias in `web.ui/backend/package.json` under `"scripts"`:
+- [x] Add a script alias in `web.ui/backend/package.json` under `"scripts"`:
 
   ```json
   "test:pinterest:live": "node scripts/test-pinterest-live.mjs"
@@ -3617,7 +3617,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: `test:pinterest:live` is present.
 
-- [ ] Verify the script refuses to run without the gate:
+- [x] Verify the script refuses to run without the gate:
 
   ```bash
   cd web.ui/backend && node scripts/test-pinterest-live.mjs
@@ -3625,11 +3625,11 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: prints `Refusing to run against real Pinterest without PINTEREST_LIVE=1` and exits 2.
 
-- [ ] **DO NOT** run the live script in this task — it requires a real
+- [x] **DO NOT** run the live script in this task â€” it requires a real
   Pinterest account login. Add a sticky note: live verification is its own
   manual smoke step after merge.
 
-- [ ] Commit:
+- [x] Commit:
 
   ```bash
   git add web.ui/backend/scripts/test-pinterest-live.mjs web.ui/backend/package.json
@@ -3640,7 +3640,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ## Task 21: Full backend test suite + Plan E module audit
 
-- [ ] Run the full backend test suite:
+- [x] Run the full backend test suite:
 
   ```bash
   cd web.ui/backend && npm test -- --run
@@ -3650,7 +3650,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   If any non-Plan-E test fails as a side effect of the Plan B route refactor in Task 8, re-read the failure and patch the assertion (it's almost certainly a counting expectation that needs the same "between 0 and 6 inclusive" loosening).
 
-- [ ] Run the frontend build:
+- [x] Run the frontend build:
 
   ```bash
   cd web.ui/frontend-react && npm run build
@@ -3658,15 +3658,15 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
   Expected: build succeeds.
 
-- [ ] Run the frontend unit tests (if Plan A/B/C/D installed any):
+- [x] Run the frontend unit tests (if Plan A/B/C/D installed any):
 
   ```bash
   cd web.ui/frontend-react && npm test -- --run
   ```
 
-  Expected: pass, or "no tests found" — Plan E does not add frontend unit tests (the live UI is verified via the e2e step below).
+  Expected: pass, or "no tests found" â€” Plan E does not add frontend unit tests (the live UI is verified via the e2e step below).
 
-- [ ] Manual UI smoke. In one terminal:
+- [x] Manual UI smoke. In one terminal:
 
   ```bash
   cd web.ui/backend && \
@@ -3683,15 +3683,15 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   Open `http://localhost:5173/pinterest`. Verify:
 
   - The page renders three sections (Settings, Queue, History).
-  - With an empty database, Settings shows `0 pending · 0 paused`, Queue
+  - With an empty database, Settings shows `0 pending Â· 0 paused`, Queue
     shows "No pins in queue...", History shows "No posting history yet."
   - Clicking **Sign in to Pinterest** triggers `POST /api/pinterest/login`
-    and surfaces the "Opening Pinterest login window…" status message.
-    (Cancel the Chromium window — we are not doing a real login here.)
+    and surfaces the "Opening Pinterest login windowâ€¦" status message.
+    (Cancel the Chromium window â€” we are not doing a real login here.)
 
   Stop both servers (Ctrl+C in each).
 
-- [ ] Commit (only if any files changed during this audit):
+- [x] Commit (only if any files changed during this audit):
 
   ```bash
   git status
@@ -3711,9 +3711,9 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 - [x] Spec coverage check. Read this list and confirm each item is shipped:
 
   - [x] `pinterest_queue` and `pinterest_history` tables are written by Plan A (verified by reading `web.ui/backend/migrations/0001_init.sql`).
-  - [x] cover_hero and interior_preview pin templates emit 1000×1500 PNGs.
+  - [x] cover_hero and interior_preview pin templates emit 1000Ã—1500 PNGs.
   - [x] Pin generator writes to `output/pinterest/<slug>/<pin_type>-<idx>.png`.
-  - [x] Scheduler assigns 3–5/day jittered slots inside [09:00, 21:00] in
+  - [x] Scheduler assigns 3â€“5/day jittered slots inside [09:00, 21:00] in
     `profile.time_zone`.
   - [x] `enqueuePinsForBook(bookId)` is called from `/api/kdp/books/:slug/mark-published`.
   - [x] Poster worker (a) detects logged-out state, (b) pauses the queue,
@@ -3728,7 +3728,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
     `queue.js` + `poster.js`.
   - [x] `/pinterest` UI page renders Queue + History + Settings, auto-refreshes
     on any `pinterest:*` SSE event, and exposes pause/resume + re-login + edit
-    + cancel actions per spec §6.8.
+    + cancel actions per spec Â§6.8.
   - [x] `help/pinterest_first_login.md` exists and is reachable at
     `/api/help/pinterest_first_login`.
   - [x] `web.ui/backend/.pinterest-profile/` and `output/pinterest/` are
@@ -3736,7 +3736,7 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
   - [x] Real Playwright is exercised only via the manual `npm run test:pinterest:live`
     script; unit + integration tests use the injected fake driver.
 
-- [x] Placeholder scan — confirm none of the Plan E source files contain TODO / TBD / "implement later":
+- [x] Placeholder scan â€” confirm none of the Plan E source files contain TODO / TBD / "implement later":
 
   ```bash
   grep -rn "TODO\|TBD\|implement later\|placeholder" \
@@ -3758,16 +3758,16 @@ Plan B Task 6 ships a `/api/kdp/books/:slug/mark-published` route that inserts s
 
 ## Out of scope for Plan E (deferred)
 
-- Pinterest API path (returns once the user's API approval is granted —
-  superseded for now per spec §11).
+- Pinterest API path (returns once the user's API approval is granted â€”
+  superseded for now per spec Â§11).
 - Multi-board posting. Plan E posts every pin to the user's default board;
   board selection lives in a future enhancement.
 - Pin analytics (impressions, saves, click-through). The dashboard only
   knows whether a pin was successfully created.
 - A/B testing of pin templates. Both templates are fixed; varying them is
   a content-strategy task, not a dashboard task.
-- Drag-and-drop reorder of queue rows. Spec §6.8 mentions "draggable
-  reorder" — Plan E exposes per-row edit of `scheduled_for` instead, which
+- Drag-and-drop reorder of queue rows. Spec Â§6.8 mentions "draggable
+  reorder" â€” Plan E exposes per-row edit of `scheduled_for` instead, which
   is the underlying ordering field. A future plan can layer dnd-kit on top.
 
 ## Definition of done (Plan E)

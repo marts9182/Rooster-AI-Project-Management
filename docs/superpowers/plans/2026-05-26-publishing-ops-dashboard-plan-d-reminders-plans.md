@@ -1,4 +1,4 @@
-# Publishing Ops Dashboard — Plan D: Reminders + Plans browser
+﻿# Publishing Ops Dashboard â€” Plan D: Reminders + Plans browser
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -33,19 +33,19 @@ npm test
 ```
 
 **Inherited from Plan A (assume present):**
-- `web.ui/backend/db.js` — better-sqlite3 wrapper exporting `openDb()` (opens WAL-mode SQLite + runs migrations).
-- `web.ui/backend/events.js` — exports `recordEvent(kind, payload)`, which BOTH inserts a row into the `events` table AND fans out to SSE subscribers (single call covers both — there is no separate broadcast export). Also exports `subscribe(fn)` and `replayRecent(n)`.
-- `web.ui/backend/workerStatus.js` — exports the procedural functions `setWorkerHeartbeat(worker: string)`, `setWorkerError(worker: string, message: string)`, `getAllStatuses()`, and `trayColor()`. Workers call these directly with their own name string (no factory, no returned handle).
-- `web.ui/backend/migrations/0001_*.sql` already created the `reminders`, `events`, and `profile` tables per spec §4.
+- `web.ui/backend/db.js` â€” better-sqlite3 wrapper exporting `openDb()` (opens WAL-mode SQLite + runs migrations).
+- `web.ui/backend/events.js` â€” exports `recordEvent(kind, payload)`, which BOTH inserts a row into the `events` table AND fans out to SSE subscribers (single call covers both â€” there is no separate broadcast export). Also exports `subscribe(fn)` and `replayRecent(n)`.
+- `web.ui/backend/workerStatus.js` â€” exports the procedural functions `setWorkerHeartbeat(worker: string)`, `setWorkerError(worker: string, message: string)`, `getAllStatuses()`, and `trayColor()`. Workers call these directly with their own name string (no factory, no returned handle).
+- `web.ui/backend/migrations/0001_*.sql` already created the `reminders`, `events`, and `profile` tables per spec Â§4.
 - `web.ui/backend/server.js` mounts routes via `app.use('/api/...', router)` and boots workers after `app.listen()`.
 - `web.ui/frontend-react/src/App.tsx` has React Router with a placeholder `/plans` page component at `src/pages/PlansPage.tsx` that currently renders only `<h1>Plans</h1>`.
-- `web.ui/frontend-react/src/components/TopBar.tsx` already renders a bell icon with hard-coded count `0` and an empty `onClick` — you wire it.
+- `web.ui/frontend-react/src/components/TopBar.tsx` already renders a bell icon with hard-coded count `0` and an empty `onClick` â€” you wire it.
 - A typed SSE hook `src/hooks/useEvents.ts` exposes `useEventStream(kindPrefix: string, onEvent: (payload) => void)`.
 
 **Assumed from Plans B and C (may or may not be merged):**
 - Plan B (KDP) may insert `reminders` rows with `source_kind='kdp.book'` and a `payload_json` shaped `{slug, asin, kind: "day30"}`.
 - Plan C (Etsy) may insert reminders with `source_kind='etsy.listing'` and `payload_json` shaped `{etsy_listing_id, gate: "day30"|"day60"|"day90"}`.
-- Your scheduler is agnostic to source — it only reads `title`, `body`, `channel`, `due_at`. Source linkage is informational, surfaced in the popover.
+- Your scheduler is agnostic to source â€” it only reads `title`, `body`, `channel`, `due_at`. Source linkage is informational, surfaced in the popover.
 
 **Help drawer policy (per scope):** Plan B's task list creates per-field markdown files under `web.ui/backend/help/`. Plan D adds `gmail_app_password.md` ONLY if Plan B did not. See Task 11 for the conditional.
 
@@ -83,12 +83,12 @@ npm test
 - `web.ui/frontend-react/src/services/plans.ts`
 
 **Modified backend files:**
-- `web.ui/backend/server.js` — mount reminder and plans routes; boot scheduler.
-- `web.ui/backend/package.json` — add `node-cron`, `node-notifier`, `nodemailer`, `gray-matter` to `dependencies`.
+- `web.ui/backend/server.js` â€” mount reminder and plans routes; boot scheduler.
+- `web.ui/backend/package.json` â€” add `node-cron`, `node-notifier`, `nodemailer`, `gray-matter` to `dependencies`.
 
 **Modified frontend files:**
-- `web.ui/frontend-react/src/components/TopBar.tsx` — wire bell to live count + popover.
-- `web.ui/frontend-react/package.json` — add `react-markdown`, `remark-gfm`.
+- `web.ui/frontend-react/src/components/TopBar.tsx` â€” wire bell to live count + popover.
+- `web.ui/frontend-react/package.json` â€” add `react-markdown`, `remark-gfm`.
 
 **Conditional new file (Task 11):**
 - `web.ui/backend/help/gmail_app_password.md`
@@ -100,16 +100,16 @@ npm test
 **Files:**
 - Modify: `web.ui/backend/package.json`
 
-- [ ] **Step 1: Install packages**
+- [x] **Step 1: Install packages**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
 npm install --save node-cron@3.0.3 node-notifier@10.0.1 nodemailer@6.9.13 gray-matter@4.0.3
 ```
 
-Expected: `package.json` `dependencies` now contains those four entries; `npm install` reports `added N packages` with no peer-dependency errors. If you see a `node-notifier` install warning about optional native build, that is normal on Windows — `node-notifier` ships a prebuilt SnoreToast binary.
+Expected: `package.json` `dependencies` now contains those four entries; `npm install` reports `added N packages` with no peer-dependency errors. If you see a `node-notifier` install warning about optional native build, that is normal on Windows â€” `node-notifier` ships a prebuilt SnoreToast binary.
 
-- [ ] **Step 2: Verify dependencies resolve**
+- [x] **Step 2: Verify dependencies resolve**
 
 ```bash
 node -e "console.log(require('node-cron').validate('* * * * *'))"
@@ -126,7 +126,7 @@ function
 function
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/package.json web.ui/backend/package-lock.json
@@ -141,7 +141,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "b
 - Create: `web.ui/backend/reminders/repo.js`
 - Create: `web.ui/backend/__tests__/reminders/repo.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/reminders/repo.test.js`:
 
@@ -259,7 +259,7 @@ describe('reminders/repo', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -267,7 +267,7 @@ npm test -- --run reminders/repo.test.js 2>&1 | tail -10
 ```
 Expected: `Cannot find module '../../reminders/repo.js'` or all tests fail with import error.
 
-- [ ] **Step 3: Implement the repo**
+- [x] **Step 3: Implement the repo**
 
 Create `web.ui/backend/reminders/repo.js`:
 
@@ -404,14 +404,14 @@ export function countPending(db) {
 }
 ```
 
-- [ ] **Step 4: Run tests to confirm pass**
+- [x] **Step 4: Run tests to confirm pass**
 
 ```bash
 npm test -- --run reminders/repo.test.js 2>&1 | tail -10
 ```
 Expected: 8 passed (`repo.test.js`).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/reminders/repo.js web.ui/backend/__tests__/reminders/repo.test.js
@@ -426,7 +426,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/backend/reminders/toast.js`
 - Create: `web.ui/backend/__tests__/reminders/toast.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/reminders/toast.test.js`:
 
@@ -467,14 +467,14 @@ describe('reminders/toast', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 npm test -- --run reminders/toast.test.js 2>&1 | tail -10
 ```
 Expected: `Cannot find module '../../reminders/toast.js'`.
 
-- [ ] **Step 3: Implement the wrapper**
+- [x] **Step 3: Implement the wrapper**
 
 Create `web.ui/backend/reminders/toast.js`:
 
@@ -535,16 +535,16 @@ export function sendToast(input, deps = {}) {
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 npm test -- --run reminders/toast.test.js 2>&1 | tail -10
 ```
 Expected: 3 passed.
 
-Note on the icon path: the file `web.ui/backend/assets/rooster-icon.png` is owned by Plan A's tray work. If it does not exist yet, the toast still fires — node-notifier on Windows tolerates a missing icon by falling back to a default. Do NOT create the icon here.
+Note on the icon path: the file `web.ui/backend/assets/rooster-icon.png` is owned by Plan A's tray work. If it does not exist yet, the toast still fires â€” node-notifier on Windows tolerates a missing icon by falling back to a default. Do NOT create the icon here.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/reminders/toast.js web.ui/backend/__tests__/reminders/toast.test.js
@@ -559,7 +559,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/backend/reminders/email.js`
 - Create: `web.ui/backend/__tests__/reminders/email.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/reminders/email.test.js`:
 
@@ -620,14 +620,14 @@ describe('reminders/email', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 npm test -- --run reminders/email.test.js 2>&1 | tail -10
 ```
 Expected: import error on `../../reminders/email.js`.
 
-- [ ] **Step 3: Implement the wrapper**
+- [x] **Step 3: Implement the wrapper**
 
 Create `web.ui/backend/reminders/email.js`:
 
@@ -714,14 +714,14 @@ export function sendEmail(input, deps = {}) {
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 npm test -- --run reminders/email.test.js 2>&1 | tail -10
 ```
 Expected: 5 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/reminders/email.js web.ui/backend/__tests__/reminders/email.test.js
@@ -736,7 +736,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/backend/reminders/scheduler.js`
 - Create: `web.ui/backend/__tests__/reminders/scheduler.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/reminders/scheduler.test.js`:
 
@@ -884,20 +884,20 @@ describe('reminders/scheduler.tick', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 npm test -- --run reminders/scheduler.test.js 2>&1 | tail -10
 ```
 Expected: module not found.
 
-- [ ] **Step 3: Implement the scheduler**
+- [x] **Step 3: Implement the scheduler**
 
 Create `web.ui/backend/reminders/scheduler.js`:
 
 ```javascript
 /**
- * @file Reminder scheduler — node-cron tick fires due reminders every 60s.
+ * @file Reminder scheduler â€” node-cron tick fires due reminders every 60s.
  *
  * Wiring: `startScheduler(db, options)` registers a cron job (`* * * * *`)
  * that on each tick selects pending reminders due now, delivers them on the
@@ -919,7 +919,7 @@ import { sendEmail as defaultSendEmail } from './email.js';
  * @typedef {Object} TickDeps
  * @property {(input: { title: string, body?: string }) => Promise<{ok: true}>} sendToast
  * @property {(input: { to: string, from?: string, subject: string, text: string }) => Promise<{ok: true, messageId: string}>} sendEmail
- * @property {(kind: string, payload: object) => void} recordEvent  Plan A's recordEvent — writes the audit-log row AND fans out to SSE subscribers in a single call.
+ * @property {(kind: string, payload: object) => void} recordEvent  Plan A's recordEvent â€” writes the audit-log row AND fans out to SSE subscribers in a single call.
  * @property {() => { gmail_address: string|null }} profileFor
  * @property {() => Date} [now]
  */
@@ -1033,14 +1033,14 @@ export function startScheduler(db, overrides = {}) {
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 npm test -- --run reminders/scheduler.test.js 2>&1 | tail -10
 ```
 Expected: 6 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/reminders/scheduler.js web.ui/backend/__tests__/reminders/scheduler.test.js
@@ -1055,7 +1055,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/backend/reminders/routes.js`
 - Create: `web.ui/backend/__tests__/reminders/routes.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/reminders/routes.test.js`:
 
@@ -1192,14 +1192,14 @@ describe('reminders/routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 npm test -- --run reminders/routes.test.js 2>&1 | tail -10
 ```
 Expected: module not found.
 
-- [ ] **Step 3: Implement the router**
+- [x] **Step 3: Implement the router**
 
 Create `web.ui/backend/reminders/routes.js`:
 
@@ -1294,14 +1294,14 @@ export function createRemindersRouter({ db }) {
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 npm test -- --run reminders/routes.test.js 2>&1 | tail -10
 ```
 Expected: 10 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/reminders/routes.js web.ui/backend/__tests__/reminders/routes.test.js
@@ -1315,14 +1315,14 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 **Files:**
 - Modify: `web.ui/backend/server.js`
 
-- [ ] **Step 1: Locate the insertion points**
+- [x] **Step 1: Locate the insertion points**
 
 ```bash
 grep -n "app.use\|setWorkerHeartbeat\|app.listen" C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend/server.js
 ```
 Expected: shows existing `app.use('/api/...', ...)` mounts and the `app.listen(...)` call. The exact line numbers depend on Plan A; you'll add new lines near the existing route mounts and after `app.listen` resolves.
 
-- [ ] **Step 2: Add the route mount**
+- [x] **Step 2: Add the route mount**
 
 In `server.js`, add to the imports section near the other Plan A route imports:
 
@@ -1339,11 +1339,11 @@ Below the existing `app.use('/api/events', ...)` mount (or alongside other `/api
 app.use('/api/reminders', createRemindersRouter({ db }));
 ```
 
-Replace the relative path of any existing import for `db.js` so it matches your style — `from './db.js'`. The line that obtains `db` already exists from Plan A; if it does not, add `import { openDb } from './db.js'; const db = openDb();` near the top.
+Replace the relative path of any existing import for `db.js` so it matches your style â€” `from './db.js'`. The line that obtains `db` already exists from Plan A; if it does not, add `import { openDb } from './db.js'; const db = openDb();` near the top.
 
-- [ ] **Step 3: Boot the scheduler after server starts**
+- [x] **Step 3: Boot the scheduler after server starts**
 
-After `app.listen(PORT, '127.0.0.1', () => { ... })`, start the scheduler. Workers update their status by calling the procedural `setWorkerHeartbeat`/`setWorkerError` functions directly with their own name string — there is no factory handle to obtain:
+After `app.listen(PORT, '127.0.0.1', () => { ... })`, start the scheduler. Workers update their status by calling the procedural `setWorkerHeartbeat`/`setWorkerError` functions directly with their own name string â€” there is no factory handle to obtain:
 
 ```javascript
 const stopScheduler = startScheduler(db, {
@@ -1373,7 +1373,7 @@ const task = cron.schedule('* * * * *', () => {
 });
 ```
 
-- [ ] **Step 4: Manual smoke test**
+- [x] **Step 4: Manual smoke test**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -1385,14 +1385,14 @@ kill $SERVER_PID
 ```
 Expected: JSON body `{"reminders":[]}` (or with whatever rows existed). No 500 error.
 
-- [ ] **Step 5: Run full backend test suite**
+- [x] **Step 5: Run full backend test suite**
 
 ```bash
 npm test 2>&1 | tail -5
 ```
 Expected: all passes (baseline + everything Plan D added).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/server.js web.ui/backend/reminders/scheduler.js
@@ -1407,7 +1407,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/backend/plans/scanner.js`
 - Create: `web.ui/backend/__tests__/plans/scanner.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/plans/scanner.test.js`:
 
@@ -1521,7 +1521,7 @@ describe('plans/scanner', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -1529,7 +1529,7 @@ npm test -- --run plans/scanner.test.js 2>&1 | tail -10
 ```
 Expected: module not found.
 
-- [ ] **Step 3: Implement the scanner**
+- [x] **Step 3: Implement the scanner**
 
 Create `web.ui/backend/plans/scanner.js`:
 
@@ -1550,7 +1550,7 @@ import matter from 'gray-matter';
  * @property {number} open
  * @property {number} done
  * @property {number} total
- * @property {number} percent  rounded 0–100
+ * @property {number} percent  rounded 0â€“100
  *
  * @typedef {Object} PlanEntry
  * @property {'spec'|'plan'} kind
@@ -1569,8 +1569,8 @@ const H1 = /^# (.+)$/m;
 
 /**
  * Strip the date prefix and `-design` / `-implementation` suffix from a filename.
- * "2026-05-22-etsy-rooster-shop-plan-3-implementation.md" → "etsy-rooster-shop-plan-3"
- * "2026-05-13-may-release-pair.md" → "may-release-pair"
+ * "2026-05-22-etsy-rooster-shop-plan-3-implementation.md" â†’ "etsy-rooster-shop-plan-3"
+ * "2026-05-13-may-release-pair.md" â†’ "may-release-pair"
  * @param {string} filename
  * @returns {string}
  */
@@ -1604,10 +1604,10 @@ export function computeProgress(markdown) {
 
 /**
  * Derive a status label from progress counts.
- * - `done`      → all checkboxes complete (total > 0, open == 0)
- * - `in-flight` → at least one done OR at least one open and at least one done
- * - `open`      → no checkboxes at all (no plan started)
- * For files with checkboxes but zero done → `in-flight` (work has started).
+ * - `done`      â†’ all checkboxes complete (total > 0, open == 0)
+ * - `in-flight` â†’ at least one done OR at least one open and at least one done
+ * - `open`      â†’ no checkboxes at all (no plan started)
+ * For files with checkboxes but zero done â†’ `in-flight` (work has started).
  * @param {PlanProgress} progress
  * @returns {'open'|'in-flight'|'done'}
  */
@@ -1618,7 +1618,7 @@ export function _statusOf(progress) {
 }
 
 /**
- * Extract title in order of preference: frontmatter.title → first H1 → slug.
+ * Extract title in order of preference: frontmatter.title â†’ first H1 â†’ slug.
  * @param {{ data: Record<string, unknown>, content: string }} parsed
  * @param {string} slug
  * @returns {string}
@@ -1681,14 +1681,14 @@ export function scanDocs(superpowersRoot) {
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 npm test -- --run plans/scanner.test.js 2>&1 | tail -10
 ```
 Expected: 8 passed.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/plans/scanner.js web.ui/backend/__tests__/plans/scanner.test.js
@@ -1703,7 +1703,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/backend/plans/routes.js`
 - Create: `web.ui/backend/__tests__/plans/routes.test.js`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `web.ui/backend/__tests__/plans/routes.test.js`:
 
@@ -1772,14 +1772,14 @@ describe('plans/routes', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 npm test -- --run plans/routes.test.js 2>&1 | tail -10
 ```
 Expected: module not found.
 
-- [ ] **Step 3: Implement the router**
+- [x] **Step 3: Implement the router**
 
 Create `web.ui/backend/plans/routes.js`:
 
@@ -1836,14 +1836,14 @@ export function createPlansRouter({ superpowersRoot }) {
 }
 ```
 
-- [ ] **Step 4: Run tests**
+- [x] **Step 4: Run tests**
 
 ```bash
 npm test -- --run plans/routes.test.js 2>&1 | tail -10
 ```
 Expected: 4 passed.
 
-- [ ] **Step 5: Wire into server.js**
+- [x] **Step 5: Wire into server.js**
 
 In `web.ui/backend/server.js`, near the other route mounts add:
 
@@ -1860,7 +1860,7 @@ app.use('/api/plans', createPlansRouter({ superpowersRoot: SUPERPOWERS_ROOT }));
 
 (If `__filename`/`__dirname` are already defined in `server.js`, do not redeclare; reuse them.)
 
-- [ ] **Step 6: Smoke test**
+- [x] **Step 6: Smoke test**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -1872,7 +1872,7 @@ kill $SERVER_PID
 ```
 Expected: JSON body with `entries` containing the actual repo's specs and plans (you should see entries for `etsy-rooster-shop-plan-2e`, etc.).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/plans/routes.js web.ui/backend/__tests__/plans/routes.test.js web.ui/backend/server.js
@@ -1881,14 +1881,14 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 
 ---
 
-## Task 10: Frontend — install deps + reminder service
+## Task 10: Frontend â€” install deps + reminder service
 
 **Files:**
 - Modify: `web.ui/frontend-react/package.json`
 - Create: `web.ui/frontend-react/src/services/reminders.ts`
 - Create: `web.ui/frontend-react/src/services/plans.ts`
 
-- [ ] **Step 1: Install frontend deps**
+- [x] **Step 1: Install frontend deps**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/frontend-react
@@ -1897,7 +1897,7 @@ npm install --save react-markdown@9.0.1 remark-gfm@4.0.0
 
 Expected: `react-markdown` and `remark-gfm` added to `dependencies`.
 
-- [ ] **Step 2: Create the reminders service**
+- [x] **Step 2: Create the reminders service**
 
 Create `web.ui/frontend-react/src/services/reminders.ts`:
 
@@ -1963,7 +1963,7 @@ export async function snoozeReminder(id: number, snoozeMinutes: number): Promise
 }
 ```
 
-- [ ] **Step 3: Create the plans service**
+- [x] **Step 3: Create the plans service**
 
 Create `web.ui/frontend-react/src/services/plans.ts`:
 
@@ -2008,7 +2008,7 @@ export async function getPlan(slug: string): Promise<PlanDetail[]> {
 }
 ```
 
-- [ ] **Step 4: Type-check**
+- [x] **Step 4: Type-check**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/frontend-react
@@ -2016,7 +2016,7 @@ npx tsc --noEmit 2>&1 | tail -10
 ```
 Expected: no errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/frontend-react/package.json web.ui/frontend-react/package-lock.json web.ui/frontend-react/src/services/reminders.ts web.ui/frontend-react/src/services/plans.ts
@@ -2030,7 +2030,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 **Files:**
 - Create (conditionally): `web.ui/backend/help/gmail_app_password.md`
 
-- [ ] **Step 1: Check whether Plan B already created the file**
+- [x] **Step 1: Check whether Plan B already created the file**
 
 ```bash
 ls C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend/help/gmail_app_password.md 2>&1
@@ -2044,13 +2044,13 @@ If the file does not exist: continue with Step 2. Also confirm the `help/` direc
 ls C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend/help/ 2>&1
 ```
 
-If the directory itself does not exist, Plan B's help module has not yet shipped — create the directory but otherwise stay minimal:
+If the directory itself does not exist, Plan B's help module has not yet shipped â€” create the directory but otherwise stay minimal:
 
 ```bash
 mkdir -p C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend/help
 ```
 
-- [ ] **Step 2: Create the article**
+- [x] **Step 2: Create the article**
 
 Create `web.ui/backend/help/gmail_app_password.md`:
 
@@ -2076,7 +2076,7 @@ Reminder emails are sent over Gmail SMTP. Google requires an **app password**
    GMAIL_APP_PASSWORD=xxxxxxxxxxxxxxxx
    ```
 
-8. Restart the dashboard (tray menu → Restart server, or kill the Node process
+8. Restart the dashboard (tray menu â†’ Restart server, or kill the Node process
    and let Task Scheduler relaunch on next login).
 
 ## What to do if the app-password option is missing
@@ -2092,7 +2092,7 @@ Revoke a leaked password at the same `apppasswords` page; deleting the row
 invalidates it immediately. Generate a new one and update `.env`.
 ```
 
-- [ ] **Step 3: Verify the help endpoint serves it (if Plan B's help module is merged)**
+- [x] **Step 3: Verify the help endpoint serves it (if Plan B's help module is merged)**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -2102,9 +2102,9 @@ sleep 2
 curl -s http://127.0.0.1:5000/api/help/gmail_app_password | head -c 300
 kill $SERVER_PID
 ```
-Expected: markdown body returned. If you get 404, Plan B's help routes are not merged yet — file is still committed for when they do.
+Expected: markdown body returned. If you get 404, Plan B's help routes are not merged yet â€” file is still committed for when they do.
 
-- [ ] **Step 4: Commit (only if you created the file in Step 2)**
+- [x] **Step 4: Commit (only if you created the file in Step 2)**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/backend/help/gmail_app_password.md
@@ -2120,7 +2120,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "d
 - Create: `web.ui/frontend-react/src/components/BellPopover.tsx`
 - Create: `web.ui/frontend-react/src/components/BellPopover.test.tsx`
 
-- [ ] **Step 1: Write failing test for the popover**
+- [x] **Step 1: Write failing test for the popover**
 
 Create `web.ui/frontend-react/src/components/BellPopover.test.tsx`:
 
@@ -2212,7 +2212,7 @@ describe('BellPopover', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/frontend-react
@@ -2220,7 +2220,7 @@ npm test -- --run BellPopover 2>&1 | tail -10
 ```
 Expected: module not found.
 
-- [ ] **Step 3: Implement the popover**
+- [x] **Step 3: Implement the popover**
 
 Create `web.ui/frontend-react/src/components/BellPopover.tsx`:
 
@@ -2265,7 +2265,7 @@ export function BellPopover({ open, onClose }: BellPopoverProps) {
       <header className="bell-popover__header">
         <h2>Pending reminders</h2>
         <button type="button" onClick={onClose} aria-label="Close">
-          ×
+          Ã—
         </button>
       </header>
       {error && <div className="bell-popover__error">Failed to load: {error}</div>}
@@ -2318,7 +2318,7 @@ export function BellPopover({ open, onClose }: BellPopoverProps) {
 }
 ```
 
-- [ ] **Step 4: Wire into TopBar**
+- [x] **Step 4: Wire into TopBar**
 
 Open `web.ui/frontend-react/src/components/TopBar.tsx`. Locate the bell icon (Plan A wired it with a hard-coded `0`). Replace the count + onClick with live state.
 
@@ -2365,15 +2365,15 @@ useEventStream('reminder:', () => {
   onClick={() => setPopoverOpen((v) => !v)}
   aria-label={`${pendingCount} pending reminders`}
 >
-  🔔
+  ðŸ””
   {pendingCount > 0 && <span className="topbar__badge">{pendingCount}</span>}
 </button>
 <BellPopover open={popoverOpen} onClose={() => setPopoverOpen(false)} />
 ```
 
-If the bell icon in your TopBar already uses an SVG or different JSX, preserve that markup — only swap the count source and onClick handler.
+If the bell icon in your TopBar already uses an SVG or different JSX, preserve that markup â€” only swap the count source and onClick handler.
 
-- [ ] **Step 5: Run frontend tests**
+- [x] **Step 5: Run frontend tests**
 
 ```bash
 npm test -- --run BellPopover 2>&1 | tail -10
@@ -2385,7 +2385,7 @@ npm test 2>&1 | tail -5
 ```
 Expected: full frontend suite passes (Plan A baseline + new tests).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/frontend-react/src/components/BellPopover.tsx web.ui/frontend-react/src/components/BellPopover.test.tsx web.ui/frontend-react/src/components/TopBar.tsx
@@ -2401,7 +2401,7 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 - Create: `web.ui/frontend-react/src/pages/PlansPage.test.tsx`
 - Create: `web.ui/frontend-react/src/pages/PlanDetailModal.tsx`
 
-- [ ] **Step 1: Write failing test for PlansPage**
+- [x] **Step 1: Write failing test for PlansPage**
 
 Create `web.ui/frontend-react/src/pages/PlansPage.test.tsx`:
 
@@ -2482,7 +2482,7 @@ describe('PlansPage', () => {
 });
 ```
 
-- [ ] **Step 2: Run test to confirm failure**
+- [x] **Step 2: Run test to confirm failure**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/frontend-react
@@ -2490,7 +2490,7 @@ npm test -- --run PlansPage 2>&1 | tail -10
 ```
 Expected: tests fail because `PlansPage` is still a placeholder.
 
-- [ ] **Step 3: Implement the detail modal**
+- [x] **Step 3: Implement the detail modal**
 
 Create `web.ui/frontend-react/src/pages/PlanDetailModal.tsx`:
 
@@ -2533,9 +2533,9 @@ export function PlanDetailModal({ slug, onClose }: PlanDetailModalProps) {
       <div className="plan-modal__backdrop" onClick={onClose} />
       <div className="plan-modal__panel">
         <header className="plan-modal__header">
-          <h2>{entries[activeIndex]?.title ?? 'Loading…'}</h2>
+          <h2>{entries[activeIndex]?.title ?? 'Loadingâ€¦'}</h2>
           <button type="button" onClick={onClose} aria-label="Close">
-            ×
+            Ã—
           </button>
         </header>
         {entries.length > 1 && (
@@ -2566,7 +2566,7 @@ export function PlanDetailModal({ slug, onClose }: PlanDetailModalProps) {
 }
 ```
 
-- [ ] **Step 4: Replace the placeholder PlansPage**
+- [x] **Step 4: Replace the placeholder PlansPage**
 
 Overwrite `web.ui/frontend-react/src/pages/PlansPage.tsx`:
 
@@ -2646,7 +2646,7 @@ function StatusBadge({ status }: { status: PlanEntry['status'] }) {
 
 Make sure the existing route definition for `/plans` in `App.tsx` imports the named export `PlansPage` (`import { PlansPage } from './pages/PlansPage'`). If Plan A used a default export, switch the import or add `export default PlansPage` at the bottom of the new file.
 
-- [ ] **Step 5: Run frontend tests**
+- [x] **Step 5: Run frontend tests**
 
 ```bash
 npm test -- --run PlansPage 2>&1 | tail -10
@@ -2658,7 +2658,7 @@ npm test 2>&1 | tail -5
 ```
 Expected: full frontend suite passes.
 
-- [ ] **Step 6: Type-check + build**
+- [x] **Step 6: Type-check + build**
 
 ```bash
 npx tsc --noEmit 2>&1 | tail -10
@@ -2666,7 +2666,7 @@ npm run build 2>&1 | tail -10
 ```
 Expected: no type errors, build succeeds.
 
-- [ ] **Step 7: Manual smoke test**
+- [x] **Step 7: Manual smoke test**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -2679,7 +2679,7 @@ sleep 2
 kill $SERVER_PID
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management add web.ui/frontend-react/src/pages/PlansPage.tsx web.ui/frontend-react/src/pages/PlansPage.test.tsx web.ui/frontend-react/src/pages/PlanDetailModal.tsx
@@ -2693,15 +2693,15 @@ git -C C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management commit -m "f
 **Files:**
 - None (verification only)
 
-- [ ] **Step 1: Backend full suite**
+- [x] **Step 1: Backend full suite**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
 npm test 2>&1 | tail -10
 ```
-Expected: all green. Compared to the pre-Plan-D baseline, the test count should have grown by approximately 41 (8 repo + 3 toast + 5 email + 6 scheduler + 10 routes + 8 scanner + 4 plans routes — actual count may vary by ±2 if any baseline test names overlap).
+Expected: all green. Compared to the pre-Plan-D baseline, the test count should have grown by approximately 41 (8 repo + 3 toast + 5 email + 6 scheduler + 10 routes + 8 scanner + 4 plans routes â€” actual count may vary by Â±2 if any baseline test names overlap).
 
-- [ ] **Step 2: Frontend full suite**
+- [x] **Step 2: Frontend full suite**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/frontend-react
@@ -2709,7 +2709,7 @@ npm test 2>&1 | tail -10
 ```
 Expected: all green. New tests: 4 (BellPopover) + 4 (PlansPage) = 8 above the Plan A baseline.
 
-- [ ] **Step 3: Integration smoke — schedule a 90-second-out reminder**
+- [x] **Step 3: Integration smoke â€” schedule a 90-second-out reminder**
 
 ```bash
 cd C:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend
@@ -2739,7 +2739,7 @@ If toasts do not appear: check that `node-notifier`'s SnoreToast.exe is present 
 
 If the reminder remains pending: the cron tick may not yet have fired (it runs at top-of-minute, so 95s should cover one tick). If still stuck, check `events` table for `reminder:failed` rows.
 
-- [ ] **Step 4: Plans browser smoke**
+- [x] **Step 4: Plans browser smoke**
 
 Open `http://localhost:5000/plans` in a browser. Confirm:
 
@@ -2748,7 +2748,7 @@ Open `http://localhost:5000/plans` in a browser. Confirm:
 - This very plan (`2026-05-26-publishing-ops-dashboard-plan-d-reminders-plans`) appears in the Implementation Plans column. Its progress bar reads close to 100% (since you've checked off each task in this implementation).
 - Clicking any card opens the modal and renders the markdown including code blocks and tables.
 
-- [ ] **Step 5: No commit (verification task only)**
+- [x] **Step 5: No commit (verification task only)**
 
 This task ships no new files. The plan is complete after this verification.
 
@@ -2765,8 +2765,8 @@ This task ships no new files. The plan is complete after this verification.
 
 ## Out of scope (deferred to later plans or never)
 
-- Per-channel retry policies more sophisticated than the "two consecutive failures → degraded banner" rule.
-- Calendar integration of reminder events — owned by Plan E (Calendar / Pinterest / Profile).
-- The Pinterest queue's `pinterest:login-required` reminder ingestion — owned by Plan E; this plan's scheduler will deliver it generically once Plan E inserts the row.
+- Per-channel retry policies more sophisticated than the "two consecutive failures â†’ degraded banner" rule.
+- Calendar integration of reminder events â€” owned by Plan E (Calendar / Pinterest / Profile).
+- The Pinterest queue's `pinterest:login-required` reminder ingestion â€” owned by Plan E; this plan's scheduler will deliver it generically once Plan E inserts the row.
 - Email HTML formatting beyond the plain-text body. We can add MJML or similar later if reminder emails need richer layout.
-- A way to edit a reminder in flight from the UI — for v1, dismiss + recreate is the workflow.
+- A way to edit a reminder in flight from the UI â€” for v1, dismiss + recreate is the workflow.

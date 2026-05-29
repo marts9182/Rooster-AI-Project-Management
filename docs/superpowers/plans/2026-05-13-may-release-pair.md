@@ -1,8 +1,8 @@
-# May 2026 KDP Release Pair Implementation Plan
+﻿# May 2026 KDP Release Pair Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build and ship two KDP puzzle books in May 2026 — a Father's Day Variety Puzzle Book (mixed Sudoku/Word Search/Cryptograms/Kakuro) and Futoshiki Large Print for Seniors Vol. 1.
+**Goal:** Build and ship two KDP puzzle books in May 2026 â€” a Father's Day Variety Puzzle Book (mixed Sudoku/Word Search/Cryptograms/Kakuro) and Futoshiki Large Print for Seniors Vol. 1.
 
 **Architecture:** Two new book modules consume existing generators and a shared set of new infrastructure: (1) Futoshiki rendering added to `pdf_builder.py`, (2) section-divider rendering added to `pdf_builder.py`, (3) a new `assemble_mixed_puzzle_book` method on `BookAssembler`, (4) a new `assemble_futoshiki_book` method, and (5) a new `scripts/build_four_grid_hero.py` cover renderer. All work stays inside the locked playful cover theme.
 
@@ -18,46 +18,46 @@
 
 ---
 
-## ⚠️ Plan Corrections (verified post-Phase-0 reading of actual code)
+## âš ï¸ Plan Corrections (verified post-Phase-0 reading of actual code)
 
 The plan body below was drafted from a prior Explore agent's notes that turned out to contain material errors. **These corrections override anything in the task bodies that conflicts.**
 
-**Repo layout** — nested-repos setup:
+**Repo layout** â€” nested-repos setup:
 - **Outer repo** (`c:/Sandbox/AIProjectManagement/Rooster-AI-Project-Management`) holds `docs/superpowers/plans/...` and `docs/superpowers/specs/...`. Plan/spec/spike-result commits land here.
 - **Inner repo** (`projects/kdp-puzzle-press/`) is its own git repo (excluded from outer via `.gitignore`). All Python source, tests, metadata, output, and cover scripts commit here. You must `cd projects/kdp-puzzle-press` before any `git add`/`git commit` of book/code work.
 
 **Imports:**
-- `TEMPLATE_85X11_LARGEPRINT`, `TEMPLATE_6X9_POCKET`, and the `PageTemplate` class come from `pocket_rooster_press.layout.templates` — **not** from `config`.
+- `TEMPLATE_85X11_LARGEPRINT`, `TEMPLATE_6X9_POCKET`, and the `PageTemplate` class come from `pocket_rooster_press.layout.templates` â€” **not** from `config`.
 - `OUTPUT_DIR`, the `PALETTE_*` constants (19 already shipped: `PALETTE_KAKURO`, `PALETTE_GRANDPARENT_GIFT`, etc.), `IMPRINT_TAGLINE`, font paths, and the `ColorPalette` dataclass come from `pocket_rooster_press.config`.
 
-**`PDFBuilder` constructor — actual signature:**
+**`PDFBuilder` constructor â€” actual signature:**
 ```python
 PDFBuilder(template: PageTemplate, output_path: Path, *, imprint_tagline: str | None = None)
 ```
-**No palette argument.** Palettes are exclusively a `CoverBuilder` concern. Every place in the plan that says `PDFBuilder(template, palette, path)` is wrong — drop the palette argument. Interior PDF styling is driven by the fonts registered in `pdf_builder.py` and the per-method drawing code.
+**No palette argument.** Palettes are exclusively a `CoverBuilder` concern. Every place in the plan that says `PDFBuilder(template, palette, path)` is wrong â€” drop the palette argument. Interior PDF styling is driven by the fonts registered in `pdf_builder.py` and the per-method drawing code.
 
-**`BookAssembler` and palettes:** `BookConfig` does not need `metadata={"palette": PALETTE_X}` — drop that pattern from Book A and Book B modules. The palette is passed only to `CoverBuilder` at the cover-build step.
+**`BookAssembler` and palettes:** `BookConfig` does not need `metadata={"palette": PALETTE_X}` â€” drop that pattern from Book A and Book B modules. The palette is passed only to `CoverBuilder` at the cover-build step.
 
-**Consequence for Tasks 1.4–1.7:** new `build_futoshiki_book`, `_draw_section_header`, `assemble_futoshiki_book`, and `assemble_mixed_puzzle_book` methods do **not** thread a palette through. They use existing interior styling. If a future variety book wants a different interior tint, that's a separate refactor — out of scope here.
+**Consequence for Tasks 1.4â€“1.7:** new `build_futoshiki_book`, `_draw_section_header`, `assemble_futoshiki_book`, and `assemble_mixed_puzzle_book` methods do **not** thread a palette through. They use existing interior styling. If a future variety book wants a different interior tint, that's a separate refactor â€” out of scope here.
 
 **Phase 0 results so far:**
-- **S1 outcome:** **(C)** — no section-page rendering exists at all (`_draw_section_header` absent; no `section`/`divider`/`header` methods in `pdf_builder.py`; `build_sudoku_book` uses `_draw_text_page` inline for difficulty intros). Task 1.5 builds it from scratch as planned.
-- **S2 outcome:** **(B)** — no Futoshiki rendering exists in `pdf_builder.py` (none of `build_futoshiki_book`, `_draw_futoshiki_puzzle`, `_draw_futoshiki_page`, `_draw_futoshiki_solution`, `_draw_futoshiki_answer_key` present; `[m for m in dir(builder) if "futoshiki" in m]` returns `[]`). Generator output shape confirmed as planned: `FutoshikiPuzzle(size=6, givens={} (count=0), inequalities=[Inequality(r1, c1, r2, c2), ...] (count=60 for full-ineq bank puzzle), solution=list[list[int]] 6×6)`. `puzzle.difficulty` is `Difficulty.EASY`; `puzzle.metadata` includes `size`, `seed`, `base_id`, `symmetry_op`, `ineq_count`, `givens_count`. Task 1.4 proceeds as planned. Note: `data/futoshiki_bank.json` does not exist yet — spike used an inline temp bank (same pattern as `test_futoshiki.py`); `scripts/build_futoshiki_bank.py` must be run before Task 1.4 integration tests.
-- **S3 outcome:** **(A)** — four-grid collage reads clearly at 200×300px thumbnail; all four quadrants have 15–21% non-background pixel density, palette coverage 12.2%, brass label zone has 119 pixels. Composition is distinguishable at thumbnail scale. Task 2.2 proceeds with four-grid layout as planned.
+- **S1 outcome:** **(C)** â€” no section-page rendering exists at all (`_draw_section_header` absent; no `section`/`divider`/`header` methods in `pdf_builder.py`; `build_sudoku_book` uses `_draw_text_page` inline for difficulty intros). Task 1.5 builds it from scratch as planned.
+- **S2 outcome:** **(B)** â€” no Futoshiki rendering exists in `pdf_builder.py` (none of `build_futoshiki_book`, `_draw_futoshiki_puzzle`, `_draw_futoshiki_page`, `_draw_futoshiki_solution`, `_draw_futoshiki_answer_key` present; `[m for m in dir(builder) if "futoshiki" in m]` returns `[]`). Generator output shape confirmed as planned: `FutoshikiPuzzle(size=6, givens={} (count=0), inequalities=[Inequality(r1, c1, r2, c2), ...] (count=60 for full-ineq bank puzzle), solution=list[list[int]] 6Ã—6)`. `puzzle.difficulty` is `Difficulty.EASY`; `puzzle.metadata` includes `size`, `seed`, `base_id`, `symmetry_op`, `ineq_count`, `givens_count`. Task 1.4 proceeds as planned. Note: `data/futoshiki_bank.json` does not exist yet â€” spike used an inline temp bank (same pattern as `test_futoshiki.py`); `scripts/build_futoshiki_bank.py` must be run before Task 1.4 integration tests.
+- **S3 outcome:** **(A)** â€” four-grid collage reads clearly at 200Ã—300px thumbnail; all four quadrants have 15â€“21% non-background pixel density, palette coverage 12.2%, brass label zone has 119 pixels. Composition is distinguishable at thumbnail scale. Task 2.2 proceeds with four-grid layout as planned.
 Decision: proceed with four-grid as planned
 
 ---
 
-## Phase 0 — Discovery Spikes (Day 1, May 14)
+## Phase 0 â€” Discovery Spikes (Day 1, May 14)
 
 Two facts in the spec are unverified: whether `pdf_builder.py` has any Futoshiki support, and whether section dividers exist for mixed-puzzle books. Phase 0 confirms both, in <1 day, before any production work. If either spike reveals >1 day of work, stop and replan.
 
-### Task 0.1: Spike S1 — Section Divider Capability
+### Task 0.1: Spike S1 â€” Section Divider Capability
 
 **Files:**
-- Create: `projects/kdp-puzzle-press/tests/spike_s1_section_divider.py` (throwaway — delete or convert after spike)
+- Create: `projects/kdp-puzzle-press/tests/spike_s1_section_divider.py` (throwaway â€” delete or convert after spike)
 
-- [ ] **Step 1: Write a probe that tries to render a 4-section divider PDF**
+- [x] **Step 1: Write a probe that tries to render a 4-section divider PDF**
 
 ```python
 # projects/kdp-puzzle-press/tests/spike_s1_section_divider.py
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 2: Run the probe and inspect output**
+- [x] **Step 2: Run the probe and inspect output**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -91,35 +91,35 @@ python tests/spike_s1_section_divider.py
 ```
 
 Expected outcomes (one of three):
-- (A) A `_draw_section_header` or `_draw_section_divider` method exists → wire it to a public path; finish in 1 hour.
-- (B) `build_sudoku_book` has section headers between difficulties but they're inlined → extract to a public `render_section_divider(title, accent_color)` method in Task 1.4.
-- (C) No section-page rendering exists at all → Task 1.4 builds it from scratch (still <1 day).
+- (A) A `_draw_section_header` or `_draw_section_divider` method exists â†’ wire it to a public path; finish in 1 hour.
+- (B) `build_sudoku_book` has section headers between difficulties but they're inlined â†’ extract to a public `render_section_divider(title, accent_color)` method in Task 1.4.
+- (C) No section-page rendering exists at all â†’ Task 1.4 builds it from scratch (still <1 day).
 
-- [ ] **Step 3: Document the outcome in the plan checkpoint**
+- [x] **Step 3: Document the outcome in the plan checkpoint**
 
 Append to `docs/superpowers/plans/2026-05-13-may-release-pair.md` under "Spike Results":
 
 ```
-S1 outcome: [A/B/C] — [one-line explanation]
+S1 outcome: [A/B/C] â€” [one-line explanation]
 Decision: [keep Task 1.5 as planned / scope reduces to wrapper / scope expands to full impl]
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/tests/spike_s1_section_divider.py \
         docs/superpowers/plans/2026-05-13-may-release-pair.md
-git commit -m "spike: S1 — section divider capability probe"
+git commit -m "spike: S1 â€” section divider capability probe"
 ```
 
 ---
 
-### Task 0.2: Spike S2 — Futoshiki Rendering Capability
+### Task 0.2: Spike S2 â€” Futoshiki Rendering Capability
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/tests/spike_s2_futoshiki_render.py`
 
-- [ ] **Step 1: Write a probe that tries to render one Futoshiki puzzle to PDF**
+- [x] **Step 1: Write a probe that tries to render one Futoshiki puzzle to PDF**
 
 ```python
 # projects/kdp-puzzle-press/tests/spike_s2_futoshiki_render.py
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 2: Run the probe**
+- [x] **Step 2: Run the probe**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -155,11 +155,11 @@ python tests/spike_s2_futoshiki_render.py
 
 Expected outcome (per Explore findings): **No Futoshiki support exists.** Task 1.4 must build `_draw_futoshiki_puzzle()` and `build_futoshiki_book()` from scratch.
 
-- [ ] **Step 3: Estimate the rendering work**
+- [x] **Step 3: Estimate the rendering work**
 
-Skim `_draw_kakuro_puzzle` and `_render_kakuro_grid` in `pdf_builder.py` — those are the closest analogues (grid + glyphs in inter-cell positions). Confirm Futoshiki renderer is <1 day. The inequality glyphs (`<`, `>`, `∨`, `∧`) need to be placed at the midpoint between two adjacent cells; orientation is determined by `Inequality.r1, c1, r2, c2`.
+Skim `_draw_kakuro_puzzle` and `_render_kakuro_grid` in `pdf_builder.py` â€” those are the closest analogues (grid + glyphs in inter-cell positions). Confirm Futoshiki renderer is <1 day. The inequality glyphs (`<`, `>`, `âˆ¨`, `âˆ§`) need to be placed at the midpoint between two adjacent cells; orientation is determined by `Inequality.r1, c1, r2, c2`.
 
-- [ ] **Step 4: Document outcome**
+- [x] **Step 4: Document outcome**
 
 Append to plan under "Spike Results":
 
@@ -169,22 +169,22 @@ and build_futoshiki_book() following the kakuro pattern. Estimated 4-6 hours.
 Decision: Proceed with Phase 1.
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/tests/spike_s2_futoshiki_render.py \
         docs/superpowers/plans/2026-05-13-may-release-pair.md
-git commit -m "spike: S2 — Futoshiki render capability probe"
+git commit -m "spike: S2 â€” Futoshiki render capability probe"
 ```
 
 ---
 
-### Task 0.3: Spike S3 — Four-Grid Cover Composition at Thumbnail Size
+### Task 0.3: Spike S3 â€” Four-Grid Cover Composition at Thumbnail Size
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/tests/spike_s3_four_grid_thumbnail.py`
 
-- [ ] **Step 1: Write a low-fidelity thumbnail mock**
+- [x] **Step 1: Write a low-fidelity thumbnail mock**
 
 ```python
 # projects/kdp-puzzle-press/tests/spike_s3_four_grid_thumbnail.py
@@ -201,7 +201,7 @@ def make_thumb(out_path: Path, w: int = 200, h: int = 300):
     img = Image.new("RGB", (w, h), CREAM_BG)
     d = ImageDraw.Draw(img)
     # Header
-    d.text((10, 8), "★ Father's Day Edition ★", fill=CORAL)
+    d.text((10, 8), "â˜… Father's Day Edition â˜…", fill=CORAL)
     d.text((30, 22), "Puzzle Book for Dad", fill=INK_TEAL)
     # 2x2 collage
     pad, gap = 20, 8
@@ -232,16 +232,16 @@ if __name__ == "__main__":
     print(f"Wrote {out}")
 ```
 
-- [ ] **Step 2: Generate and visually inspect**
+- [x] **Step 2: Generate and visually inspect**
 
 ```bash
 cd projects/kdp-puzzle-press
 python tests/spike_s3_four_grid_thumbnail.py
 ```
 
-Open `output/spike_s3_thumb.png` and confirm at actual size (200×300px): four tiles distinguishable, labels readable, palette pops against cream background. If yes, Task 2.2 proceeds. If no, revise composition (larger tile/label ratio, fewer tiles, or fall back to Direction A single-hero cover).
+Open `output/spike_s3_thumb.png` and confirm at actual size (200Ã—300px): four tiles distinguishable, labels readable, palette pops against cream background. If yes, Task 2.2 proceeds. If no, revise composition (larger tile/label ratio, fewer tiles, or fall back to Direction A single-hero cover).
 
-- [ ] **Step 3: Document outcome**
+- [x] **Step 3: Document outcome**
 
 Append to plan:
 
@@ -250,18 +250,18 @@ S3 outcome: [readable / needs revision / fall back to Direction A]
 Decision: [proceed with build_four_grid_hero.py as planned / revise / use single-hero cover]
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/tests/spike_s3_four_grid_thumbnail.py \
         docs/superpowers/plans/2026-05-13-may-release-pair.md \
         projects/kdp-puzzle-press/output/spike_s3_thumb.png
-git commit -m "spike: S3 — four-grid cover composition thumbnail proof"
+git commit -m "spike: S3 â€” four-grid cover composition thumbnail proof"
 ```
 
 ---
 
-## Phase 1 — Foundation (Shared Infrastructure)
+## Phase 1 â€” Foundation (Shared Infrastructure)
 
 After Phase 0 spikes confirm scope, build the shared pieces both books need.
 
@@ -273,7 +273,7 @@ The uniqueness registry has fingerprints for sudoku, word-search, cryptogram, an
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/registry.py`
 - Create: `projects/kdp-puzzle-press/tests/test_registry_futoshiki.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_registry_futoshiki.py
@@ -309,7 +309,7 @@ def test_fingerprint_ignores_input_ordering():
     assert fingerprint_futoshiki(size, {}, a) == fingerprint_futoshiki(size, {}, b)
 ```
 
-- [ ] **Step 2: Run test, confirm it fails**
+- [x] **Step 2: Run test, confirm it fails**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -318,9 +318,9 @@ pytest tests/test_registry_futoshiki.py -v
 
 Expected: `ImportError` or `AttributeError: module 'pocket_rooster_press.registry' has no attribute 'fingerprint_futoshiki'`.
 
-- [ ] **Step 3: Add `fingerprint_futoshiki` to `registry.py`**
+- [x] **Step 3: Add `fingerprint_futoshiki` to `registry.py`**
 
-Add at the end of `registry.py` (preserving existing imports — add only what's needed):
+Add at the end of `registry.py` (preserving existing imports â€” add only what's needed):
 
 ```python
 # ---- Futoshiki ----
@@ -328,7 +328,7 @@ Add at the end of `registry.py` (preserving existing imports — add only what's
 def fingerprint_futoshiki(
     size: int,
     givens: dict[tuple[int, int], int],
-    inequalities: "Iterable[Any]",  # list[Inequality] — Any to avoid hard import
+    inequalities: "Iterable[Any]",  # list[Inequality] â€” Any to avoid hard import
 ) -> str:
     """Hash a Futoshiki puzzle's structural identity.
 
@@ -348,7 +348,7 @@ def fingerprint_futoshiki(
     return _sha256(payload)
 ```
 
-- [ ] **Step 4: Run test, confirm it passes**
+- [x] **Step 4: Run test, confirm it passes**
 
 ```bash
 pytest tests/test_registry_futoshiki.py -v
@@ -356,7 +356,7 @@ pytest tests/test_registry_futoshiki.py -v
 
 Expected: all 4 tests PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/registry.py \
@@ -371,7 +371,7 @@ git commit -m "feat(registry): fingerprint_futoshiki for Futoshiki uniqueness"
 **Files:**
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/config.py`
 
-- [ ] **Step 1: Add the palette dict**
+- [x] **Step 1: Add the palette dict**
 
 Locate the existing palette definitions section in `config.py` (alongside `PALETTE_KAKURO`, `PALETTE_GRANDPARENT_GIFT`, etc.). Add:
 
@@ -387,9 +387,9 @@ PALETTE_FATHERS_DAY_DAD = ColorPalette(
 )
 ```
 
-> Note: Match the actual `ColorPalette` dataclass fields used by sibling palettes. If the dataclass uses different field names, adapt — but keep the hex values shown.
+> Note: Match the actual `ColorPalette` dataclass fields used by sibling palettes. If the dataclass uses different field names, adapt â€” but keep the hex values shown.
 
-- [ ] **Step 2: Smoke-import the palette**
+- [x] **Step 2: Smoke-import the palette**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -398,7 +398,7 @@ python -c "from pocket_rooster_press.config import PALETTE_FATHERS_DAY_DAD; prin
 
 Expected output: `fathers-day-dad`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/config.py
@@ -412,7 +412,7 @@ git commit -m "feat(config): PALETTE_FATHERS_DAY_DAD playful warm-coral variant"
 **Files:**
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/config.py`
 
-- [ ] **Step 1: Add the palette**
+- [x] **Step 1: Add the palette**
 
 ```python
 PALETTE_FUTOSHIKI = ColorPalette(
@@ -426,7 +426,7 @@ PALETTE_FUTOSHIKI = ColorPalette(
 )
 ```
 
-- [ ] **Step 2: Smoke-import**
+- [x] **Step 2: Smoke-import**
 
 ```bash
 python -c "from pocket_rooster_press.config import PALETTE_FUTOSHIKI; print(PALETTE_FUTOSHIKI.name)"
@@ -434,7 +434,7 @@ python -c "from pocket_rooster_press.config import PALETTE_FUTOSHIKI; print(PALE
 
 Expected: `futoshiki`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/config.py
@@ -449,7 +449,7 @@ git commit -m "feat(config): PALETTE_FUTOSHIKI cool-teal playful variant"
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/pdf_builder.py`
 - Create: `projects/kdp-puzzle-press/tests/test_pdf_builder_futoshiki.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_pdf_builder_futoshiki.py
@@ -474,7 +474,7 @@ def test_build_futoshiki_book_produces_valid_pdf(tmp_path):
     )
     assert result.exists()
     reader = PdfReader(str(result))
-    # Title + copyright + intro + 4 puzzles (1-up) + ~1 answer page + back ≈ 8-12 pages
+    # Title + copyright + intro + 4 puzzles (1-up) + ~1 answer page + back â‰ˆ 8-12 pages
     assert 6 <= len(reader.pages) <= 14
 
 def test_build_futoshiki_book_supports_multi_up(tmp_path):
@@ -495,7 +495,7 @@ def test_build_futoshiki_book_supports_multi_up(tmp_path):
     assert 4 <= len(reader.pages) <= 10
 ```
 
-- [ ] **Step 2: Run test, confirm failure**
+- [x] **Step 2: Run test, confirm failure**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -504,9 +504,9 @@ pytest tests/test_pdf_builder_futoshiki.py -v
 
 Expected: `AttributeError: 'PDFBuilder' object has no attribute 'build_futoshiki_book'`.
 
-- [ ] **Step 3: Implement `_draw_futoshiki_puzzle` and `build_futoshiki_book` in `pdf_builder.py`**
+- [x] **Step 3: Implement `_draw_futoshiki_puzzle` and `build_futoshiki_book` in `pdf_builder.py`**
 
-Add (next to `_draw_kakuro_puzzle` and `build_kakuro_book` — those are the structural analogues):
+Add (next to `_draw_kakuro_puzzle` and `build_kakuro_book` â€” those are the structural analogues):
 
 ```python
 def _draw_futoshiki_puzzle(
@@ -522,7 +522,7 @@ def _draw_futoshiki_puzzle(
     """Render a single Futoshiki puzzle.
 
     The puzzle.content is a FutoshikiPuzzle with size, givens, inequalities.
-    Inequality glyphs (<, >, ∧, ∨) are drawn in the inter-cell gutters.
+    Inequality glyphs (<, >, âˆ§, âˆ¨) are drawn in the inter-cell gutters.
     Args origin_x/origin_y/cell_size let multi-up layouts pin grids manually;
     when None, the grid is centered on the page.
     """
@@ -572,8 +572,8 @@ def _draw_futoshiki_puzzle(
 def _glyph_for_inequality(ineq: Any, n: int, gx: float, gy: float, cell: float):
     """Return (glyph_char, x_center, y_center) for an inequality between two cells.
 
-    Convention: ineq.r1,c1 < ineq.r2,c2 (canonically). Horizontal pair → '<' or '>';
-    vertical pair → '∧' (small above) or '∨' (small below).
+    Convention: ineq.r1,c1 < ineq.r2,c2 (canonically). Horizontal pair â†’ '<' or '>';
+    vertical pair â†’ 'âˆ§' (small above) or 'âˆ¨' (small below).
     """
     r1, c1, r2, c2 = ineq.r1, ineq.c1, ineq.r2, ineq.c2
     # Compute midpoint between two adjacent cells
@@ -583,15 +583,15 @@ def _glyph_for_inequality(ineq: Any, n: int, gx: float, gy: float, cell: float):
     cy2 = gy + (n - 1 - r2 + 0.5) * cell
     mx = (cx1 + cx2) / 2
     my = (cy1 + cy2) / 2
-    if r1 == r2:  # horizontal — cells side-by-side
+    if r1 == r2:  # horizontal â€” cells side-by-side
         glyph = "<" if c1 < c2 else ">"
     else:  # vertical
         # ineq is "small < large" (r1,c1) < (r2,c2)
         # In screen coords, top row is smaller r, but PDF y grows upward
         if r1 < r2:    # small cell is upper, large is lower
-            glyph = "∨"  # pointing down toward larger
+            glyph = "âˆ¨"  # pointing down toward larger
         else:
-            glyph = "∧"
+            glyph = "âˆ§"
     return glyph, mx, my
 
 
@@ -743,7 +743,7 @@ def _multi_up_positions(self, per_page: int, top_offset: float = 80):
 
 
 def _center_grid(self, n: int, cell: float) -> tuple[float, float]:
-    """Center a single n×n grid on the page; return bottom-left origin (gx, gy)."""
+    """Center a single nÃ—n grid on the page; return bottom-left origin (gx, gy)."""
     w = self.template.width
     h = self.template.height
     gx = (w - n * cell) / 2
@@ -751,7 +751,7 @@ def _center_grid(self, n: int, cell: float) -> tuple[float, float]:
     return gx, gy
 ```
 
-- [ ] **Step 4: Run test, confirm pass**
+- [x] **Step 4: Run test, confirm pass**
 
 ```bash
 pytest tests/test_pdf_builder_futoshiki.py -v
@@ -759,7 +759,7 @@ pytest tests/test_pdf_builder_futoshiki.py -v
 
 Expected: both tests PASS. Open one generated PDF (under pytest tmp_path) visually to confirm inequality glyphs render in the right gutters.
 
-- [ ] **Step 5: Visual sanity check**
+- [x] **Step 5: Visual sanity check**
 
 ```bash
 python -c "
@@ -781,7 +781,7 @@ print(f'wrote {out}')
 
 Open `output/visual_futoshiki.pdf`. Verify (1) cells are crisp, (2) inequality glyphs sit in gutters not inside cells, (3) given digits are centered, (4) answer key page renders 4-up solutions.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/pdf_builder.py \
@@ -795,11 +795,11 @@ git commit -m "feat(pdf): Futoshiki rendering (puzzle, multi-up, answer key)"
 
 This depends on Spike S1 outcome. Three branches:
 
-**If S1 outcome (A): a `_draw_section_header` method already exists internally** → just promote it to public (`render_section_divider`) and add one test. Skip to Step 4 below using the existing method.
+**If S1 outcome (A): a `_draw_section_header` method already exists internally** â†’ just promote it to public (`render_section_divider`) and add one test. Skip to Step 4 below using the existing method.
 
-**If S1 outcome (B): section header logic is inlined in `build_sudoku_book`** → extract it.
+**If S1 outcome (B): section header logic is inlined in `build_sudoku_book`** â†’ extract it.
 
-**If S1 outcome (C): no section page rendering exists** → build it from scratch as below.
+**If S1 outcome (C): no section page rendering exists** â†’ build it from scratch as below.
 
 The plan below assumes (C). Adapt scope downward if (A) or (B).
 
@@ -807,7 +807,7 @@ The plan below assumes (C). Adapt scope downward if (A) or (B).
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/pdf_builder.py`
 - Create: `projects/kdp-puzzle-press/tests/test_pdf_builder_section_header.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_pdf_builder_section_header.py
@@ -832,7 +832,7 @@ def test_draw_section_header_renders_one_page(tmp_path):
     assert "Sudoku for Sharp Dads" in text
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 pytest tests/test_pdf_builder_section_header.py -v
@@ -840,7 +840,7 @@ pytest tests/test_pdf_builder_section_header.py -v
 
 Expected: `AttributeError: '_draw_section_header'` or `AssertionError`.
 
-- [ ] **Step 3: Add `_draw_section_header` to `pdf_builder.py`**
+- [x] **Step 3: Add `_draw_section_header` to `pdf_builder.py`**
 
 ```python
 def _draw_section_header(self, c: "canvas.Canvas", title: str,
@@ -871,7 +871,7 @@ def _draw_section_header(self, c: "canvas.Canvas", title: str,
     c.setFillColorRGB(0, 0, 0)
 ```
 
-- [ ] **Step 4: Run test, confirm pass**
+- [x] **Step 4: Run test, confirm pass**
 
 ```bash
 pytest tests/test_pdf_builder_section_header.py -v
@@ -879,7 +879,7 @@ pytest tests/test_pdf_builder_section_header.py -v
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/pdf_builder.py \
@@ -895,7 +895,7 @@ git commit -m "feat(pdf): _draw_section_header for mixed-puzzle book dividers"
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/book_assembler.py`
 - Create: `projects/kdp-puzzle-press/tests/test_assembler_futoshiki.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_assembler_futoshiki.py
@@ -927,7 +927,7 @@ def test_assemble_futoshiki_book(tmp_path):
     assert interior.suffix == ".pdf"
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 pytest tests/test_assembler_futoshiki.py -v
@@ -935,7 +935,7 @@ pytest tests/test_assembler_futoshiki.py -v
 
 Expected: `AttributeError: 'BookAssembler' object has no attribute 'assemble_futoshiki_book'`.
 
-- [ ] **Step 3: Add the assembler method**
+- [x] **Step 3: Add the assembler method**
 
 In `book_assembler.py`, add next to the other `assemble_*_book` methods:
 
@@ -972,7 +972,7 @@ Add the import at the top of `book_assembler.py`:
 from pocket_rooster_press.config import PALETTE_FUTOSHIKI
 ```
 
-- [ ] **Step 4: Run, confirm pass**
+- [x] **Step 4: Run, confirm pass**
 
 ```bash
 pytest tests/test_assembler_futoshiki.py -v
@@ -980,7 +980,7 @@ pytest tests/test_assembler_futoshiki.py -v
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/book_assembler.py \
@@ -992,7 +992,7 @@ git commit -m "feat(assembler): assemble_futoshiki_book"
 
 ### Task 1.7: Add `assemble_mixed_puzzle_book` to `BookAssembler`
 
-This is the first orchestration method that walks heterogeneous puzzle blocks (sudoku → word search → cryptograms → kakuro) and stitches their PDFs together with section dividers between blocks.
+This is the first orchestration method that walks heterogeneous puzzle blocks (sudoku â†’ word search â†’ cryptograms â†’ kakuro) and stitches their PDFs together with section dividers between blocks.
 
 Approach: build one PDF per puzzle block using existing assembler methods, then **merge PDFs using `pypdf`** (already in deps for `PdfReader`). Insert a single-page section-divider PDF between blocks.
 
@@ -1000,7 +1000,7 @@ Approach: build one PDF per puzzle block using existing assembler methods, then 
 - Modify: `projects/kdp-puzzle-press/src/pocket_rooster_press/layout/book_assembler.py`
 - Create: `projects/kdp-puzzle-press/tests/test_assembler_mixed.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_assembler_mixed.py
@@ -1045,11 +1045,11 @@ def test_assemble_mixed_puzzle_book(tmp_path):
     interior = assembler.assemble_mixed_puzzle_book(blocks)
     assert interior.exists()
     reader = PdfReader(str(interior))
-    # Front matter + 4 section dividers + puzzles + back ≈ at least 10 pages
+    # Front matter + 4 section dividers + puzzles + back â‰ˆ at least 10 pages
     assert len(reader.pages) >= 10
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 pytest tests/test_assembler_mixed.py -v
@@ -1057,7 +1057,7 @@ pytest tests/test_assembler_mixed.py -v
 
 Expected: `AttributeError: 'BookAssembler' object has no attribute 'assemble_mixed_puzzle_book'`.
 
-- [ ] **Step 3: Implement `assemble_mixed_puzzle_book`**
+- [x] **Step 3: Implement `assemble_mixed_puzzle_book`**
 
 In `book_assembler.py`:
 
@@ -1143,7 +1143,7 @@ def assemble_mixed_puzzle_book(
 
 > Note: the `build_*_book` methods do not currently accept `skip_front_matter`. **Adding this parameter is part of this task.** Update each `build_*_book` signature to accept `skip_front_matter: bool = False` and gate the title-page / copyright / intro rendering on `not skip_front_matter`. Also expose `_render_front_matter_only(title, intro)` as a public-ish method on `PDFBuilder` that calls the existing title/copyright/intro rendering helpers.
 
-- [ ] **Step 4: Run, confirm pass**
+- [x] **Step 4: Run, confirm pass**
 
 ```bash
 pytest tests/test_assembler_mixed.py -v
@@ -1151,11 +1151,11 @@ pytest tests/test_assembler_mixed.py -v
 
 Expected: PASS.
 
-- [ ] **Step 5: Visual sanity check**
+- [x] **Step 5: Visual sanity check**
 
-Open the generated PDF (`tmp_path` from pytest) — confirm: title page → copyright → intro → divider "Sudoku for Sharp Dads" → 2 sudoku puzzle pages → divider "Word Search for Workshop Days" → 1 word search puzzle → and so on.
+Open the generated PDF (`tmp_path` from pytest) â€” confirm: title page â†’ copyright â†’ intro â†’ divider "Sudoku for Sharp Dads" â†’ 2 sudoku puzzle pages â†’ divider "Word Search for Workshop Days" â†’ 1 word search puzzle â†’ and so on.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/layout/book_assembler.py \
@@ -1166,7 +1166,7 @@ git commit -m "feat(assembler): assemble_mixed_puzzle_book for variety books"
 
 ---
 
-## Phase 2 — Four-Grid Cover Renderer
+## Phase 2 â€” Four-Grid Cover Renderer
 
 ### Task 2.1: Extract shared per-grid render helpers (or duplicate cleanly)
 
@@ -1175,14 +1175,14 @@ Per Explore: `scripts/build_real_grid_hero.py` has all the per-grid rendering in
 - **Option A**: Extract `_render_sudoku_tile(img, draw, x, y, w, h, puzzle, palette)`, `_render_word_search_tile`, etc. into a new module `src/pocket_rooster_press/covers/grid_tiles.py`. Then both scripts import from there.
 - **Option B**: Copy-paste the relevant code into the new script.
 
-Option A is cleaner and serves the rest of the catalog. Use it unless `build_real_grid_hero.py` is structurally tangled in a way that makes extraction risky — in which case fall back to B and revisit later.
+Option A is cleaner and serves the rest of the catalog. Use it unless `build_real_grid_hero.py` is structurally tangled in a way that makes extraction risky â€” in which case fall back to B and revisit later.
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/covers/grid_tiles.py`
 - Modify: `projects/kdp-puzzle-press/scripts/build_real_grid_hero.py` (import from new module)
 - Create: `projects/kdp-puzzle-press/tests/test_grid_tiles.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_grid_tiles.py
@@ -1215,7 +1215,7 @@ def test_render_word_search_tile_does_not_crash():
                for x in range(10, 190) for y in range(10, 190))
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 pytest tests/test_grid_tiles.py -v
@@ -1223,7 +1223,7 @@ pytest tests/test_grid_tiles.py -v
 
 Expected: `ImportError: cannot import name 'render_sudoku_tile' from 'pocket_rooster_press.covers.grid_tiles'`.
 
-- [ ] **Step 3: Create `grid_tiles.py`**
+- [x] **Step 3: Create `grid_tiles.py`**
 
 Move per-grid render logic from `scripts/build_real_grid_hero.py` into a new module. Pseudocode for the public API:
 
@@ -1266,7 +1266,7 @@ def render_sudoku_tile(draw: ImageDraw.ImageDraw,
     """Render a Sudoku grid into the box (x, y, x+w, y+h).
 
     fill_ratio = how much of the board's given digits to render (0 = empty, 1 = full).
-    Digit colors rotate brass → coral → teal.
+    Digit colors rotate brass â†’ coral â†’ teal.
     """
     # [Implementation: 9x9 grid with thicker lines at 3x3 boundaries, digits at center]
     ...
@@ -1298,11 +1298,11 @@ def render_kakuro_tile(draw: ImageDraw.ImageDraw,
 
 Copy the actual rendering code from `build_real_grid_hero.py` into these functions, parameterizing the (x, y, w, h) origin.
 
-- [ ] **Step 4: Update `build_real_grid_hero.py` to import**
+- [x] **Step 4: Update `build_real_grid_hero.py` to import**
 
 Replace its inline rendering with calls to the new module. Keep the script's CLI behavior unchanged.
 
-- [ ] **Step 5: Run tests + verify script still works**
+- [x] **Step 5: Run tests + verify script still works**
 
 ```bash
 pytest tests/test_grid_tiles.py -v
@@ -1311,7 +1311,7 @@ python scripts/build_real_grid_hero.py kakuro-quiet-minds
 
 Expected: tests PASS; script still produces a valid hero PNG (diff visually with git's previous version if possible).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/covers/grid_tiles.py \
@@ -1328,7 +1328,7 @@ git commit -m "refactor(covers): extract shared puzzle-tile renderers to grid_ti
 - Create: `projects/kdp-puzzle-press/scripts/build_four_grid_hero.py`
 - Create: `projects/kdp-puzzle-press/tests/test_four_grid_hero.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_four_grid_hero.py
@@ -1352,7 +1352,7 @@ def test_four_grid_hero_produces_8x11_png(tmp_path):
     assert img.size == (1024, 1336)
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -1361,7 +1361,7 @@ pytest tests/test_four_grid_hero.py -v
 
 Expected: file-not-found or returncode != 0.
 
-- [ ] **Step 3: Implement `build_four_grid_hero.py`**
+- [x] **Step 3: Implement `build_four_grid_hero.py`**
 
 ```python
 # projects/kdp-puzzle-press/scripts/build_four_grid_hero.py
@@ -1501,7 +1501,7 @@ def build_hero(out_path: Path, seed: int = 42) -> Path:
     _draw_confetti(draw, W, H, seed=seed)
 
     # Eyebrow line
-    draw.text((W/2 - 200, 60), "★ Father's Day Edition ★", fill=CORAL, font=sub_font)
+    draw.text((W/2 - 200, 60), "â˜… Father's Day Edition â˜…", fill=CORAL, font=sub_font)
     # Title
     title_text = "Puzzle Book for Dad"
     bbox = draw.textbbox((0, 0), title_text, font=title_font)
@@ -1539,10 +1539,10 @@ def build_hero(out_path: Path, seed: int = 42) -> Path:
                           font=label_font)
 
     # Footer line
-    footer_text = "Sudoku · Word Search · Cryptograms · Kakuro"
+    footer_text = "Sudoku Â· Word Search Â· Cryptograms Â· Kakuro"
     bbox = draw.textbbox((0, 0), footer_text, font=sub_font)
     draw.text(((W - (bbox[2] - bbox[0]))/2, H - 130), footer_text, fill=TEAL, font=sub_font)
-    sub2 = "100+ Large-Print Puzzles · Pocket Rooster Press"
+    sub2 = "100+ Large-Print Puzzles Â· Pocket Rooster Press"
     bbox = draw.textbbox((0, 0), sub2, font=label_font)
     draw.text(((W - (bbox[2] - bbox[0]))/2, H - 80), sub2, fill=BRASS, font=label_font)
 
@@ -1568,16 +1568,16 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 4: Run test + visual check**
+- [x] **Step 4: Run test + visual check**
 
 ```bash
 pytest tests/test_four_grid_hero.py -v
 python scripts/build_four_grid_hero.py fathers-day-variety-dad --out /tmp/hero_check.png
 ```
 
-Expected: test PASSES. Open `/tmp/hero_check.png` — confirm at full-size and at 200×300 thumbnail size that all four tiles are distinguishable, labels readable, palette pops.
+Expected: test PASSES. Open `/tmp/hero_check.png` â€” confirm at full-size and at 200Ã—300 thumbnail size that all four tiles are distinguishable, labels readable, palette pops.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/scripts/build_four_grid_hero.py \
@@ -1587,7 +1587,7 @@ git commit -m "feat(covers): build_four_grid_hero.py for variety-book covers"
 
 ---
 
-## Phase 3 — Theme Content (Deliverables, Not TDD)
+## Phase 3 â€” Theme Content (Deliverables, Not TDD)
 
 These are content-curation tasks, not code. No tests. Each task produces a reviewable artifact. Treat as a content review gate before Phase 4 starts puzzle generation.
 
@@ -1596,34 +1596,34 @@ These are content-curation tasks, not code. No tests. Each task produces a revie
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/fathers_day_dad_quotes.json`
 
-- [ ] **Step 1: Draft 40 candidate quotes**
+- [x] **Step 1: Draft 40 candidate quotes**
 
 Sources (all public-domain):
-- Mark Twain (1835–1910)
-- Theodore Roosevelt (1858–1919) — fatherly wisdom
-- Benjamin Franklin (1706–1790)
-- Ralph Waldo Emerson (1803–1882)
-- Henry Ward Beecher (1813–1887)
+- Mark Twain (1835â€“1910)
+- Theodore Roosevelt (1858â€“1919) â€” fatherly wisdom
+- Benjamin Franklin (1706â€“1790)
+- Ralph Waldo Emerson (1803â€“1882)
+- Henry Ward Beecher (1813â€“1887)
 - Aesop's Fables (Public domain translations)
 - Anonymous proverbs
 
-For dad humor, draft 10 originals matching the Erma Bombeck / Dave Barry tone (gentle observational humor) and credit as "Pocket Rooster Press original" with attribution `null` — verify before publish that they don't infringe.
+For dad humor, draft 10 originals matching the Erma Bombeck / Dave Barry tone (gentle observational humor) and credit as "Pocket Rooster Press original" with attribution `null` â€” verify before publish that they don't infringe.
 
 Target ranges:
 - 15 fatherly wisdom (Roosevelt, Twain, Franklin, etc.)
 - 10 gentle humor (originals + anonymous proverbs)
-- Length 5–15 words (cryptogram-friendly)
-- Quotes must contain ≥ 12 unique letters of the alphabet (so the cipher has signal)
+- Length 5â€“15 words (cryptogram-friendly)
+- Quotes must contain â‰¥ 12 unique letters of the alphabet (so the cipher has signal)
 
-- [ ] **Step 2: Cut to best 25**
+- [x] **Step 2: Cut to best 25**
 
 Criteria:
 1. Tone fits "from your dad" gift moment (not bitter, not preachy, not edgy)
 2. Attribution verifiably public domain (author died before 1929)
-3. ≥ 12 unique letters
-4. No duplicates against existing cryptogram books — check by canonicalizing each quote with `registry.canonical_quote(text)` then comparing to `data/published-puzzles.json` quote fingerprints
+3. â‰¥ 12 unique letters
+4. No duplicates against existing cryptogram books â€” check by canonicalizing each quote with `registry.canonical_quote(text)` then comparing to `data/published-puzzles.json` quote fingerprints
 
-- [ ] **Step 3: Write JSON**
+- [x] **Step 3: Write JSON**
 
 ```json
 {
@@ -1643,7 +1643,7 @@ Criteria:
 }
 ```
 
-- [ ] **Step 4: Verify uniqueness against existing books**
+- [x] **Step 4: Verify uniqueness against existing books**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -1664,7 +1664,7 @@ print('All 25 new quotes are unique.')
 
 Expected: no collisions reported.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/fathers_day_dad_quotes.json
@@ -1678,17 +1678,17 @@ git commit -m "content: 25 Father's Day cryptogram quotes (public-domain mix)"
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/fathers_day_dad_words.json`
 
-- [ ] **Step 1: Draft word-list categories**
+- [x] **Step 1: Draft word-list categories**
 
-Pick 30 categories, ~18–22 words each. Suggested: Workshop, Toolbox, Garage, Lawn Care, Coffee Time, Classic Cars, Pickup Trucks, Fishing Gear, Tackle Box, Golf, Baseball, Football Sunday, BBQ Day, Grill Master, Spice Rack, Whiskey Bar, Beer Garden, Hardware Store, Hammer & Nails, Workshop Saturday, Sunday Drive, Hunting Trip, Camping Out, RV Life, Dad Jokes, Newspaper, Recliner, Remote Control, Saturday Chores, Sunday Football.
+Pick 30 categories, ~18â€“22 words each. Suggested: Workshop, Toolbox, Garage, Lawn Care, Coffee Time, Classic Cars, Pickup Trucks, Fishing Gear, Tackle Box, Golf, Baseball, Football Sunday, BBQ Day, Grill Master, Spice Rack, Whiskey Bar, Beer Garden, Hardware Store, Hammer & Nails, Workshop Saturday, Sunday Drive, Hunting Trip, Camping Out, RV Life, Dad Jokes, Newspaper, Recliner, Remote Control, Saturday Chores, Sunday Football.
 
 Word list quality bar:
-- 8–14 letters each — long enough to feel substantive, short enough to fit a 15×15 grid
+- 8â€“14 letters each â€” long enough to feel substantive, short enough to fit a 15Ã—15 grid
 - No proper nouns unless universally recognizable
 - No words from other published books (avoid duplicates)
 - No words flagged by the word_search generator's profanity blacklist
 
-- [ ] **Step 2: Write JSON**
+- [x] **Step 2: Write JSON**
 
 ```json
 {
@@ -1708,7 +1708,7 @@ Word list quality bar:
 }
 ```
 
-- [ ] **Step 3: Validate against profanity filter**
+- [x] **Step 3: Validate against profanity filter**
 
 ```bash
 python -c "
@@ -1729,7 +1729,7 @@ print(f'All {sum(len(l[\"words\"]) for l in lists)} words pass.')
 
 Expected: no flags.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/fathers_day_dad_words.json
@@ -1743,7 +1743,7 @@ git commit -m "content: 30 dad-themed word lists for Father's Day variety book"
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/fathers_day_dad_intro.txt`
 
-- [ ] **Step 1: Write the intro (≤150 words)**
+- [x] **Step 1: Write the intro (â‰¤150 words)**
 
 The intro lives on page 3 (after title + copyright). Tone: warm, gift-moment, not jokey, not preachy. Mention what's inside, who it's for, and a sign-off from "Pocket Rooster Press."
 
@@ -1754,18 +1754,18 @@ For the Dad who reads the paper before the day starts,
 who fixes things before they break, who keeps the gas tank full
 and the punchlines coming.
 
-Inside you'll find 100 generously-sized puzzles — sudoku
+Inside you'll find 100 generously-sized puzzles â€” sudoku
 to keep the mind sharp, word searches for unhurried evenings,
 cryptograms with quotes worth pausing over, and a handful of
 kakuros for the days you're feeling adventurous.
 
 Take your time. There's no rush.
 
-From all of us at Pocket Rooster Press —
+From all of us at Pocket Rooster Press â€”
 Happy Father's Day.
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/fathers_day_dad_intro.txt
@@ -1781,36 +1781,36 @@ git commit -m "content: Father's Day Variety book intro page"
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/futoshiki_seniors_v1_howto.txt`
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/futoshiki_seniors_v1_cheatsheet.txt`
 
-- [ ] **Step 1: Write the intro (≤150 words)**
+- [x] **Step 1: Write the intro (â‰¤150 words)**
 
 ```
 Welcome to Futoshiki.
 
 If you enjoy sudoku, you'll feel at home here. Futoshiki is a
-Japanese puzzle of Latin squares — fill the grid with the numbers
+Japanese puzzle of Latin squares â€” fill the grid with the numbers
 1 through N so that no number repeats in any row or column.
 
 The twist is the inequalities: the little arrows between cells
 ("<" and ">") tell you which neighbor is greater.
 
-This volume starts gentle and gets gradually trickier. The 5×5
-warm-ups are friendly, the 8×8 challenges will keep you company
+This volume starts gentle and gets gradually trickier. The 5Ã—5
+warm-ups are friendly, the 8Ã—8 challenges will keep you company
 through a long afternoon. Take your time, and welcome aboard.
 
-— Pocket Rooster Press
+â€” Pocket Rooster Press
 ```
 
-- [ ] **Step 2: Write the 2-page how-to-play**
+- [x] **Step 2: Write the 2-page how-to-play**
 
-A worked 5×5 example showing one full solve: start state, two reasoning steps, finished grid. Include the key insight: an inequality chain like `1 < a < b < 5` constrains `a, b` to `{2,3,4}`.
+A worked 5Ã—5 example showing one full solve: start state, two reasoning steps, finished grid. Include the key insight: an inequality chain like `1 < a < b < 5` constrains `a, b` to `{2,3,4}`.
 
 Write as plain prose with ASCII grid diagrams. ~400 words total, fitting on two pages with diagrams.
 
-- [ ] **Step 3: Write the rules cheat-sheet**
+- [x] **Step 3: Write the rules cheat-sheet**
 
-A one-page reference: bullet rules + glyph legend (`<`, `>`, `∧`, `∨`) + grid-size reminder.
+A one-page reference: bullet rules + glyph legend (`<`, `>`, `âˆ§`, `âˆ¨`) + grid-size reminder.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/themes/data/futoshiki_seniors_v1_*.txt
@@ -1819,14 +1819,14 @@ git commit -m "content: Futoshiki Seniors V1 intro + how-to-play + cheat-sheet"
 
 ---
 
-## Phase 4 — Book A: Father's Day Variety
+## Phase 4 â€” Book A: Father's Day Variety
 
 ### Task 4.1: Create Book A theme-data wrapper
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/fathers_day_dad.py`
 
-- [ ] **Step 1: Write the loader module**
+- [x] **Step 1: Write the loader module**
 
 ```python
 # projects/kdp-puzzle-press/src/pocket_rooster_press/themes/fathers_day_dad.py
@@ -1866,7 +1866,7 @@ def load_intro() -> str:
     return (_DATA_DIR / "fathers_day_dad_intro.txt").read_text(encoding="utf-8")
 ```
 
-- [ ] **Step 2: Smoke-test**
+- [x] **Step 2: Smoke-test**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -1880,7 +1880,7 @@ print(f'intro {len(load_intro())} chars')
 
 Expected: `25 quotes / 30 word lists / intro ~XXX chars`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/themes/fathers_day_dad.py
@@ -1895,7 +1895,7 @@ git commit -m "feat(themes): fathers_day_dad theme data loader"
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/books/fathers_day_variety_dad.py`
 - Create: `projects/kdp-puzzle-press/tests/test_book_fathers_day_variety_dad.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_book_fathers_day_variety_dad.py
@@ -1919,7 +1919,7 @@ def test_book_a_uniqueness_registered(tmp_path):
     assert interior1 != interior2
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 pytest tests/test_book_fathers_day_variety_dad.py -v
@@ -1927,11 +1927,11 @@ pytest tests/test_book_fathers_day_variety_dad.py -v
 
 Expected: ImportError.
 
-- [ ] **Step 3: Write the book module**
+- [x] **Step 3: Write the book module**
 
 ```python
 # projects/kdp-puzzle-press/src/pocket_rooster_press/books/fathers_day_variety_dad.py
-"""Father's Day Variety Puzzle Book for Dad — Large Print (8.5x11, ~108 pages).
+"""Father's Day Variety Puzzle Book for Dad â€” Large Print (8.5x11, ~108 pages).
 
 100+ puzzles across Sudoku, Word Search, Cryptograms, Kakuro.
 First multi-puzzle-type book to use the mixed-puzzle assembler.
@@ -1956,7 +1956,7 @@ from pocket_rooster_press.themes.fathers_day_dad import (
 
 BOOK_ID = "fathers-day-variety-dad"
 TITLE = "Father's Day Puzzle Book for Dad"
-SUBTITLE = "Large-Print Sudoku, Word Search, Cryptograms & Kakuro — 100+ Puzzles"
+SUBTITLE = "Large-Print Sudoku, Word Search, Cryptograms & Kakuro â€” 100+ Puzzles"
 
 OUTPUT_DIR = Path("output")
 
@@ -2013,9 +2013,9 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
          "puzzles": _build_sudoku_block()},
         {"kind": "word_search", "title": "Word Search for Workshop Days",
          "sections": _build_word_search_block(word_lists)},
-        {"kind": "cryptogram", "title": "Cryptograms — Quotes Worth Pausing Over",
+        {"kind": "cryptogram", "title": "Cryptograms â€” Quotes Worth Pausing Over",
          "puzzles": _build_cryptogram_block(quotes)},
-        {"kind": "kakuro", "title": "Kakuro — For the Adventurous Hours",
+        {"kind": "kakuro", "title": "Kakuro â€” For the Adventurous Hours",
          "puzzles": _build_kakuro_block()},
     ]
     interior = assembler.assemble_mixed_puzzle_book(blocks)
@@ -2030,10 +2030,10 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
         TITLE,
         subtitle=SUBTITLE,
         page_count=page_count,
-        series_label="Pocket Rooster Press · Father's Day Edition",
+        series_label="Pocket Rooster Press Â· Father's Day Edition",
         hero_image_path=hero_image_for(BOOK_ID),
         back_bullets=[
-            "100+ large-print puzzles — sudoku, word search, cryptograms, kakuro",
+            "100+ large-print puzzles â€” sudoku, word search, cryptograms, kakuro",
             "Carefully curated dad-humor and fatherly-wisdom cryptogram quotes",
             "A thoughtful Father's Day gift for any dad or grandpa",
             "All solutions in the back of the book",
@@ -2049,7 +2049,7 @@ if __name__ == "__main__":
     print(f"Cover:    {cover}")
 ```
 
-- [ ] **Step 4: Generate the cover hero first**
+- [x] **Step 4: Generate the cover hero first**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -2058,7 +2058,7 @@ python scripts/build_four_grid_hero.py fathers-day-variety-dad
 
 Expected: `assets/generated/wraps/fathers-day-variety-dad.png` exists.
 
-- [ ] **Step 5: Run test**
+- [x] **Step 5: Run test**
 
 ```bash
 pytest tests/test_book_fathers_day_variety_dad.py -v
@@ -2066,7 +2066,7 @@ pytest tests/test_book_fathers_day_variety_dad.py -v
 
 Expected: PASS. If page count is out of range, tune block sizes in the helper functions (`_build_sudoku_block` etc.) per the spec's puzzle-count fallback levers (drop word search to 28; drop sudoku-hard to 8).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/books/fathers_day_variety_dad.py \
@@ -2078,7 +2078,7 @@ git commit -m "feat(book): Father's Day Variety Puzzle Book for Dad module"
 
 ### Task 4.3: Internal QA pass for Book A
 
-- [ ] **Step 1: Build the production PDF**
+- [x] **Step 1: Build the production PDF**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -2087,7 +2087,7 @@ python -m pocket_rooster_press.books.fathers_day_variety_dad
 
 Expected: `output/fathers-day-variety-dad/interior.pdf` and `output/fathers-day-variety-dad/cover.pdf` exist.
 
-- [ ] **Step 2: Page-count check**
+- [x] **Step 2: Page-count check**
 
 ```bash
 python -c "
@@ -2099,7 +2099,7 @@ print(f'Interior: {len(r.pages)} pages')
 
 Expected: between 100 and 124 pages, target 108.
 
-- [ ] **Step 3: Visual QA — open the PDF**
+- [x] **Step 3: Visual QA â€” open the PDF**
 
 Open `output/fathers-day-variety-dad/interior.pdf` and visually verify:
 - Title + copyright + intro page
@@ -2116,12 +2116,12 @@ Open `output/fathers-day-variety-dad/interior.pdf` and visually verify:
 
 Open `output/fathers-day-variety-dad/cover.pdf` at 150 DPI and confirm:
 - Four-grid collage visible
-- "★ Father's Day Edition ★" eyebrow
+- "â˜… Father's Day Edition â˜…" eyebrow
 - Title in playful teal
 - All four labels readable below tiles
 - Confetti dots scattered
 
-- [ ] **Step 4: Profanity sanity check on word-search letter fills**
+- [x] **Step 4: Profanity sanity check on word-search letter fills**
 
 ```bash
 python -c "
@@ -2141,7 +2141,7 @@ print('No profanity in puzzle text.')
 
 Expected: no flags.
 
-- [ ] **Step 5: Commit a QA-passed marker (optional)**
+- [x] **Step 5: Commit a QA-passed marker (optional)**
 
 ```bash
 git tag book-a-qa-passed
@@ -2154,14 +2154,14 @@ git tag book-a-qa-passed
 **Files:**
 - Create: `projects/kdp-puzzle-press/metadata/fathers_day_variety_dad.json`
 
-- [ ] **Step 1: Copy a sibling metadata file as template**
+- [x] **Step 1: Copy a sibling metadata file as template**
 
 ```bash
 cp projects/kdp-puzzle-press/metadata/large_print_sudoku_grandparents.json \
    projects/kdp-puzzle-press/metadata/fathers_day_variety_dad.json
 ```
 
-- [ ] **Step 2: Edit fields**
+- [x] **Step 2: Edit fields**
 
 Open the file and replace:
 
@@ -2169,17 +2169,17 @@ Open the file and replace:
 |---|---|
 | `book_id` | `"fathers-day-variety-dad"` |
 | `title` | `"Father's Day Puzzle Book for Dad"` |
-| `subtitle` | `"Large-Print Sudoku, Word Search, Cryptograms & Kakuro — 100+ Puzzles for Hours of Relaxation"` |
-| `series.name` | `"Pocket Rooster Press · Father's Day Editions"` |
+| `subtitle` | `"Large-Print Sudoku, Word Search, Cryptograms & Kakuro â€” 100+ Puzzles for Hours of Relaxation"` |
+| `series.name` | `"Pocket Rooster Press Â· Father's Day Editions"` |
 | `series.volume` | `1` |
-| `bisac` | `[{"code": "GAM015000", "label": "GAMES & ACTIVITIES / Puzzles / General"}, {"code": "GAM011000", "label": "GAMES & ACTIVITIES / Word & Word Search"}, {"code": "NON000000", "label": "HOLIDAYS / Father's Day"}]` (verify exact BISAC codes — Father's Day may not have its own code; use closest available) |
+| `bisac` | `[{"code": "GAM015000", "label": "GAMES & ACTIVITIES / Puzzles / General"}, {"code": "GAM011000", "label": "GAMES & ACTIVITIES / Word & Word Search"}, {"code": "NON000000", "label": "HOLIDAYS / Father's Day"}]` (verify exact BISAC codes â€” Father's Day may not have its own code; use closest available) |
 | `kdp_browse_categories` | `["Books > Crafts, Hobbies & Home > Crafts & Hobbies > Games > Puzzles & Games > Activity Books", "Books > Humor & Entertainment > Puzzles & Games > Sudoku"]` |
 | `keywords` | `["fathers day gifts from daughter", "fathers day gifts from son", "puzzle book for dad", "large print puzzle book for adults", "sudoku word search cryptogram book", "fathers day gift for grandpa", "activity book for men"]` |
 | `pricing.list_prices.amazon_com_USD` | `9.99` |
 | `pricing.royalty_plan` | `"60% (Standard)"` |
 | `page_count_target` | `108` |
 
-- [ ] **Step 3: Validate JSON parses**
+- [x] **Step 3: Validate JSON parses**
 
 ```bash
 python -c "
@@ -2191,7 +2191,7 @@ print('OK')
 "
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/metadata/fathers_day_variety_dad.json
@@ -2200,14 +2200,14 @@ git commit -m "meta: KDP listing metadata for Father's Day Variety Dad"
 
 ---
 
-## Phase 5 — Book B: Futoshiki Seniors Vol. 1
+## Phase 5 â€” Book B: Futoshiki Seniors Vol. 1
 
 ### Task 5.1: Create Book B theme-data loader
 
 **Files:**
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/themes/futoshiki_seniors_v1.py`
 
-- [ ] **Step 1: Write loader**
+- [x] **Step 1: Write loader**
 
 ```python
 # projects/kdp-puzzle-press/src/pocket_rooster_press/themes/futoshiki_seniors_v1.py
@@ -2227,7 +2227,7 @@ def load_cheatsheet() -> str:
     return (_DATA_DIR / "futoshiki_seniors_v1_cheatsheet.txt").read_text(encoding="utf-8")
 ```
 
-- [ ] **Step 2: Smoke-test**
+- [x] **Step 2: Smoke-test**
 
 ```bash
 python -c "
@@ -2236,7 +2236,7 @@ print(f'intro={len(load_intro())} howto={len(load_howto())} cheat={len(load_chea
 "
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/themes/futoshiki_seniors_v1.py
@@ -2251,7 +2251,7 @@ git commit -m "feat(themes): futoshiki_seniors_v1 content loader"
 - Create: `projects/kdp-puzzle-press/src/pocket_rooster_press/books/futoshiki_seniors_v1.py`
 - Create: `projects/kdp-puzzle-press/tests/test_book_futoshiki_seniors_v1.py`
 
-- [ ] **Step 1: Write failing test**
+- [x] **Step 1: Write failing test**
 
 ```python
 # projects/kdp-puzzle-press/tests/test_book_futoshiki_seniors_v1.py
@@ -2280,7 +2280,7 @@ def test_book_b_puzzle_uniqueness(tmp_path):
     assert len(fps) == len(puzzles)
 ```
 
-- [ ] **Step 2: Run, confirm fails**
+- [x] **Step 2: Run, confirm fails**
 
 ```bash
 pytest tests/test_book_futoshiki_seniors_v1.py -v
@@ -2288,7 +2288,7 @@ pytest tests/test_book_futoshiki_seniors_v1.py -v
 
 Expected: ImportError.
 
-- [ ] **Step 3: Write the book module**
+- [x] **Step 3: Write the book module**
 
 ```python
 # projects/kdp-puzzle-press/src/pocket_rooster_press/books/futoshiki_seniors_v1.py
@@ -2314,7 +2314,7 @@ from pocket_rooster_press.themes.futoshiki_seniors_v1 import (
 
 BOOK_ID = "futoshiki-seniors-v1"
 TITLE = "Futoshiki Large Print for Seniors"
-SUBTITLE = "120 Number-Logic Puzzles to Sharpen the Mind — Volume 1"
+SUBTITLE = "120 Number-Logic Puzzles to Sharpen the Mind â€” Volume 1"
 
 OUTPUT_DIR = Path("output")
 
@@ -2353,8 +2353,8 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
     assembler = BookAssembler(config)
     interior = assembler.assemble_futoshiki_book(
         puzzles,
-        section_titles=["Warm-up · 5x5", "Steady · 6x6",
-                        "Sharpen · 7x7", "Challenge · 8x8"],
+        section_titles=["Warm-up Â· 5x5", "Steady Â· 6x6",
+                        "Sharpen Â· 7x7", "Challenge Â· 8x8"],
         section_boundaries=[30, 70, 100, 120],
         puzzles_per_page=1,  # multi-up handled inside builder by size if needed
     )
@@ -2369,12 +2369,12 @@ def build(output_dir: Path = OUTPUT_DIR) -> tuple[Path, Path]:
         TITLE,
         subtitle=SUBTITLE,
         page_count=page_count,
-        series_label="Pocket Rooster Press · Large Print",
+        series_label="Pocket Rooster Press Â· Large Print",
         hero_image_path=hero_image_for(BOOK_ID),
         back_bullets=[
             "120 Futoshiki puzzles graded easy to hard, 5x5 to 8x8",
             "Generous large print designed for senior readers",
-            "Full how-to-play with worked example — beginners welcome",
+            "Full how-to-play with worked example â€” beginners welcome",
             "All solutions in the back of the book",
         ],
     )
@@ -2388,7 +2388,7 @@ if __name__ == "__main__":
     print(f"Cover:    {cover}")
 ```
 
-- [ ] **Step 4: Generate the cover hero**
+- [x] **Step 4: Generate the cover hero**
 
 The single-grid hero uses the existing `build_real_grid_hero.py` script. If that script doesn't yet know about Futoshiki book IDs, add a Futoshiki branch:
 
@@ -2397,9 +2397,9 @@ cd projects/kdp-puzzle-press
 python scripts/build_real_grid_hero.py futoshiki-seniors-v1
 ```
 
-If the script errors with `unknown niche`, edit `scripts/build_real_grid_hero.py` to add a `futoshiki-seniors-v1` entry in the `NICHES` dict (use `{"trace_color": CORAL, "confetti_palette": [BRASS, CORAL, INK_TEAL]}`) and add a render path that calls a new `render_futoshiki_tile` (which you'll need to add to `grid_tiles.py` — it's the only puzzle type that doesn't have a tile renderer yet, by parallel to the other types).
+If the script errors with `unknown niche`, edit `scripts/build_real_grid_hero.py` to add a `futoshiki-seniors-v1` entry in the `NICHES` dict (use `{"trace_color": CORAL, "confetti_palette": [BRASS, CORAL, INK_TEAL]}`) and add a render path that calls a new `render_futoshiki_tile` (which you'll need to add to `grid_tiles.py` â€” it's the only puzzle type that doesn't have a tile renderer yet, by parallel to the other types).
 
-- [ ] **Step 5: Run test**
+- [x] **Step 5: Run test**
 
 ```bash
 pytest tests/test_book_futoshiki_seniors_v1.py -v
@@ -2407,7 +2407,7 @@ pytest tests/test_book_futoshiki_seniors_v1.py -v
 
 Expected: both tests PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/src/pocket_rooster_press/books/futoshiki_seniors_v1.py \
@@ -2421,14 +2421,14 @@ git commit -m "feat(book): Futoshiki Seniors V1 module + Futoshiki tile renderer
 
 ### Task 5.3: Internal QA pass for Book B
 
-- [ ] **Step 1: Build the production PDF**
+- [x] **Step 1: Build the production PDF**
 
 ```bash
 cd projects/kdp-puzzle-press
 python -m pocket_rooster_press.books.futoshiki_seniors_v1
 ```
 
-- [ ] **Step 2: Page-count check**
+- [x] **Step 2: Page-count check**
 
 ```bash
 python -c "
@@ -2438,27 +2438,27 @@ print(f'Interior: {len(r.pages)} pages')
 "
 ```
 
-Expected: 100–124, target 108.
+Expected: 100â€“124, target 108.
 
-- [ ] **Step 3: Visual QA**
+- [x] **Step 3: Visual QA**
 
 Open `output/futoshiki-seniors-v1/interior.pdf` and verify:
 - Title, copyright, intro
 - 2-page how-to-play with worked example
 - 1-page rules cheat-sheet
-- Section divider "Warm-up · 5x5"
+- Section divider "Warm-up Â· 5x5"
 - 30 warm-up puzzles (consider 4-up layout if pages overshoot)
-- Divider "Steady · 6x6"
+- Divider "Steady Â· 6x6"
 - 40 steady puzzles
-- Divider "Sharpen · 7x7"
+- Divider "Sharpen Â· 7x7"
 - 30 sharpen puzzles
-- Divider "Challenge · 8x8"
+- Divider "Challenge Â· 8x8"
 - 20 challenge puzzles
-- Answer key — every puzzle's solution rendered
+- Answer key â€” every puzzle's solution rendered
 
 Open cover and verify single playful-themed Futoshiki hero with inequality glyphs visible.
 
-- [ ] **Step 4: Validate every puzzle's solution is correct**
+- [x] **Step 4: Validate every puzzle's solution is correct**
 
 ```bash
 python -c "
@@ -2474,7 +2474,7 @@ print(f'All {len(puzzles)} puzzles validate.')
 
 Expected: all 120 puzzles validate.
 
-- [ ] **Step 5: Tag**
+- [x] **Step 5: Tag**
 
 ```bash
 git tag book-b-qa-passed
@@ -2487,20 +2487,20 @@ git tag book-b-qa-passed
 **Files:**
 - Create: `projects/kdp-puzzle-press/metadata/futoshiki_seniors_v1.json`
 
-- [ ] **Step 1: Copy sibling as template**
+- [x] **Step 1: Copy sibling as template**
 
 ```bash
 cp projects/kdp-puzzle-press/metadata/large_print_sudoku_grandparents.json \
    projects/kdp-puzzle-press/metadata/futoshiki_seniors_v1.json
 ```
 
-- [ ] **Step 2: Edit fields**
+- [x] **Step 2: Edit fields**
 
 | Field | Value |
 |---|---|
 | `book_id` | `"futoshiki-seniors-v1"` |
 | `title` | `"Futoshiki Large Print for Seniors"` |
-| `subtitle` | `"120 Number-Logic Puzzles to Sharpen the Mind — Volume 1"` |
+| `subtitle` | `"120 Number-Logic Puzzles to Sharpen the Mind â€” Volume 1"` |
 | `series.name` | `"Futoshiki Large Print for Seniors"` |
 | `series.volume` | `1` |
 | `bisac` | `[{"code": "GAM015000", "label": "GAMES & ACTIVITIES / Puzzles / Logic"}, {"code": "GAM006000", "label": "GAMES & ACTIVITIES / Sudoku"}]` |
@@ -2509,7 +2509,7 @@ cp projects/kdp-puzzle-press/metadata/large_print_sudoku_grandparents.json \
 | `pricing.list_prices.amazon_com_USD` | `9.99` |
 | `page_count_target` | `108` |
 
-- [ ] **Step 3: Validate**
+- [x] **Step 3: Validate**
 
 ```bash
 python -c "
@@ -2521,7 +2521,7 @@ print('OK')
 "
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add projects/kdp-puzzle-press/metadata/futoshiki_seniors_v1.json
@@ -2530,13 +2530,13 @@ git commit -m "meta: KDP listing metadata for Futoshiki Seniors V1"
 
 ---
 
-## Phase 6 — Final QA + Release
+## Phase 6 â€” Final QA + Release
 
 These are manual steps the engineer performs after all code/content tasks pass. Not TDD, just a checklist.
 
 ### Task 6.1: Run the full test suite
 
-- [ ] **Step 1: Run all tests**
+- [x] **Step 1: Run all tests**
 
 ```bash
 cd projects/kdp-puzzle-press
@@ -2545,7 +2545,7 @@ pytest -v
 
 Expected: ALL tests PASS, no skips, no warnings about deprecated patterns.
 
-- [ ] **Step 2: Run linter / type checker if the project has one**
+- [x] **Step 2: Run linter / type checker if the project has one**
 
 Check `pyproject.toml` for `ruff`/`mypy`/`pylint`. If present:
 
@@ -2556,7 +2556,7 @@ mypy src
 
 Fix any new issues introduced by these changes.
 
-- [ ] **Step 3: Tag**
+- [x] **Step 3: Tag**
 
 ```bash
 git tag may-release-pair-qa-passed
@@ -2578,7 +2578,7 @@ This is not engineering work. The plan's job ends with the QA-passed tag; the hu
 7. Set "Adult content" = No
 8. Upload interior PDF (`output/<book_id>/interior.pdf`)
 9. Upload cover PDF (`output/<book_id>/cover.pdf`)
-10. Preview — confirm bleed, spine width, page count match what KDP calculated
+10. Preview â€” confirm bleed, spine width, page count match what KDP calculated
 11. Set US price $9.99 (royalty plan: 60% Standard, Expanded Distribution: Off)
 12. Submit for review
 
@@ -2588,17 +2588,17 @@ This is not engineering work. The plan's job ends with the QA-passed tag; the hu
 
 **Post-launch:**
 - Monitor Author Central for review notifications
-- Launch PPC at $10–20/day per book starting on live date
+- Launch PPC at $10â€“20/day per book starting on live date
 
 ---
 
 ## Spike Results (filled in during Phase 0)
 
 ```
-S1 outcome: (C) — No section-page rendering exists at all; _draw_text_page is used inline in build_sudoku_book for difficulty intros but there is no _draw_section_header, _draw_section_divider, or any public/private method for section divider pages.
-Decision: scope expands to full impl — Task 1.5 builds render_section_divider from scratch (estimated <1 day).
+S1 outcome: (C) â€” No section-page rendering exists at all; _draw_text_page is used inline in build_sudoku_book for difficulty intros but there is no _draw_section_header, _draw_section_divider, or any public/private method for section divider pages.
+Decision: scope expands to full impl â€” Task 1.5 builds render_section_divider from scratch (estimated <1 day).
 S2 outcome: TBD (write during execution)
-S3 outcome: (A) — four tiles distinguishable, palette pops, labels render in brass (quad non-bg ratios 15–21%, palette coverage 12.2%, 119 brass label pixels)
+S3 outcome: (A) â€” four tiles distinguishable, palette pops, labels render in brass (quad non-bg ratios 15â€“21%, palette coverage 12.2%, 119 brass label pixels)
 Decision: proceed with four-grid as planned
 ```
 
@@ -2608,13 +2608,13 @@ Decision: proceed with four-grid as planned
 
 All of the following true:
 
-- [ ] Phase 0 spikes ran, results recorded
-- [ ] All `pytest` tests pass (Phases 1, 2, 4.2, 5.2)
-- [ ] `output/fathers-day-variety-dad/interior.pdf` and `cover.pdf` exist and pass visual QA
-- [ ] `output/futoshiki-seniors-v1/interior.pdf` and `cover.pdf` exist and pass visual QA
-- [ ] `metadata/fathers_day_variety_dad.json` and `metadata/futoshiki_seniors_v1.json` parse as valid JSON and match the canonical schema
-- [ ] Page counts in target range (100–124, ideally 108)
-- [ ] No profanity in interior word-search fills
-- [ ] All 120 Futoshiki puzzles validate via `gen.validate(p)`
-- [ ] No duplicate fingerprints across the new books or against existing published catalog
-- [ ] Git tag `may-release-pair-qa-passed` set
+- [x] Phase 0 spikes ran, results recorded
+- [x] All `pytest` tests pass (Phases 1, 2, 4.2, 5.2)
+- [x] `output/fathers-day-variety-dad/interior.pdf` and `cover.pdf` exist and pass visual QA
+- [x] `output/futoshiki-seniors-v1/interior.pdf` and `cover.pdf` exist and pass visual QA
+- [x] `metadata/fathers_day_variety_dad.json` and `metadata/futoshiki_seniors_v1.json` parse as valid JSON and match the canonical schema
+- [x] Page counts in target range (100â€“124, ideally 108)
+- [x] No profanity in interior word-search fills
+- [x] All 120 Futoshiki puzzles validate via `gen.validate(p)`
+- [x] No duplicate fingerprints across the new books or against existing published catalog
+- [x] Git tag `may-release-pair-qa-passed` set

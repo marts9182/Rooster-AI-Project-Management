@@ -1,4 +1,4 @@
-# Pinterest API Pivot Implementation Plan
+﻿# Pinterest API Pivot Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -12,7 +12,7 @@
 
 ---
 
-## Commit 1 — `refactor(pinterest): replace Playwright poster with v5 API`
+## Commit 1 â€” `refactor(pinterest): replace Playwright poster with v5 API`
 
 ### Task 1: `api_oauth.js` + tests (TDD)
 
@@ -20,13 +20,13 @@
 - Create: `web.ui/backend/pinterest/api_oauth.js`
 - Test: `web.ui/backend/__tests__/pinterest/api_oauth.test.js`
 
-- [ ] **Step 1: Write the failing test file**
+- [x] **Step 1: Write the failing test file**
 
 Create `web.ui/backend/__tests__/pinterest/api_oauth.test.js`:
 
 ```javascript
 /**
- * Tests for pinterest/api_oauth.js — ensureFreshToken().
+ * Tests for pinterest/api_oauth.js â€” ensureFreshToken().
  *
  * Mirrors the Etsy oauth.test.js pattern (vi-mocked fetch) so no real
  * Pinterest endpoint is hit. msw is reserved for api_client.test.js where
@@ -194,7 +194,7 @@ describe('ensureFreshToken', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test — confirm it fails (no module yet)**
+- [x] **Step 2: Run the test â€” confirm it fails (no module yet)**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/api_oauth.test.js
@@ -202,7 +202,7 @@ cd web.ui/backend && npx vitest run __tests__/pinterest/api_oauth.test.js
 
 Expected: `Cannot find module '../../pinterest/api_oauth.js'` (or similar import error).
 
-- [ ] **Step 3: Implement `web.ui/backend/pinterest/api_oauth.js`**
+- [x] **Step 3: Implement `web.ui/backend/pinterest/api_oauth.js`**
 
 ```javascript
 /**
@@ -282,7 +282,7 @@ export async function ensureFreshToken({
   }
 
   if (resp.status === 401) {
-    throw new Error('Pinterest refresh token expired — re-auth required');
+    throw new Error('Pinterest refresh token expired â€” re-auth required');
   }
   if (!resp.ok) {
     const text = await resp.text();
@@ -349,7 +349,7 @@ export function readStoredToken(tokenStorePath) {
 }
 ```
 
-- [ ] **Step 4: Run the test — confirm green**
+- [x] **Step 4: Run the test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/api_oauth.test.js
@@ -365,13 +365,13 @@ Expected: `Test Files  1 passed (1)` with all 8 tests passing.
 - Create: `web.ui/backend/pinterest/api_client.js`
 - Test: `web.ui/backend/__tests__/pinterest/api_client.test.js`
 
-- [ ] **Step 1: Write the failing msw-backed test**
+- [x] **Step 1: Write the failing msw-backed test**
 
 Create `web.ui/backend/__tests__/pinterest/api_client.test.js`:
 
 ```javascript
 /**
- * Tests for pinterest/api_client.js — PinterestApiClient.
+ * Tests for pinterest/api_client.js â€” PinterestApiClient.
  *
  * Uses msw to intercept https://api.pinterest.com/v5/* so no real network
  * call ever happens. Each test seeds a tokenStore so the client doesn't
@@ -423,7 +423,7 @@ beforeEach(async () => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pin-client-'));
   tokenPath = path.join(tmpDir, 'pinterest_token.json');
   imagePath = path.join(tmpDir, 'pin.png');
-  // 4-byte PNG-ish payload is enough — we only need readFileSync to succeed.
+  // 4-byte PNG-ish payload is enough â€” we only need readFileSync to succeed.
   fs.writeFileSync(imagePath, Buffer.from([0x89, 0x50, 0x4e, 0x47]));
   vi.spyOn(Date, 'now').mockReturnValue(NOW_MS);
 });
@@ -611,7 +611,7 @@ describe('getTokenStatus', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test — confirm it fails (no module yet)**
+- [x] **Step 2: Run the test â€” confirm it fails (no module yet)**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/api_client.test.js
@@ -619,7 +619,7 @@ cd web.ui/backend && npx vitest run __tests__/pinterest/api_client.test.js
 
 Expected: `Cannot find module '../../pinterest/api_client.js'`.
 
-- [ ] **Step 3: Implement `web.ui/backend/pinterest/api_client.js`**
+- [x] **Step 3: Implement `web.ui/backend/pinterest/api_client.js`**
 
 ```javascript
 /**
@@ -710,9 +710,9 @@ export class PinterestApiClient {
 
   /**
    * Call the API with full retry behavior.
-   *   - 401 → force refresh and retry once
-   *   - 429 → sleep `backoffMs[attempt]` and retry
-   *   - 5xx → retry up to 3 attempts total
+   *   - 401 â†’ force refresh and retry once
+   *   - 429 â†’ sleep `backoffMs[attempt]` and retry
+   *   - 5xx â†’ retry up to 3 attempts total
    *
    * @param {string} method
    * @param {string} path  e.g. '/v5/pins'
@@ -823,7 +823,7 @@ function forceTokenExpiry(tokenStorePath) {
 }
 ```
 
-- [ ] **Step 4: Run the test — confirm green**
+- [x] **Step 4: Run the test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/api_client.test.js
@@ -839,11 +839,11 @@ Expected: all 8 tests pass.
 - Modify: `web.ui/backend/pinterest/poster.js` (full rewrite)
 - Modify: `web.ui/backend/__tests__/pinterest/poster.test.js` (full rewrite)
 
-- [ ] **Step 1: Replace `__tests__/pinterest/poster.test.js` with the API-based version**
+- [x] **Step 1: Replace `__tests__/pinterest/poster.test.js` with the API-based version**
 
 ```javascript
 /**
- * Tests for pinterest/poster.js — runOnce() with an injected fake apiClient.
+ * Tests for pinterest/poster.js â€” runOnce() with an injected fake apiClient.
  *
  * No real Pinterest API calls fire; tests pass an `apiClient` stub that
  * resolves/rejects createPin() synchronously.
@@ -906,7 +906,7 @@ function fakeApiClient(overrides = {}) {
   };
 }
 
-describe('runOnce — happy path', () => {
+describe('runOnce â€” happy path', () => {
   it('calls apiClient.createPin with the row payload and marks posted', async () => {
     const img = path.join(tmpRoot, 'pin.png');
     await fakeImage(img);
@@ -951,7 +951,7 @@ describe('runOnce — happy path', () => {
   });
 });
 
-describe('runOnce — error paths', () => {
+describe('runOnce â€” error paths', () => {
   it('marks the row failed when image_path is missing', async () => {
     const id = makePendingRow(path.join(tmpRoot, 'missing.png'));
     const api = fakeApiClient();
@@ -1000,7 +1000,7 @@ describe('runOnce — error paths', () => {
   });
 });
 
-describe('runOnce — nothing due', () => {
+describe('runOnce â€” nothing due', () => {
   it('returns idle with no api calls when no rows are due', async () => {
     const api = fakeApiClient();
     const result = await runOnce({ apiClient: api });
@@ -1031,27 +1031,27 @@ describe('msUntilNextPending', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test — confirm it fails (old poster.js still imports login.js)**
+- [x] **Step 2: Run the test â€” confirm it fails (old poster.js still imports login.js)**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/poster.test.js
 ```
 
-Expected: tests fail because `runOnce` no longer accepts `apiClient`. That's fine — we are rewriting it.
+Expected: tests fail because `runOnce` no longer accepts `apiClient`. That's fine â€” we are rewriting it.
 
-- [ ] **Step 3: Replace `web.ui/backend/pinterest/poster.js` wholesale**
+- [x] **Step 3: Replace `web.ui/backend/pinterest/poster.js` wholesale**
 
 ```javascript
 /**
- * Pinterest poster worker — API edition.
+ * Pinterest poster worker â€” API edition.
  *
  * `runOnce({apiClient})` dequeues one pending row, reads its PNG, and calls
- * `apiClient.createPin(...)`. Success → markPosted + history row; failure →
+ * `apiClient.createPin(...)`. Success â†’ markPosted + history row; failure â†’
  * markFailed + history row.
  *
  * `startPosterWorker({apiClient, intervalMs})` is a sleep-until-next loop:
  * computes msUntilNextPending and schedules the next runOnce. On consecutive
- * failures, the backoff ladder kicks in (1m → 5m → 30m → pauseQueue).
+ * failures, the backoff ladder kicks in (1m â†’ 5m â†’ 30m â†’ pauseQueue).
  *
  * No Playwright. No browser. The api_oauth + api_client layer handles auth.
  *
@@ -1099,7 +1099,7 @@ async function resolveBoardId(apiClient) {
   }
   const boards = await apiClient.listBoards();
   if (!boards.length) {
-    throw new Error('No Pinterest boards available — create one at pinterest.com first');
+    throw new Error('No Pinterest boards available â€” create one at pinterest.com first');
   }
   return boards[0].id;
 }
@@ -1258,7 +1258,7 @@ export function _resetPosterStateForTests() {
 }
 ```
 
-- [ ] **Step 4: Run the poster test — confirm green**
+- [x] **Step 4: Run the poster test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/poster.test.js
@@ -1276,7 +1276,7 @@ Expected: all 7 tests pass.
 - Modify: `web.ui/backend/pinterest/routes.js` (remove `POST /login` block)
 - Modify: `web.ui/backend/__tests__/pinterest/routes.test.js` (remove `POST /api/pinterest/login` describe block)
 
-- [ ] **Step 1: Delete the login module and its test**
+- [x] **Step 1: Delete the login module and its test**
 
 ```bash
 git rm web.ui/backend/pinterest/login.js
@@ -1285,13 +1285,13 @@ git rm web.ui/backend/__tests__/pinterest/login.test.js
 
 Expected: both files removed, staged for commit.
 
-- [ ] **Step 2: Strip the login route from `routes.js`**
+- [x] **Step 2: Strip the login route from `routes.js`**
 
-Edit `web.ui/backend/pinterest/routes.js` — delete the entire `router.post('/login', ...)` block (lines starting at `router.post('/login', async (_req, res) => {` through its closing `});`). Also delete the corresponding mention in the file's header comment:
+Edit `web.ui/backend/pinterest/routes.js` â€” delete the entire `router.post('/login', ...)` block (lines starting at `router.post('/login', async (_req, res) => {` through its closing `});`). Also delete the corresponding mention in the file's header comment:
 
 Old header comment (delete the matching lines):
 ```
- *   POST /api/pinterest/login              — fire-and-forget visible Playwright login
+ *   POST /api/pinterest/login              â€” fire-and-forget visible Playwright login
 ```
 
 ```
@@ -1305,14 +1305,14 @@ Old header comment (delete the matching lines):
 
 Final `routes.js` should retain: `queue`, `history`, `pause`, `resume`, `queue/:id/cancel`, `queue/:id` (PUT). Nothing else.
 
-- [ ] **Step 3: Strip the login describe block from `routes.test.js`**
+- [x] **Step 3: Strip the login describe block from `routes.test.js`**
 
 Edit `web.ui/backend/__tests__/pinterest/routes.test.js`:
 
 1. Delete the entire `describe('POST /api/pinterest/login', () => { ... })` block (from `describe('POST /api/pinterest/login'` through the matching closing `});`).
 2. In the `afterEach` block, delete the line `vi.doUnmock('../../pinterest/login.js');` since no test mocks login.js any more.
 
-- [ ] **Step 4: Run the routes test — confirm green**
+- [x] **Step 4: Run the routes test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
@@ -1329,7 +1329,7 @@ Expected: all remaining tests pass.
 - Modify: `web.ui/backend/pinterest/index.js` (forward apiClient through mount)
 - Modify: `web.ui/backend/__tests__/pinterest/routes.test.js` (add three new describe blocks)
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `web.ui/backend/__tests__/pinterest/routes.test.js` (after the existing `PUT /api/pinterest/queue/:id` block):
 
@@ -1408,7 +1408,7 @@ describe('GET /api/pinterest/token-status', () => {
 });
 ```
 
-- [ ] **Step 2: Run the new tests — confirm they fail**
+- [x] **Step 2: Run the new tests â€” confirm they fail**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
@@ -1416,7 +1416,7 @@ cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
 
 Expected: three new tests fail with 404 (route absent) and `installPinterestModule` doesn't accept a second arg.
 
-- [ ] **Step 3: Update `web.ui/backend/pinterest/routes.js` to expose a factory + add three routes**
+- [x] **Step 3: Update `web.ui/backend/pinterest/routes.js` to expose a factory + add three routes**
 
 Replace the existing module-level `export const router = express.Router();` and its handlers with a factory function that accepts an `apiClient`:
 
@@ -1424,15 +1424,15 @@ Replace the existing module-level `export const router = express.Router();` and 
 /**
  * Pinterest REST routes.
  *
- *   GET  /api/pinterest/queue              — pending+posting+paused rows
- *   GET  /api/pinterest/history?limit=N    — most recent N history rows
- *   POST /api/pinterest/pause              — flip all pending → paused
- *   POST /api/pinterest/resume             — flip all paused  → pending
- *   POST /api/pinterest/queue/:id/cancel   — remove a pending/paused row
- *   PUT  /api/pinterest/queue/:id          — patch title/description/scheduled_for
- *   GET  /api/pinterest/whoami             — apiClient.getUserAccount()
- *   GET  /api/pinterest/boards             — apiClient.listBoards()
- *   GET  /api/pinterest/token-status       — apiClient.getTokenStatus()
+ *   GET  /api/pinterest/queue              â€” pending+posting+paused rows
+ *   GET  /api/pinterest/history?limit=N    â€” most recent N history rows
+ *   POST /api/pinterest/pause              â€” flip all pending â†’ paused
+ *   POST /api/pinterest/resume             â€” flip all paused  â†’ pending
+ *   POST /api/pinterest/queue/:id/cancel   â€” remove a pending/paused row
+ *   PUT  /api/pinterest/queue/:id          â€” patch title/description/scheduled_for
+ *   GET  /api/pinterest/whoami             â€” apiClient.getUserAccount()
+ *   GET  /api/pinterest/boards             â€” apiClient.listBoards()
+ *   GET  /api/pinterest/token-status       â€” apiClient.getTokenStatus()
  *
  * SSE events emitted on state changes:
  *   - pinterest:paused
@@ -1571,12 +1571,12 @@ export function buildRouter(opts = {}) {
   return router;
 }
 
-// Back-compat default router (no apiClient) — kept so existing imports of
+// Back-compat default router (no apiClient) â€” kept so existing imports of
 // `router` keep working until the migration lands.
 export const router = buildRouter();
 ```
 
-- [ ] **Step 4: Update `web.ui/backend/pinterest/index.js` to forward the apiClient**
+- [x] **Step 4: Update `web.ui/backend/pinterest/index.js` to forward the apiClient**
 
 ```javascript
 /**
@@ -1605,7 +1605,7 @@ export function installPinterestModule(app, opts = {}) {
 }
 ```
 
-- [ ] **Step 5: Run the routes test — confirm green**
+- [x] **Step 5: Run the routes test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
@@ -1618,20 +1618,20 @@ Expected: every test (existing + 4 new) passes.
 ### Task 6: Rename + rewrite the end-to-end fake-driver test
 
 **Files:**
-- Rename: `web.ui/backend/__tests__/pinterest/e2e_fake_driver.test.js` → `web.ui/backend/__tests__/pinterest/e2e_api.test.js`
+- Rename: `web.ui/backend/__tests__/pinterest/e2e_fake_driver.test.js` â†’ `web.ui/backend/__tests__/pinterest/e2e_api.test.js`
 - Rewrite the renamed file
 
-- [ ] **Step 1: git mv the file**
+- [x] **Step 1: git mv the file**
 
 ```bash
 git mv web.ui/backend/__tests__/pinterest/e2e_fake_driver.test.js web.ui/backend/__tests__/pinterest/e2e_api.test.js
 ```
 
-- [ ] **Step 2: Replace the file's contents with the API-driven version**
+- [x] **Step 2: Replace the file's contents with the API-driven version**
 
 ```javascript
 /**
- * End-to-end smoke for the Pinterest pipeline — API edition.
+ * End-to-end smoke for the Pinterest pipeline â€” API edition.
  *
  * Seeds a kdp_books row with on-disk cover + 5 interior PNGs, enqueues the
  * full 6-pin bundle via enqueuePinsForBook, then drives runOnce() six times
@@ -1725,7 +1725,7 @@ describe('end-to-end with fake apiClient', () => {
         expect(result.action).toBe('posted');
       }
 
-      // Verify exactly 6 createPin calls — no real API.
+      // Verify exactly 6 createPin calls â€” no real API.
       expect(fakeApi.createPin).toHaveBeenCalledTimes(6);
       // listBoards is short-circuited by PINTEREST_DEFAULT_BOARD_ID env, so
       // it should not be called.
@@ -1765,7 +1765,7 @@ describe('end-to-end with fake apiClient', () => {
 });
 ```
 
-- [ ] **Step 3: Run the renamed test — confirm green**
+- [x] **Step 3: Run the renamed test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/e2e_api.test.js
@@ -1778,11 +1778,11 @@ Expected: 1 test passes, 6 createPin invocations.
 ### Task 7: Module surface cleanup + delete `.pinterest-profile/` + gitignore
 
 **Files:**
-- Modify: `web.ui/backend/pinterest/index.js` (already done in Task 5 — verify exports)
+- Modify: `web.ui/backend/pinterest/index.js` (already done in Task 5 â€” verify exports)
 - Modify: `.gitignore` (remove `.pinterest-profile/` line)
 - Delete: `web.ui/backend/.pinterest-profile/` directory if present
 
-- [ ] **Step 1: Verify `index.js` no longer exports anything from login.js**
+- [x] **Step 1: Verify `index.js` no longer exports anything from login.js**
 
 ```bash
 grep -n "login" web.ui/backend/pinterest/index.js || echo "no login references"
@@ -1790,7 +1790,7 @@ grep -n "login" web.ui/backend/pinterest/index.js || echo "no login references"
 
 Expected: `no login references`. (Task 5 already removed them.)
 
-- [ ] **Step 2: Edit `.gitignore` — remove the `.pinterest-profile/` line**
+- [x] **Step 2: Edit `.gitignore` â€” remove the `.pinterest-profile/` line**
 
 Open `.gitignore` and delete the line:
 ```
@@ -1801,11 +1801,11 @@ Keep `output/pinterest/` (still used for pin PNGs).
 
 The block should now read:
 ```
-# Plan E — Pinterest automation
+# Plan E â€” Pinterest automation
 output/pinterest/
 ```
 
-- [ ] **Step 3: Remove the persistent profile dir if it exists**
+- [x] **Step 3: Remove the persistent profile dir if it exists**
 
 Run from the repo root:
 
@@ -1815,7 +1815,7 @@ node -e "require('node:fs').rmSync('web.ui/backend/.pinterest-profile', {recursi
 
 Expected: `removed (or absent)`. The `force: true` flag makes it a no-op when the directory doesn't exist.
 
-- [ ] **Step 4: Run the entire pinterest test suite to catch regressions**
+- [x] **Step 4: Run the entire pinterest test suite to catch regressions**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest
@@ -1832,7 +1832,7 @@ Expected: all four pinterest test files pass:
 
 ### Task 8: Commit 1
 
-- [ ] **Step 1: Stage every Commit 1 change**
+- [x] **Step 1: Stage every Commit 1 change**
 
 ```bash
 git add web.ui/backend/pinterest/api_oauth.js \
@@ -1853,22 +1853,22 @@ git status
 
 Expected: every file above is staged; `login.js` and `login.test.js` are staged as deleted; `e2e_fake_driver.test.js` is staged as a rename to `e2e_api.test.js`.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
 refactor(pinterest): replace Playwright poster with v5 API
 
-Pinterest trial access was approved 2026-05-27 — the Playwright DOM-
+Pinterest trial access was approved 2026-05-27 â€” the Playwright DOM-
 automation poster is now strictly worse than direct v5 API calls. This
 commit removes the Playwright path entirely:
 
-- Add api_oauth.js — 30-day token refresh with 5-minute skew + first-run
+- Add api_oauth.js â€” 30-day token refresh with 5-minute skew + first-run
   env-var bootstrap. Mirrors etsy/oauth.js with Basic auth.
-- Add api_client.js — Pinterest v5 wrapper. createPin uses base64 inline
+- Add api_client.js â€” Pinterest v5 wrapper. createPin uses base64 inline
   upload; 401 forces refresh+retry once; 429 backs off through the 60s/
   5m/30m ladder; 5xx retries up to 3 times. msw-mocked tests.
-- Rewrite poster.js — runOnce() now takes an apiClient and calls
+- Rewrite poster.js â€” runOnce() now takes an apiClient and calls
   createPin instead of driving a browser. Backoff supervisor loop
   unchanged.
 - Delete login.js + login.test.js (no more visible Chromium window).
@@ -1889,7 +1889,7 @@ Expected: commit lands with the message above.
 
 ---
 
-## Commit 2 — `feat(pinterest): API-based settings UI + help article`
+## Commit 2 â€” `feat(pinterest): API-based settings UI + help article`
 
 ### Task 9: Extend `src/api/pinterest.ts` + add tests
 
@@ -1897,7 +1897,7 @@ Expected: commit lands with the message above.
 - Modify: `web.ui/frontend-react/src/api/pinterest.ts`
 - Modify: `web.ui/frontend-react/src/__tests__/api-pinterest.test.ts`
 
-- [ ] **Step 1: Append the new test blocks to `api-pinterest.test.ts`**
+- [x] **Step 1: Append the new test blocks to `api-pinterest.test.ts`**
 
 Add to the imports at the top:
 
@@ -1985,7 +1985,7 @@ describe('refreshToken', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test — confirm it fails**
+- [x] **Step 2: Run the test â€” confirm it fails**
 
 ```bash
 cd web.ui/frontend-react && npx vitest run src/__tests__/api-pinterest.test.ts
@@ -1993,7 +1993,7 @@ cd web.ui/frontend-react && npx vitest run src/__tests__/api-pinterest.test.ts
 
 Expected: `'getWhoami' is not exported from '../api/pinterest'` etc.
 
-- [ ] **Step 3: Rewrite `web.ui/frontend-react/src/api/pinterest.ts`**
+- [x] **Step 3: Rewrite `web.ui/frontend-react/src/api/pinterest.ts`**
 
 Append the new types + functions and delete `startLogin`. The full file:
 
@@ -2001,20 +2001,20 @@ Append the new types + functions and delete `startLogin`. The full file:
 /**
  * Typed fetch wrappers for the /api/pinterest/* backend routes.
  *
- *   listQueue()                  → GET    /api/pinterest/queue
- *   listHistory(limit?)          → GET    /api/pinterest/history?limit=N
- *   pauseQueue()                 → POST   /api/pinterest/pause
- *   resumeQueue()                → POST   /api/pinterest/resume
- *   cancelQueueRow(id)           → POST   /api/pinterest/queue/:id/cancel
- *   updateQueueRow(id, patch)    → PUT    /api/pinterest/queue/:id
- *   getWhoami()                  → GET    /api/pinterest/whoami
- *   listBoards()                 → GET    /api/pinterest/boards
- *   getTokenStatus()             → GET    /api/pinterest/token-status
- *   refreshToken()               → POST   /api/pinterest/refresh
+ *   listQueue()                  â†’ GET    /api/pinterest/queue
+ *   listHistory(limit?)          â†’ GET    /api/pinterest/history?limit=N
+ *   pauseQueue()                 â†’ POST   /api/pinterest/pause
+ *   resumeQueue()                â†’ POST   /api/pinterest/resume
+ *   cancelQueueRow(id)           â†’ POST   /api/pinterest/queue/:id/cancel
+ *   updateQueueRow(id, patch)    â†’ PUT    /api/pinterest/queue/:id
+ *   getWhoami()                  â†’ GET    /api/pinterest/whoami
+ *   listBoards()                 â†’ GET    /api/pinterest/boards
+ *   getTokenStatus()             â†’ GET    /api/pinterest/token-status
+ *   refreshToken()               â†’ POST   /api/pinterest/refresh
  *
  * All functions throw an `ApiError` (re-exported from ./kdp) with `.status`
  * and `.body` on non-2xx. The backend wraps list responses in `{queue: [...]}`
- * / `{history: [...]}` / `{boards: [...]}` envelopes — those are unwrapped
+ * / `{history: [...]}` / `{boards: [...]}` envelopes â€” those are unwrapped
  * here so callers see plain arrays.
  *
  * Tests stub `globalThis.fetch`.
@@ -2162,7 +2162,7 @@ export async function refreshToken(): Promise<PinterestTokenStatus> {
 export { ApiError };
 ```
 
-- [ ] **Step 4: Add the matching backend `POST /refresh` route**
+- [x] **Step 4: Add the matching backend `POST /refresh` route**
 
 The `refreshToken()` frontend helper hits a new backend route. Edit `web.ui/backend/pinterest/routes.js` and add inside `buildRouter()` before the `return router;`:
 
@@ -2171,7 +2171,7 @@ The `refreshToken()` frontend helper hits a new backend route. Edit `web.ui/back
     if (!apiClient) return res.status(503).json({ error: 'api_client_unavailable' });
     try {
       // Force a refresh by zeroing expires_at then calling getTokenStatus
-      // — which triggers ensureFreshToken on its next call via createPin /
+      // â€” which triggers ensureFreshToken on its next call via createPin /
       // listBoards. Here we explicitly invoke ensureFreshToken via the
       // apiClient's exposed _refresh hook.
       await apiClient._forceRefresh();
@@ -2229,7 +2229,7 @@ describe('POST /api/pinterest/refresh', () => {
   });
 
   it('surfaces a 401 when the refresh-token is expired', async () => {
-    const err = new Error('Pinterest refresh token expired — re-auth required');
+    const err = new Error('Pinterest refresh token expired â€” re-auth required');
     err.status = 401;
     const api = {
       _forceRefresh: vi.fn(async () => { throw err; }),
@@ -2244,7 +2244,7 @@ describe('POST /api/pinterest/refresh', () => {
 });
 ```
 
-- [ ] **Step 5: Run the frontend test — confirm green**
+- [x] **Step 5: Run the frontend test â€” confirm green**
 
 ```bash
 cd web.ui/frontend-react && npx vitest run src/__tests__/api-pinterest.test.ts
@@ -2252,7 +2252,7 @@ cd web.ui/frontend-react && npx vitest run src/__tests__/api-pinterest.test.ts
 
 Expected: every test passes (existing + 8 new for getWhoami/listBoards/getTokenStatus/refreshToken).
 
-- [ ] **Step 6: Run the backend routes test — confirm green**
+- [x] **Step 6: Run the backend routes test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/pinterest/routes.test.js
@@ -2268,7 +2268,7 @@ Expected: every test passes including the two new refresh tests.
 - Modify: `web.ui/frontend-react/src/components/PinterestSettings.tsx`
 - Modify: `web.ui/frontend-react/src/__tests__/PinterestSettings.test.tsx`
 
-- [ ] **Step 1: Replace `PinterestSettings.test.tsx` with the API-edition test**
+- [x] **Step 1: Replace `PinterestSettings.test.tsx` with the API-edition test**
 
 ```typescript
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -2362,7 +2362,7 @@ describe('<PinterestSettings />', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/pinterest/boards');
   });
 
-  it('renders the "Connected" chip when token-status returns connected=true and ≥7d remaining', async () => {
+  it('renders the "Connected" chip when token-status returns connected=true and â‰¥7d remaining', async () => {
     render(<PinterestSettings queue={[]} onChanged={vi.fn()} />);
     await waitFor(() => expect(screen.getByText(/Connected as @pocketroosterpress/i)).toBeInTheDocument());
     expect(screen.getByText(/Connected/i).className).toMatch(/chip-ok/);
@@ -2450,7 +2450,7 @@ describe('<PinterestSettings />', () => {
 });
 ```
 
-- [ ] **Step 2: Run the test — confirm it fails (old component still has Sign-in button)**
+- [x] **Step 2: Run the test â€” confirm it fails (old component still has Sign-in button)**
 
 ```bash
 cd web.ui/frontend-react && npx vitest run src/__tests__/PinterestSettings.test.tsx
@@ -2458,7 +2458,7 @@ cd web.ui/frontend-react && npx vitest run src/__tests__/PinterestSettings.test.
 
 Expected: tests fail because the component doesn't render Connected/Refresh/Default-board controls yet.
 
-- [ ] **Step 3: Rewrite `web.ui/frontend-react/src/components/PinterestSettings.tsx`**
+- [x] **Step 3: Rewrite `web.ui/frontend-react/src/components/PinterestSettings.tsx`**
 
 ```typescript
 import { useEffect, useState } from 'react';
@@ -2523,7 +2523,7 @@ export default function PinterestSettings({ queue, onChanged }: Props) {
         const u = await getWhoami();
         if (!cancelled) setUser(u);
       } catch {
-        // Leave user=null — chip falls back to "Not connected".
+        // Leave user=null â€” chip falls back to "Not connected".
       }
     }
     void load();
@@ -2545,7 +2545,7 @@ export default function PinterestSettings({ queue, onChanged }: Props) {
   }
 
   function formatExpires(): string {
-    if (!status?.expires_at) return '—';
+    if (!status?.expires_at) return 'â€”';
     const d = new Date(status.expires_at);
     const days = Math.round((d.getTime() - Date.now()) / 86400_000);
     return `${d.toISOString().slice(0, 10)} (${days} days)`;
@@ -2611,9 +2611,9 @@ export default function PinterestSettings({ queue, onChanged }: Props) {
       <div className="pin-settings-row">
         <div>
           <span className={chipClass()}>{chipLabel()}</span>
-          <span className="muted"> · Token expires: {formatExpires()}</span>
+          <span className="muted"> Â· Token expires: {formatExpires()}</span>
           {lastRefreshAt && (
-            <span className="muted"> · Last refresh: {lastRefreshAt}</span>
+            <span className="muted"> Â· Last refresh: {lastRefreshAt}</span>
           )}
         </div>
         <div className="pin-settings-actions">
@@ -2644,7 +2644,7 @@ export default function PinterestSettings({ queue, onChanged }: Props) {
 
       <div className="pin-settings-row">
         <div>
-          <strong>{pendingCount}</strong> pending ·{' '}
+          <strong>{pendingCount}</strong> pending Â·{' '}
           <strong>{pausedCount}</strong> paused
         </div>
         <div className="pin-settings-actions">
@@ -2665,7 +2665,7 @@ export default function PinterestSettings({ queue, onChanged }: Props) {
       </div>
 
       <p className="muted">
-        Posting cadence: 3–5 pins/day between 09:00 and 21:00 in your
+        Posting cadence: 3â€“5 pins/day between 09:00 and 21:00 in your
         profile time zone. Edit the time zone on /profile to shift the
         window.
       </p>
@@ -2675,7 +2675,7 @@ export default function PinterestSettings({ queue, onChanged }: Props) {
 }
 ```
 
-- [ ] **Step 4: Run the test — confirm green**
+- [x] **Step 4: Run the test â€” confirm green**
 
 ```bash
 cd web.ui/frontend-react && npx vitest run src/__tests__/PinterestSettings.test.tsx
@@ -2688,17 +2688,17 @@ Expected: all 10 tests pass.
 ### Task 11: Rename help article + update help-articles test
 
 **Files:**
-- Rename: `web.ui/backend/help/pinterest_first_login.md` → `web.ui/backend/help/pinterest_api_setup.md`
+- Rename: `web.ui/backend/help/pinterest_first_login.md` â†’ `web.ui/backend/help/pinterest_api_setup.md`
 - Replace contents of the renamed file
 - Modify: `web.ui/backend/__tests__/help_articles.test.js` (update ARTICLES entry)
 
-- [ ] **Step 1: git mv the article**
+- [x] **Step 1: git mv the article**
 
 ```bash
 git mv web.ui/backend/help/pinterest_first_login.md web.ui/backend/help/pinterest_api_setup.md
 ```
 
-- [ ] **Step 2: Replace the file's contents per spec §5.2**
+- [x] **Step 2: Replace the file's contents per spec Â§5.2**
 
 Overwrite `web.ui/backend/help/pinterest_api_setup.md` with:
 
@@ -2726,17 +2726,17 @@ PINTEREST_DEFAULT_BOARD_ID=<optional; auto-detected if missing>
 1. Visit https://developers.pinterest.com/apps/
 2. Open your app (Pocket Rooster Press Pin Bot)
 3. Under "Configuration":
-    - App ID is shown at the top — that's `PINTEREST_APP_ID`
-    - "App secret key" — that's `PINTEREST_APP_SECRET`
+    - App ID is shown at the top â€” that's `PINTEREST_APP_ID`
+    - "App secret key" â€” that's `PINTEREST_APP_SECRET`
 4. Under "Trial access":
-    - "Generate access token" → that's `PINTEREST_ACCESS_TOKEN`
-    - The refresh token is returned alongside — that's `PINTEREST_REFRESH_TOKEN`
+    - "Generate access token" â†’ that's `PINTEREST_ACCESS_TOKEN`
+    - The refresh token is returned alongside â€” that's `PINTEREST_REFRESH_TOKEN`
 5. Restart the dashboard (Quit + relaunch from the tray menu)
 
 ## Verifying
 
 Open /pinterest in the dashboard, scroll to Settings. The status chip
-should say "✓ Connected as @<your-handle>". Click "Test connection" to
+should say "âœ“ Connected as @<your-handle>". Click "Test connection" to
 double-check.
 
 ## When the refresh fails
@@ -2747,7 +2747,7 @@ Pinterest revoked them). Regenerate from the dev portal and re-paste
 into .env.local.
 ````
 
-- [ ] **Step 3: Update `__tests__/help_articles.test.js` ARTICLES entry**
+- [x] **Step 3: Update `__tests__/help_articles.test.js` ARTICLES entry**
 
 Replace the entry:
 
@@ -2763,7 +2763,7 @@ with:
 
 The signature phrase `Pinterest API` appears in the article's H1 (`# Pinterest API Setup`).
 
-- [ ] **Step 4: If any frontend code references the old help slug, update it**
+- [x] **Step 4: If any frontend code references the old help slug, update it**
 
 ```bash
 grep -rn "pinterest_first_login" web.ui/ || echo "no references remain"
@@ -2771,7 +2771,7 @@ grep -rn "pinterest_first_login" web.ui/ || echo "no references remain"
 
 Expected: `no references remain`. If anything matches, change those slugs to `pinterest_api_setup`.
 
-- [ ] **Step 5: Run the help test — confirm green**
+- [x] **Step 5: Run the help test â€” confirm green**
 
 ```bash
 cd web.ui/backend && npx vitest run __tests__/help_articles.test.js
@@ -2779,7 +2779,7 @@ cd web.ui/backend && npx vitest run __tests__/help_articles.test.js
 
 Expected: all 8 article tests pass.
 
-- [ ] **Step 6: Run the full backend + frontend test suites for a final regression sweep**
+- [x] **Step 6: Run the full backend + frontend test suites for a final regression sweep**
 
 ```bash
 cd web.ui/backend && npx vitest run
@@ -2792,7 +2792,7 @@ Expected: every test passes in both packages.
 
 ### Task 12: Commit 2
 
-- [ ] **Step 1: Stage every Commit 2 change**
+- [x] **Step 1: Stage every Commit 2 change**
 
 ```bash
 git add web.ui/frontend-react/src/api/pinterest.ts \
@@ -2809,7 +2809,7 @@ git status
 
 Expected: every file above is staged; `pinterest_first_login.md` is staged as a rename to `pinterest_api_setup.md`.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -2824,9 +2824,9 @@ Wire Commit 1's new backend endpoints into the dashboard:
   red based on token-status), [Test connection] + [Refresh token now]
   buttons, and a default-board <select> populated from /boards. Pause/
   resume queue toggle stays put.
-- Add POST /api/pinterest/refresh — forces ensureFreshToken via a new
+- Add POST /api/pinterest/refresh â€” forces ensureFreshToken via a new
   PinterestApiClient._forceRefresh method.
-- Rename help/pinterest_first_login.md → pinterest_api_setup.md with
+- Rename help/pinterest_first_login.md â†’ pinterest_api_setup.md with
   new env-var / dev-portal copy.
 - Update help_articles.test.js ARTICLES entry to match the new slug
   and signature phrase.
@@ -2842,16 +2842,16 @@ Expected: commit lands with the message above.
 
 After both commits land, every box below should be checked:
 
-- [ ] `cd web.ui/backend && npx vitest run` — all backend tests green
-- [ ] `cd web.ui/frontend-react && npx vitest run` — all frontend tests green
-- [ ] `grep -rn "pinterest/login" web.ui/ || echo ok` — prints `ok` (no stale imports)
-- [ ] `grep -rn "playwright" web.ui/backend/pinterest/ || echo ok` — prints `ok`
-- [ ] `grep -rn "pinterest_first_login" web.ui/ || echo ok` — prints `ok`
-- [ ] `.gitignore` no longer mentions `.pinterest-profile/`
-- [ ] `web.ui/backend/.pinterest-profile/` does not exist on disk
-- [ ] `web.ui/backend/pinterest/login.js` does not exist on disk
-- [ ] `web.ui/backend/__tests__/pinterest/login.test.js` does not exist on disk
-- [ ] `git log --oneline -5` shows the two new commits with the expected subjects
+- [x] `cd web.ui/backend && npx vitest run` â€” all backend tests green
+- [x] `cd web.ui/frontend-react && npx vitest run` â€” all frontend tests green
+- [x] `grep -rn "pinterest/login" web.ui/ || echo ok` â€” prints `ok` (no stale imports)
+- [x] `grep -rn "playwright" web.ui/backend/pinterest/ || echo ok` â€” prints `ok`
+- [x] `grep -rn "pinterest_first_login" web.ui/ || echo ok` â€” prints `ok`
+- [x] `.gitignore` no longer mentions `.pinterest-profile/`
+- [x] `web.ui/backend/.pinterest-profile/` does not exist on disk
+- [x] `web.ui/backend/pinterest/login.js` does not exist on disk
+- [x] `web.ui/backend/__tests__/pinterest/login.test.js` does not exist on disk
+- [x] `git log --oneline -5` shows the two new commits with the expected subjects
 
 ---
 
@@ -2859,15 +2859,15 @@ After both commits land, every box below should be checked:
 
 | Spec section | Covered by |
 |---|---|
-| §3.1 Backend module map | T1 (api_oauth.js), T2 (api_client.js), T3 (poster.js rewrite), T4 (login.js deletion + login route removal), T5 (whoami/boards/token-status routes), T7 (index.js surface) |
-| §3.2 Token storage shape (`{access_token, refresh_token, expires_at}` ISO) | T1 implementation + tests |
-| §3.3 Env vars | T1 (bootstrap), T3 (PINTEREST_DEFAULT_BOARD_ID), spec §5.2 help article |
-| §3.4 Final route shape | T4 (delete /login), T5 (/whoami, /boards, /token-status), T9 (/refresh) |
-| §4.1 Posting flow | T3 poster.js + e2e_api.test.js (T6) |
-| §4.2 Token-refresh flow | T1 + T2 (401-retry + force-refresh) |
-| §4.3 First-run bootstrap | T1 last three tests |
-| §5.1 PinterestSettings UI | T10 component + test |
-| §5.2 Help article | T11 rename + content + ARTICLES update |
-| §6 Test matrix | T1, T2, T3, T5, T6, T9, T10, T11 |
-| §7 Errors / security | PinterestApiError class (T2); token gitignored via existing `data/` rule; secrets only in env (T1) |
-| §8 Migration plan (two commits) | T8 + T12 |
+| Â§3.1 Backend module map | T1 (api_oauth.js), T2 (api_client.js), T3 (poster.js rewrite), T4 (login.js deletion + login route removal), T5 (whoami/boards/token-status routes), T7 (index.js surface) |
+| Â§3.2 Token storage shape (`{access_token, refresh_token, expires_at}` ISO) | T1 implementation + tests |
+| Â§3.3 Env vars | T1 (bootstrap), T3 (PINTEREST_DEFAULT_BOARD_ID), spec Â§5.2 help article |
+| Â§3.4 Final route shape | T4 (delete /login), T5 (/whoami, /boards, /token-status), T9 (/refresh) |
+| Â§4.1 Posting flow | T3 poster.js + e2e_api.test.js (T6) |
+| Â§4.2 Token-refresh flow | T1 + T2 (401-retry + force-refresh) |
+| Â§4.3 First-run bootstrap | T1 last three tests |
+| Â§5.1 PinterestSettings UI | T10 component + test |
+| Â§5.2 Help article | T11 rename + content + ARTICLES update |
+| Â§6 Test matrix | T1, T2, T3, T5, T6, T9, T10, T11 |
+| Â§7 Errors / security | PinterestApiError class (T2); token gitignored via existing `data/` rule; secrets only in env (T1) |
+| Â§8 Migration plan (two commits) | T8 + T12 |

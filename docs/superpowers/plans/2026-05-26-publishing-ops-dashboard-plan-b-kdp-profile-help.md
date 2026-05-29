@@ -1,4 +1,4 @@
-# Publishing Ops Dashboard — Plan B: KDP + Profile + Help
+﻿# Publishing Ops Dashboard â€” Plan B: KDP + Profile + Help
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -34,12 +34,12 @@ npx playwright test tests/e2e/kdp.spec.ts  # one e2e
 
 **Plan A is assumed to have delivered:**
 
-- `web.ui/backend/db.js` — `export function openDb(): import('better-sqlite3').Database`. Opens `data/dashboard.db` (WAL), runs migrations. Tests may pass `ROOSTER_DB_PATH` env var to point at a temp file.
-- `web.ui/backend/events.js` — `export function recordEvent(kind: string, payload: object): void` (INSERTs into `events` AND broadcasts via subscribers — there is no separate broadcast export); `export function subscribe(fn): () => void`; `export function replayRecent(n): DashboardEvent[]` for SSE on-connect replay.
-- `web.ui/backend/workerStatus.js` — exports the procedural functions `setWorkerHeartbeat(worker: string)`, `setWorkerError(worker: string, message: string)`, `getAllStatuses()`, and `trayColor()`. Workers call these directly with their own name string (no factory). The map is mounted at `/api/status`.
-- SQLite tables `kdp_books`, `profile`, `reminders`, `pinterest_queue`, `events` already created (schema in spec §4). Plan A seeds `profile` row id=1 with NULLs.
+- `web.ui/backend/db.js` â€” `export function openDb(): import('better-sqlite3').Database`. Opens `data/dashboard.db` (WAL), runs migrations. Tests may pass `ROOSTER_DB_PATH` env var to point at a temp file.
+- `web.ui/backend/events.js` â€” `export function recordEvent(kind: string, payload: object): void` (INSERTs into `events` AND broadcasts via subscribers â€” there is no separate broadcast export); `export function subscribe(fn): () => void`; `export function replayRecent(n): DashboardEvent[]` for SSE on-connect replay.
+- `web.ui/backend/workerStatus.js` â€” exports the procedural functions `setWorkerHeartbeat(worker: string)`, `setWorkerError(worker: string, message: string)`, `getAllStatuses()`, and `trayColor()`. Workers call these directly with their own name string (no factory). The map is mounted at `/api/status`.
+- SQLite tables `kdp_books`, `profile`, `reminders`, `pinterest_queue`, `events` already created (schema in spec Â§4). Plan A seeds `profile` row id=1 with NULLs.
 - `web.ui/frontend-react/src/pages/` has empty exports `KdpCatalog`, `KdpDetail`, `Profile`, `HelpIndex` wired into React Router at `/kdp`, `/kdp/:slug`, `/profile`, `/help`.
-- `web.ui/frontend-react/src/hooks/useSse.ts` — `useSse(channelPrefix: string, handler: (evt: {kind:string, payload:any}) => void): void`.
+- `web.ui/frontend-react/src/hooks/useSse.ts` â€” `useSse(channelPrefix: string, handler: (evt: {kind:string, payload:any}) => void): void`.
 - `vitest.config.js` exists in both packages; Playwright configured under `web.ui/frontend-react/playwright.config.ts`.
 
 **Verify before starting:**
@@ -49,10 +49,10 @@ node -e "import('./web.ui/backend/db.js').then(({openDb})=>{const db=openDb();co
 Expected output includes `kdp_books`, `profile`, `reminders`, `pinterest_queue`, `events`.
 
 **KDP source assets parsed by this plan:**
-- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/listing.md` — title, subtitle, blurb (Section 5 HTML), price, BISAC, trim.
-- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/metadata.json` — structured fields. Source of truth where overlapping with `listing.md`.
-- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/interior.pdf` — page-count + preview rendering.
-- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/cover.pdf` — cover preview rendering.
+- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/listing.md` â€” title, subtitle, blurb (Section 5 HTML), price, BISAC, trim.
+- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/metadata.json` â€” structured fields. Source of truth where overlapping with `listing.md`.
+- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/interior.pdf` â€” page-count + preview rendering.
+- `projects/kdp-puzzle-press/output/kdp-ready/<slug>/cover.pdf` â€” cover preview rendering.
 
 The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default is `<repoRoot>/projects/kdp-puzzle-press/output/kdp-ready`.
 
@@ -61,18 +61,18 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 ## File structure
 
 **New backend source files:**
-- `web.ui/backend/kdp/parser.js` — pure functions to parse `listing.md` + `metadata.json`.
-- `web.ui/backend/kdp/scanner.js` — directory scanner + 10-min worker registration.
-- `web.ui/backend/kdp/routes.js` — Express router mounted at `/api/kdp`.
-- `web.ui/backend/kdp/previewRenderer.js` — pdf2pic wrapper, 8-page interior preview cache.
-- `web.ui/backend/kdp/pinterestPlanner.js` — computes 6 pin rows + jittered schedules for `mark-published`.
-- `web.ui/backend/kdp/index.js` — re-exports + `installKdpModule(app)` mount helper.
-- `web.ui/backend/profile/routes.js` — Express router mounted at `/api/profile`.
-- `web.ui/backend/profile/index.js` — `installProfileModule(app)`.
-- `web.ui/backend/help/routes.js` — Express router mounted at `/api/help`.
-- `web.ui/backend/help/index.js` — `installHelpModule(app)`.
-- `web.ui/backend/help/asin.md`, `kdp_author_url.md`, `etsy_shop_url.md`, `pinterest_url.md`, `gmail_app_password.md`, `bisac_code.md`, `release_date.md` — markdown content.
-- `web.ui/backend/help/screenshots/.gitkeep` — placeholder.
+- `web.ui/backend/kdp/parser.js` â€” pure functions to parse `listing.md` + `metadata.json`.
+- `web.ui/backend/kdp/scanner.js` â€” directory scanner + 10-min worker registration.
+- `web.ui/backend/kdp/routes.js` â€” Express router mounted at `/api/kdp`.
+- `web.ui/backend/kdp/previewRenderer.js` â€” pdf2pic wrapper, 8-page interior preview cache.
+- `web.ui/backend/kdp/pinterestPlanner.js` â€” computes 6 pin rows + jittered schedules for `mark-published`.
+- `web.ui/backend/kdp/index.js` â€” re-exports + `installKdpModule(app)` mount helper.
+- `web.ui/backend/profile/routes.js` â€” Express router mounted at `/api/profile`.
+- `web.ui/backend/profile/index.js` â€” `installProfileModule(app)`.
+- `web.ui/backend/help/routes.js` â€” Express router mounted at `/api/help`.
+- `web.ui/backend/help/index.js` â€” `installHelpModule(app)`.
+- `web.ui/backend/help/asin.md`, `kdp_author_url.md`, `etsy_shop_url.md`, `pinterest_url.md`, `gmail_app_password.md`, `bisac_code.md`, `release_date.md` â€” markdown content.
+- `web.ui/backend/help/screenshots/.gitkeep` â€” placeholder.
 
 **New backend test files:**
 - `web.ui/backend/__tests__/kdp/parser.test.js`
@@ -84,14 +84,14 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 - `web.ui/backend/__tests__/help/routes.test.js`
 
 **New frontend source files:**
-- `web.ui/frontend-react/src/pages/KdpCatalog.tsx` — replaces empty stub.
-- `web.ui/frontend-react/src/pages/KdpDetail.tsx` — replaces empty stub.
-- `web.ui/frontend-react/src/pages/Profile.tsx` — replaces empty stub.
-- `web.ui/frontend-react/src/pages/HelpIndex.tsx` — replaces empty stub.
+- `web.ui/frontend-react/src/pages/KdpCatalog.tsx` â€” replaces empty stub.
+- `web.ui/frontend-react/src/pages/KdpDetail.tsx` â€” replaces empty stub.
+- `web.ui/frontend-react/src/pages/Profile.tsx` â€” replaces empty stub.
+- `web.ui/frontend-react/src/pages/HelpIndex.tsx` â€” replaces empty stub.
 - `web.ui/frontend-react/src/components/HelpDrawer.tsx`
 - `web.ui/frontend-react/src/components/HelpIcon.tsx`
 - `web.ui/frontend-react/src/components/MarkPublishedModal.tsx`
-- `web.ui/frontend-react/src/api/kdp.ts` — typed fetch wrappers.
+- `web.ui/frontend-react/src/api/kdp.ts` â€” typed fetch wrappers.
 - `web.ui/frontend-react/src/api/profile.ts`
 - `web.ui/frontend-react/src/api/help.ts`
 
@@ -104,34 +104,34 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 - `web.ui/frontend-react/tests/e2e/profile.spec.ts`
 
 **Modified files:**
-- `web.ui/backend/server.js` — mount `installKdpModule(app)`, `installProfileModule(app)`, `installHelpModule(app)`, start scanner worker.
-- `web.ui/backend/package.json` — add `pdf2pic`, `gray-matter`, `marked`, `multer`-not-needed; only `pdf2pic`, `gray-matter`, `marked`.
-- `web.ui/frontend-react/package.json` — add `react-markdown`, `react-router-dom` if not present, `@testing-library/react`, `@testing-library/user-event`, `jsdom` (devDeps).
+- `web.ui/backend/server.js` â€” mount `installKdpModule(app)`, `installProfileModule(app)`, `installHelpModule(app)`, start scanner worker.
+- `web.ui/backend/package.json` â€” add `pdf2pic`, `gray-matter`, `marked`, `multer`-not-needed; only `pdf2pic`, `gray-matter`, `marked`.
+- `web.ui/frontend-react/package.json` â€” add `react-markdown`, `react-router-dom` if not present, `@testing-library/react`, `@testing-library/user-event`, `jsdom` (devDeps).
 
 ---
 
 ## Task 1: Add npm dependencies + scaffold directories
 
-- [ ] Verify current backend deps:
+- [x] Verify current backend deps:
   ```bash
   cd web.ui/backend && cat package.json
   ```
   Expected: existing deps include `express`, `dotenv`. No `pdf2pic`, no `gray-matter`, no `marked`.
 
-- [ ] Install backend deps:
+- [x] Install backend deps:
   ```bash
   cd web.ui/backend
   npm install pdf2pic@^3.1.3 gray-matter@^4.0.3 marked@^14.1.3
   ```
   Expected: `package.json` `dependencies` now lists those three. `node_modules/pdf2pic/package.json` exists.
 
-- [ ] Verify current frontend deps:
+- [x] Verify current frontend deps:
   ```bash
   cd web.ui/frontend-react && cat package.json
   ```
   Expected: existing deps include `react@^19.2.0`. `react-router-dom`, `react-markdown` may or may not be there from Plan A.
 
-- [ ] Install frontend deps (skip any already present):
+- [x] Install frontend deps (skip any already present):
   ```bash
   cd web.ui/frontend-react
   npm install react-markdown@^9.0.1
@@ -139,7 +139,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   ```
   Expected: those packages appear in `package.json`.
 
-- [ ] Create directories:
+- [x] Create directories:
   ```bash
   mkdir -p web.ui/backend/kdp web.ui/backend/profile web.ui/backend/help/screenshots
   mkdir -p web.ui/backend/__tests__/kdp web.ui/backend/__tests__/profile web.ui/backend/__tests__/help
@@ -148,7 +148,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   ```
   Expected: `ls web.ui/backend/kdp` succeeds and prints nothing (empty dir).
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/package.json web.ui/backend/package-lock.json \
           web.ui/frontend-react/package.json web.ui/frontend-react/package-lock.json \
@@ -158,9 +158,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 2: KDP parser — pure parse of `listing.md` + `metadata.json`
+## Task 2: KDP parser â€” pure parse of `listing.md` + `metadata.json`
 
-- [ ] Write the failing test at `web.ui/backend/__tests__/kdp/parser.test.js`:
+- [x] Write the failing test at `web.ui/backend/__tests__/kdp/parser.test.js`:
 
   ```javascript
   import { describe, it, expect } from 'vitest';
@@ -227,13 +227,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run the test, confirm it fails because `parser.js` does not exist:
+- [x] Run the test, confirm it fails because `parser.js` does not exist:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/parser.test.js
   ```
   Expected: `FAIL` with "Cannot find module '../../kdp/parser.js'".
 
-- [ ] Implement `web.ui/backend/kdp/parser.js`:
+- [x] Implement `web.ui/backend/kdp/parser.js`:
 
   ```javascript
   /**
@@ -339,13 +339,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Re-run the test, confirm pass:
+- [x] Re-run the test, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/parser.test.js
   ```
   Expected: `PASS  __tests__/kdp/parser.test.js`, all describe blocks green.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/kdp/parser.js web.ui/backend/__tests__/kdp/parser.test.js
   git commit -m "feat(kdp): pure parser for listing.md + metadata.json"
@@ -353,9 +353,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 3: KDP scanner — directory walk + upsert + worker registration
+## Task 3: KDP scanner â€” directory walk + upsert + worker registration
 
-- [ ] Write `web.ui/backend/__tests__/kdp/scanner.test.js`:
+- [x] Write `web.ui/backend/__tests__/kdp/scanner.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -454,17 +454,17 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run, confirm fail:
+- [x] Run, confirm fail:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/scanner.test.js
   ```
   Expected: `Cannot find module '../../kdp/scanner.js'`.
 
-- [ ] Implement `web.ui/backend/kdp/scanner.js`:
+- [x] Implement `web.ui/backend/kdp/scanner.js`:
 
   ```javascript
   /**
-   * KDP scanner — walks projects/kdp-puzzle-press/output/kdp-ready/<slug>/
+   * KDP scanner â€” walks projects/kdp-puzzle-press/output/kdp-ready/<slug>/
    * and upserts kdp_books rows.
    * @module kdp/scanner
    */
@@ -585,7 +585,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
 
   /**
-   * Boot the scanner worker — runs immediately, then every 10 minutes.
+   * Boot the scanner worker â€” runs immediately, then every 10 minutes.
    * @returns {{stop: () => void}}
    */
   export function startScannerWorker() {
@@ -615,13 +615,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Re-run scanner tests, confirm pass:
+- [x] Re-run scanner tests, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/scanner.test.js
   ```
   Expected: 4 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/kdp/scanner.js web.ui/backend/__tests__/kdp/scanner.test.js
   git commit -m "feat(kdp): scanner module reading output/kdp-ready/ into kdp_books"
@@ -629,9 +629,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 4: Pinterest planner — compute 6 queue rows for mark-published
+## Task 4: Pinterest planner â€” compute 6 queue rows for mark-published
 
-- [ ] Write `web.ui/backend/__tests__/kdp/pinterestPlanner.test.js`:
+- [x] Write `web.ui/backend/__tests__/kdp/pinterestPlanner.test.js`:
 
   ```javascript
   import { describe, it, expect } from 'vitest';
@@ -685,13 +685,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run, confirm fail:
+- [x] Run, confirm fail:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/pinterestPlanner.test.js
   ```
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/kdp/pinterestPlanner.js`:
+- [x] Implement `web.ui/backend/kdp/pinterestPlanner.js`:
 
   ```javascript
   /**
@@ -733,17 +733,17 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
     const baseTitle = book.title;
     const baseDesc = book.blurb
       ? book.blurb.replace(/<[^>]+>/g, '').slice(0, 480)
-      : `${baseTitle} — available now on Amazon.`;
+      : `${baseTitle} â€” available now on Amazon.`;
     const slug = book.slug;
     const rows = [];
 
     const pinSpecs = [
       { pin_type: 'cover_hero', image: 'cover_hero.png', title: baseTitle },
       { pin_type: 'interior_preview', image: 'interior_01.png', title: `Inside ${baseTitle}: a peek` },
-      { pin_type: 'interior_preview', image: 'interior_02.png', title: `${baseTitle} — sample pages` },
-      { pin_type: 'interior_preview', image: 'interior_03.png', title: `${baseTitle} — large-print layout` },
-      { pin_type: 'interior_preview', image: 'interior_04.png', title: `${baseTitle} — what's inside` },
-      { pin_type: 'interior_preview', image: 'interior_05.png', title: `${baseTitle} — answer key & extras` },
+      { pin_type: 'interior_preview', image: 'interior_02.png', title: `${baseTitle} â€” sample pages` },
+      { pin_type: 'interior_preview', image: 'interior_03.png', title: `${baseTitle} â€” large-print layout` },
+      { pin_type: 'interior_preview', image: 'interior_04.png', title: `${baseTitle} â€” what's inside` },
+      { pin_type: 'interior_preview', image: 'interior_05.png', title: `${baseTitle} â€” answer key & extras` },
     ];
 
     for (let i = 0; i < pinSpecs.length; i++) {
@@ -769,13 +769,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/pinterestPlanner.test.js
   ```
   Expected: 4 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/kdp/pinterestPlanner.js web.ui/backend/__tests__/kdp/pinterestPlanner.test.js
   git commit -m "feat(kdp): pinterest planner produces 6 queue rows scheduled across 7 days"
@@ -783,9 +783,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 5: Preview renderer — interior PDF to 8 cached PNGs via pdf2pic
+## Task 5: Preview renderer â€” interior PDF to 8 cached PNGs via pdf2pic
 
-- [ ] Write `web.ui/backend/__tests__/kdp/previewRenderer.test.js`:
+- [x] Write `web.ui/backend/__tests__/kdp/previewRenderer.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -868,13 +868,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run, confirm fail:
+- [x] Run, confirm fail:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/previewRenderer.test.js
   ```
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/kdp/previewRenderer.js`:
+- [x] Implement `web.ui/backend/kdp/previewRenderer.js`:
 
   ```javascript
   /**
@@ -939,13 +939,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/previewRenderer.test.js
   ```
   Expected: 3 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/kdp/previewRenderer.js web.ui/backend/__tests__/kdp/previewRenderer.test.js
   git commit -m "feat(kdp): interior pdf preview renderer with disk cache"
@@ -953,9 +953,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 6: KDP routes — list, detail, mark-in-review, mark-published
+## Task 6: KDP routes â€” list, detail, mark-in-review, mark-published
 
-- [ ] Write `web.ui/backend/__tests__/kdp/routes.test.js`:
+- [x] Write `web.ui/backend/__tests__/kdp/routes.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -1028,7 +1028,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
 
   describe('POST /api/kdp/books/:slug/mark-in-review', () => {
-    it('transitions built→in_review and inserts a 3-day reminder', async () => {
+    it('transitions builtâ†’in_review and inserts a 3-day reminder', async () => {
       const res = await request(app).post('/api/kdp/books/book-a/mark-in-review');
       expect(res.status).toBe(200);
       expect(res.body.book.status).toBe('in_review');
@@ -1082,13 +1082,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run, confirm fail:
+- [x] Run, confirm fail:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/routes.test.js
   ```
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/kdp/index.js`:
+- [x] Implement `web.ui/backend/kdp/index.js`:
 
   ```javascript
   /**
@@ -1108,7 +1108,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Implement `web.ui/backend/kdp/routes.js`:
+- [x] Implement `web.ui/backend/kdp/routes.js`:
 
   ```javascript
   /**
@@ -1248,13 +1248,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Re-run routes tests, confirm pass:
+- [x] Re-run routes tests, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/kdp/routes.test.js
   ```
   Expected: 7 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/kdp/index.js web.ui/backend/kdp/routes.js web.ui/backend/__tests__/kdp/routes.test.js
   git commit -m "feat(kdp): mark-published flow with ASIN paste + Pinterest queue trigger"
@@ -1264,13 +1264,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 7: Wire scanner worker + KDP module into server.js
 
-- [ ] Read current `web.ui/backend/server.js` to find the mount block:
+- [x] Read current `web.ui/backend/server.js` to find the mount block:
   ```bash
   cd web.ui/backend && cat server.js
   ```
   Expected: Plan A added a `// MODULE_MOUNT_POINT` comment or similar pattern. If not present, locate the section just after `app.use(express.json())` and before `app.listen(...)`.
 
-- [ ] Edit `web.ui/backend/server.js` to add KDP wiring. Insert after the existing module mounts (or just before `app.listen`):
+- [x] Edit `web.ui/backend/server.js` to add KDP wiring. Insert after the existing module mounts (or just before `app.listen`):
 
   ```javascript
   import { installKdpModule, startScannerWorker } from './kdp/index.js';
@@ -1285,13 +1285,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
   (If the file already imports modules via a different pattern established in Plan A, follow that pattern. The two API surface points required by this plan are `installKdpModule(app)` being invoked and `startScannerWorker()` being invoked unless `SKIP_KDP_SCANNER=1`.)
 
-- [ ] Verify server boots without exceptions:
+- [x] Verify server boots without exceptions:
   ```bash
   cd web.ui/backend && SKIP_KDP_SCANNER=1 node -e "import('./server.js').then(()=>setTimeout(()=>process.exit(0),500))"
   ```
   Expected: process exits 0 with no thrown errors.
 
-- [ ] Smoke-test the new endpoints against a real running server in a separate terminal:
+- [x] Smoke-test the new endpoints against a real running server in a separate terminal:
   ```bash
   cd web.ui/backend && SKIP_KDP_SCANNER=1 node server.js &
   sleep 2
@@ -1300,7 +1300,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   ```
   Expected: a JSON object `{"books":[...]}` (possibly empty) printed.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/server.js
   git commit -m "feat(kdp): wire KDP routes + scanner worker into server.js"
@@ -1308,9 +1308,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 8: Profile routes — GET/PUT /api/profile
+## Task 8: Profile routes â€” GET/PUT /api/profile
 
-- [ ] Write `web.ui/backend/__tests__/profile/routes.test.js`:
+- [x] Write `web.ui/backend/__tests__/profile/routes.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -1380,13 +1380,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run, confirm fail:
+- [x] Run, confirm fail:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/profile/routes.test.js
   ```
   Expected: module not found.
 
-- [ ] Implement `web.ui/backend/profile/routes.js`:
+- [x] Implement `web.ui/backend/profile/routes.js`:
 
   ```javascript
   /**
@@ -1471,7 +1471,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Implement `web.ui/backend/profile/index.js`:
+- [x] Implement `web.ui/backend/profile/index.js`:
 
   ```javascript
   /**
@@ -1488,20 +1488,20 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Re-run, confirm pass:
+- [x] Re-run, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/profile/routes.test.js
   ```
   Expected: 4 tests pass.
 
-- [ ] Wire profile into `web.ui/backend/server.js`. Add next to the KDP mount:
+- [x] Wire profile into `web.ui/backend/server.js`. Add next to the KDP mount:
 
   ```javascript
   import { installProfileModule } from './profile/index.js';
   installProfileModule(app);
   ```
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/profile/ web.ui/backend/__tests__/profile/ web.ui/backend/server.js
   git commit -m "feat(profile): GET/PUT routes + single-row read/write"
@@ -1509,9 +1509,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 9: Help routes — markdown content + per-field endpoint
+## Task 9: Help routes â€” markdown content + per-field endpoint
 
-- [ ] Write `web.ui/backend/__tests__/help/routes.test.js`:
+- [x] Write `web.ui/backend/__tests__/help/routes.test.js`:
 
   ```javascript
   import { describe, it, expect, beforeEach } from 'vitest';
@@ -1572,23 +1572,23 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run, confirm fail.
+- [x] Run, confirm fail.
 
-- [ ] Author the markdown content. Create each file at `web.ui/backend/help/<field>.md`:
+- [x] Author the markdown content. Create each file at `web.ui/backend/help/<field>.md`:
 
   `web.ui/backend/help/asin.md`:
   ```markdown
   # Where to find your ASIN
 
-  Amazon Standard Identification Number — the 10-character ID Amazon assigns
+  Amazon Standard Identification Number â€” the 10-character ID Amazon assigns
   to your book the moment it goes live.
 
   ## How to find it
 
   1. Sign in to <https://kdp.amazon.com>.
   2. Open **Bookshelf**.
-  3. For the book in question, click the **`...`** menu → **View on Amazon**.
-  4. The URL ends in `/dp/B0XXXXXXXX` — that's your ASIN.
+  3. For the book in question, click the **`...`** menu â†’ **View on Amazon**.
+  4. The URL ends in `/dp/B0XXXXXXXX` â€” that's your ASIN.
 
   ## Where to paste it
 
@@ -1606,7 +1606,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   ```markdown
   # Your KDP Author URL
 
-  Your Author Central page — used by the dashboard to deep-link reviews and
+  Your Author Central page â€” used by the dashboard to deep-link reviews and
   by Pinterest pins as a fallback link target.
 
   ## How to find it
@@ -1615,7 +1615,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   2. Click your name in the top-right.
   3. The URL is `https://www.amazon.com/stores/author/B0XXXXXXXX`.
 
-  If you have not claimed Author Central yet, do that first — it takes one
+  If you have not claimed Author Central yet, do that first â€” it takes one
   business day to approve.
 
   ![Author Central URL location](screenshots/kdp_author_url.png)
@@ -1633,8 +1633,8 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   ## How to find it
 
   1. Sign in to <https://www.etsy.com>.
-  2. Click your shop icon in the top-right → **Visit your shop**.
-  3. Copy the URL — it looks like `https://www.etsy.com/shop/YourShopName`.
+  2. Click your shop icon in the top-right â†’ **Visit your shop**.
+  3. Copy the URL â€” it looks like `https://www.etsy.com/shop/YourShopName`.
 
   Trailing slashes and tracking params are stripped on save.
 
@@ -1649,14 +1649,14 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
   This is the URL the dashboard surfaces for deep-linking pins back to your
   Pinterest profile. (For the Pinterest **posting** automation, see the
-  separate `/pinterest` page — that uses a Playwright browser session, not
+  separate `/pinterest` page â€” that uses a Playwright browser session, not
   this URL.)
 
   ## How to find it
 
   1. Sign in to <https://www.pinterest.com>.
   2. Click your avatar in the top-right.
-  3. Copy the URL — it looks like `https://www.pinterest.com/yourname/`.
+  3. Copy the URL â€” it looks like `https://www.pinterest.com/yourname/`.
 
   ![Pinterest profile URL location](screenshots/pinterest_url.png)
 
@@ -1668,7 +1668,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   # How to generate a Gmail app password
 
   The dashboard sends reminder emails via Gmail SMTP. Because Google blocks
-  raw account passwords for SMTP, you need an **app password** — a
+  raw account passwords for SMTP, you need an **app password** â€” a
   16-character throwaway credential scoped to one app.
 
   ## Steps
@@ -1676,8 +1676,8 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   1. Open <https://myaccount.google.com/security>.
   2. Confirm **2-Step Verification** is on. If it is not, turn it on first.
   3. Under "How you sign in to Google," click **App passwords**.
-  4. Name the app "Rooster Dashboard" → click **Create**.
-  5. Copy the 16-character password (shown once, with spaces — copy without
+  4. Name the app "Rooster Dashboard" â†’ click **Create**.
+  5. Copy the 16-character password (shown once, with spaces â€” copy without
      spaces).
   6. Paste it into `web.ui/backend/.env` as `GMAIL_APP_PASSWORD=...`.
   7. Restart the dashboard.
@@ -1688,7 +1688,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
   ## Troubleshooting
 
-  - "Less secure app access" is **not** a valid path — Google has retired it.
+  - "Less secure app access" is **not** a valid path â€” Google has retired it.
   - If reminder emails stop arriving, regenerate the app password and update
     `.env`.
   ```
@@ -1709,7 +1709,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
     Books) or `JNF038000` (Juvenile Nonfiction / Activity Books).
 
   Each book's chosen BISACs live under the `bisac` key in
-  `metadata.json` — the dashboard reads them from there.
+  `metadata.json` â€” the dashboard reads them from there.
 
   ![BISAC lookup site](screenshots/bisac_code.png)
 
@@ -1733,7 +1733,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
   - Day-30 reminder fires at `release_date + 30 days`.
   - Pinterest pins schedule across the **7 days following the mark-live
-    action**, not relative to release date — so pin cadence is the same
+    action**, not relative to release date â€” so pin cadence is the same
     whether release_date is today or in the past.
 
   ![Release date field in KDP](screenshots/release_date.png)
@@ -1741,11 +1741,11 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   > TODO (user): drop a screenshot at `web.ui/backend/help/screenshots/release_date.png`.
   ```
 
-- [ ] Implement `web.ui/backend/help/routes.js`:
+- [x] Implement `web.ui/backend/help/routes.js`:
 
   ```javascript
   /**
-   * Help routes — serves markdown from web.ui/backend/help/<field>.md
+   * Help routes â€” serves markdown from web.ui/backend/help/<field>.md
    * @module help/routes
    */
   import express from 'express';
@@ -1798,7 +1798,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Implement `web.ui/backend/help/index.js`:
+- [x] Implement `web.ui/backend/help/index.js`:
 
   ```javascript
   /**
@@ -1815,19 +1815,19 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Re-run help tests, confirm pass:
+- [x] Re-run help tests, confirm pass:
   ```bash
   cd web.ui/backend && npx vitest run __tests__/help/routes.test.js
   ```
   Expected: 5 tests pass.
 
-- [ ] Wire help into `web.ui/backend/server.js`:
+- [x] Wire help into `web.ui/backend/server.js`:
   ```javascript
   import { installHelpModule } from './help/index.js';
   installHelpModule(app);
   ```
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/help/ web.ui/backend/__tests__/help/ web.ui/backend/server.js
   git commit -m "feat(help): per-field markdown drawer endpoint + 7 articles"
@@ -1835,9 +1835,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 10: Frontend API clients — kdp, profile, help
+## Task 10: Frontend API clients â€” kdp, profile, help
 
-- [ ] Implement `web.ui/frontend-react/src/api/kdp.ts`:
+- [x] Implement `web.ui/frontend-react/src/api/kdp.ts`:
 
   ```typescript
   export interface KdpBook {
@@ -1904,7 +1904,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/api/profile.ts`:
+- [x] Implement `web.ui/frontend-react/src/api/profile.ts`:
 
   ```typescript
   export interface Profile {
@@ -1941,7 +1941,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/api/help.ts`:
+- [x] Implement `web.ui/frontend-react/src/api/help.ts`:
 
   ```typescript
   export interface HelpArticle {
@@ -1969,13 +1969,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Type-check:
+- [x] Type-check:
   ```bash
   cd web.ui/frontend-react && npx tsc --noEmit
   ```
   Expected: no errors related to the new files.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/api/
   git commit -m "feat(api-clients): typed fetch wrappers for kdp, profile, help"
@@ -1985,7 +1985,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 11: HelpDrawer + HelpIcon components
 
-- [ ] Write `web.ui/frontend-react/src/__tests__/HelpDrawer.test.tsx`:
+- [x] Write `web.ui/frontend-react/src/__tests__/HelpDrawer.test.tsx`:
 
   ```tsx
   import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -2030,7 +2030,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/components/HelpDrawer.tsx`:
+- [x] Implement `web.ui/frontend-react/src/components/HelpDrawer.tsx`:
 
   ```tsx
   import { useEffect, useState } from 'react';
@@ -2091,7 +2091,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
           Close
         </button>
         {error && <p style={{ color: 'crimson' }}>Failed to load help: {error}</p>}
-        {!content && !error && <p>Loading…</p>}
+        {!content && !error && <p>Loadingâ€¦</p>}
         {content && (
           <article
             className="help-article"
@@ -2104,7 +2104,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/components/HelpIcon.tsx`:
+- [x] Implement `web.ui/frontend-react/src/components/HelpIcon.tsx`:
 
   ```tsx
   import { useState } from 'react';
@@ -2143,13 +2143,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Run tests, confirm pass:
+- [x] Run tests, confirm pass:
   ```bash
   cd web.ui/frontend-react && npx vitest run src/__tests__/HelpDrawer.test.tsx
   ```
   Expected: 3 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/components/HelpDrawer.tsx \
           web.ui/frontend-react/src/components/HelpIcon.tsx \
@@ -2161,7 +2161,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 12: HelpIndex page
 
-- [ ] Replace `web.ui/frontend-react/src/pages/HelpIndex.tsx`:
+- [x] Replace `web.ui/frontend-react/src/pages/HelpIndex.tsx`:
 
   ```tsx
   import { useEffect, useState } from 'react';
@@ -2198,13 +2198,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Type-check:
+- [x] Type-check:
   ```bash
   cd web.ui/frontend-react && npx tsc --noEmit
   ```
   Expected: no errors.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/pages/HelpIndex.tsx
   git commit -m "feat(help): /help index page lists articles + opens drawer"
@@ -2214,7 +2214,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 13: KdpCatalog page
 
-- [ ] Write `web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx`:
+- [x] Write `web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx`:
 
   ```tsx
   import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -2261,7 +2261,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/pages/KdpCatalog.tsx`:
+- [x] Implement `web.ui/frontend-react/src/pages/KdpCatalog.tsx`:
 
   ```tsx
   import { useEffect, useMemo, useState } from 'react';
@@ -2328,10 +2328,10 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
               <tr key={b.slug}>
                 <td><Link to={`/kdp/${b.slug}`}>{b.title}</Link></td>
                 <td>{statusBadge(b.status)}</td>
-                <td>{b.asin ?? '—'}</td>
-                <td>{b.release_date ?? '—'}</td>
-                <td>{b.trim_size ?? '—'}</td>
-                <td>{b.page_count ?? '—'}</td>
+                <td>{b.asin ?? 'â€”'}</td>
+                <td>{b.release_date ?? 'â€”'}</td>
+                <td>{b.trim_size ?? 'â€”'}</td>
+                <td>{b.page_count ?? 'â€”'}</td>
               </tr>
             ))}
           </tbody>
@@ -2341,13 +2341,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Run tests:
+- [x] Run tests:
   ```bash
   cd web.ui/frontend-react && npx vitest run src/__tests__/KdpCatalog.test.tsx
   ```
   Expected: 2 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/pages/KdpCatalog.tsx \
           web.ui/frontend-react/src/__tests__/KdpCatalog.test.tsx
@@ -2358,7 +2358,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 14: MarkPublishedModal component
 
-- [ ] Implement `web.ui/frontend-react/src/components/MarkPublishedModal.tsx`:
+- [x] Implement `web.ui/frontend-react/src/components/MarkPublishedModal.tsx`:
 
   ```tsx
   import { useState } from 'react';
@@ -2434,7 +2434,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
             <button type="button" onClick={onClose} disabled={busy}>Cancel</button>
             <button type="button" onClick={handleSave} disabled={busy}>
-              {busy ? 'Saving…' : 'Save'}
+              {busy ? 'Savingâ€¦' : 'Save'}
             </button>
           </div>
         </div>
@@ -2443,13 +2443,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Type-check:
+- [x] Type-check:
   ```bash
   cd web.ui/frontend-react && npx tsc --noEmit
   ```
   Expected: no errors.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/components/MarkPublishedModal.tsx
   git commit -m "feat(kdp): MarkPublishedModal with ASIN + date + inline help"
@@ -2459,7 +2459,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 15: KdpDetail page
 
-- [ ] Write `web.ui/frontend-react/src/__tests__/KdpDetail.test.tsx`:
+- [x] Write `web.ui/frontend-react/src/__tests__/KdpDetail.test.tsx`:
 
   ```tsx
   import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -2519,7 +2519,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/pages/KdpDetail.tsx`:
+- [x] Implement `web.ui/frontend-react/src/pages/KdpDetail.tsx`:
 
   ```tsx
   import { useEffect, useState } from 'react';
@@ -2553,7 +2553,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
     }
 
     if (error) return <main style={{ padding: '24px' }}><p style={{ color: 'crimson' }}>{error}</p></main>;
-    if (!book) return <main style={{ padding: '24px' }}><p>Loading…</p></main>;
+    if (!book) return <main style={{ padding: '24px' }}><p>Loadingâ€¦</p></main>;
 
     return (
       <main style={{ padding: '24px', display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
@@ -2567,11 +2567,11 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
           {book.subtitle && <h2>{book.subtitle}</h2>}
           <dl>
             <dt>Status</dt><dd>{book.status}</dd>
-            <dt>ASIN <HelpIcon field="asin" /></dt><dd>{book.asin ?? '—'}</dd>
-            <dt>Trim</dt><dd>{book.trim_size ?? '—'}</dd>
-            <dt>Pages</dt><dd>{book.page_count ?? '—'}</dd>
-            <dt>Price</dt><dd>{book.price_usd != null ? `$${book.price_usd.toFixed(2)}` : '—'}</dd>
-            <dt>Release <HelpIcon field="release_date" /></dt><dd>{book.release_date ?? '—'}</dd>
+            <dt>ASIN <HelpIcon field="asin" /></dt><dd>{book.asin ?? 'â€”'}</dd>
+            <dt>Trim</dt><dd>{book.trim_size ?? 'â€”'}</dd>
+            <dt>Pages</dt><dd>{book.page_count ?? 'â€”'}</dd>
+            <dt>Price</dt><dd>{book.price_usd != null ? `$${book.price_usd.toFixed(2)}` : 'â€”'}</dd>
+            <dt>Release <HelpIcon field="release_date" /></dt><dd>{book.release_date ?? 'â€”'}</dd>
           </dl>
           <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
             {book.listing_url && (
@@ -2614,13 +2614,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Run tests:
+- [x] Run tests:
   ```bash
   cd web.ui/frontend-react && npx vitest run src/__tests__/KdpDetail.test.tsx
   ```
   Expected: 2 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/pages/KdpDetail.tsx \
           web.ui/frontend-react/src/__tests__/KdpDetail.test.tsx
@@ -2631,7 +2631,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 16: Add /files static route for cover + preview images
 
-- [ ] In `web.ui/backend/server.js`, mount a static handler for the repo-rooted cache + project paths. Add (between the module installs and `app.listen`):
+- [x] In `web.ui/backend/server.js`, mount a static handler for the repo-rooted cache + project paths. Add (between the module installs and `app.listen`):
 
   ```javascript
   import path from 'node:path';
@@ -2650,7 +2650,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Smoke test (with a known existing PNG, if any; otherwise just verify the 403 path):
+- [x] Smoke test (with a known existing PNG, if any; otherwise just verify the 403 path):
   ```bash
   cd web.ui/backend && SKIP_KDP_SCANNER=1 node server.js &
   sleep 2
@@ -2659,7 +2659,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   ```
   Expected: `403`.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/backend/server.js
   git commit -m "feat(kdp): /files static route scoped to cache + kdp-ready"
@@ -2669,7 +2669,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 17: Profile page
 
-- [ ] Write `web.ui/frontend-react/src/__tests__/Profile.test.tsx`:
+- [x] Write `web.ui/frontend-react/src/__tests__/Profile.test.tsx`:
 
   ```tsx
   import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -2711,7 +2711,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Implement `web.ui/frontend-react/src/pages/Profile.tsx`:
+- [x] Implement `web.ui/frontend-react/src/pages/Profile.tsx`:
 
   ```tsx
   import { useEffect, useState } from 'react';
@@ -2768,7 +2768,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
     }
 
     if (error) return <main style={{ padding: '24px' }}><p style={{ color: 'crimson' }}>{error}</p></main>;
-    if (!p) return <main style={{ padding: '24px' }}><p>Loading…</p></main>;
+    if (!p) return <main style={{ padding: '24px' }}><p>Loadingâ€¦</p></main>;
 
     return (
       <main style={{ padding: '24px', maxWidth: '640px' }}>
@@ -2787,7 +2787,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
             {p.pen_names.map((n, i) => (
               <li key={`${n}-${i}`}>
                 {n}{' '}
-                <button type="button" onClick={() => removePenName(i)} aria-label={`Remove ${n}`}>×</button>
+                <button type="button" onClick={() => removePenName(i)} aria-label={`Remove ${n}`}>Ã—</button>
               </li>
             ))}
           </ul>
@@ -2841,7 +2841,7 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
         </label>
         <div style={{ marginTop: '16px' }}>
           <button type="button" onClick={handleSave} disabled={busy}>
-            {busy ? 'Saving…' : 'Save'}
+            {busy ? 'Savingâ€¦' : 'Save'}
           </button>
           {saved && <span style={{ marginLeft: '12px', color: 'green' }}>Saved</span>}
         </div>
@@ -2850,13 +2850,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   }
   ```
 
-- [ ] Run tests:
+- [x] Run tests:
   ```bash
   cd web.ui/frontend-react && npx vitest run src/__tests__/Profile.test.tsx
   ```
   Expected: 2 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/pages/Profile.tsx \
           web.ui/frontend-react/src/__tests__/Profile.test.tsx
@@ -2865,9 +2865,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 18: SSE wiring on KdpCatalog — refresh on kdp:new-book / kdp:published
+## Task 18: SSE wiring on KdpCatalog â€” refresh on kdp:new-book / kdp:published
 
-- [ ] Edit `web.ui/frontend-react/src/pages/KdpCatalog.tsx`. Replace the existing `useEffect` mount block with a version that subscribes to SSE and re-fetches on `kdp:*` events:
+- [x] Edit `web.ui/frontend-react/src/pages/KdpCatalog.tsx`. Replace the existing `useEffect` mount block with a version that subscribes to SSE and re-fetches on `kdp:*` events:
 
   ```tsx
   import { useEffect, useMemo, useState } from 'react';
@@ -2900,13 +2900,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
   (Keep the table JSX from Task 13 unchanged. Only the data-fetch effect changes.)
 
-- [ ] Re-run KdpCatalog tests to make sure the SSE hook doesn't break the existing test (it should noop when `useSse` has no real EventSource available in jsdom — the hook from Plan A is documented to early-return in that case):
+- [x] Re-run KdpCatalog tests to make sure the SSE hook doesn't break the existing test (it should noop when `useSse` has no real EventSource available in jsdom â€” the hook from Plan A is documented to early-return in that case):
   ```bash
   cd web.ui/frontend-react && npx vitest run src/__tests__/KdpCatalog.test.tsx
   ```
   Expected: 2 tests still pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/src/pages/KdpCatalog.tsx
   git commit -m "feat(kdp): KdpCatalog auto-refreshes on kdp:* SSE events"
@@ -2914,9 +2914,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 19: E2E — KDP publish flow
+## Task 19: E2E â€” KDP publish flow
 
-- [ ] Write `web.ui/frontend-react/tests/e2e/kdp-publish.spec.ts`:
+- [x] Write `web.ui/frontend-react/tests/e2e/kdp-publish.spec.ts`:
 
   ```typescript
   import { test, expect } from '@playwright/test';
@@ -2948,13 +2948,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
   > Note: This test depends on Plan A's `playwright.config.ts` global-setup which seeds an "E2E Book" in the dashboard's temp DB. If that seeding does not exist, add a pre-test API call in this spec's `test.beforeAll` to POST a fixture row directly via SQL through `openDb()`. The fixture-seeding mechanism is owned by Plan A; this plan just consumes whatever shape Plan A established.
 
-- [ ] Run e2e:
+- [x] Run e2e:
   ```bash
   cd web.ui/frontend-react && npx playwright test tests/e2e/kdp-publish.spec.ts
   ```
   Expected: 1 test passes.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/tests/e2e/kdp-publish.spec.ts
   git commit -m "test(e2e): KDP mark-in-review then mark-live flow"
@@ -2962,9 +2962,9 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ---
 
-## Task 20: E2E — Profile editor + Help drawer
+## Task 20: E2E â€” Profile editor + Help drawer
 
-- [ ] Write `web.ui/frontend-react/tests/e2e/profile.spec.ts`:
+- [x] Write `web.ui/frontend-react/tests/e2e/profile.spec.ts`:
 
   ```typescript
   import { test, expect } from '@playwright/test';
@@ -2990,13 +2990,13 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
   });
   ```
 
-- [ ] Run e2e:
+- [x] Run e2e:
   ```bash
   cd web.ui/frontend-react && npx playwright test tests/e2e/profile.spec.ts
   ```
   Expected: 2 tests pass.
 
-- [ ] Commit:
+- [x] Commit:
   ```bash
   git add web.ui/frontend-react/tests/e2e/profile.spec.ts
   git commit -m "test(e2e): profile save + help drawer open/close"
@@ -3006,52 +3006,52 @@ The path to the kdp-ready root is configurable via env `KDP_READY_DIR`; default 
 
 ## Task 21: Full test pass + manual smoke
 
-- [ ] Run the entire backend test suite:
+- [x] Run the entire backend test suite:
   ```bash
   cd web.ui/backend && npm test
   ```
   Expected: all tests added in this plan pass; Plan A tests remain green. No new failures.
 
-- [ ] Run the entire frontend unit suite:
+- [x] Run the entire frontend unit suite:
   ```bash
   cd web.ui/frontend-react && npm test -- --run
   ```
   Expected: all tests pass.
 
-- [ ] Run frontend type-check:
+- [x] Run frontend type-check:
   ```bash
   cd web.ui/frontend-react && npx tsc --noEmit
   ```
   Expected: zero errors.
 
-- [ ] Run Playwright e2e:
+- [x] Run Playwright e2e:
   ```bash
   cd web.ui/frontend-react && npx playwright test tests/e2e/
   ```
   Expected: all e2e tests pass.
 
-- [ ] Manual smoke on a Windows session:
+- [x] Manual smoke on a Windows session:
   1. `cd web.ui/backend && npm start` in one terminal.
   2. `cd web.ui/frontend-react && npm run dev` in another.
   3. Open <http://localhost:5173> (or whatever Vite dev port Plan A set).
-  4. Visit `/kdp` — confirm the existing kdp-ready books appear.
-  5. Click into one — confirm cover + 4×4 preview grid render (preview renderer may take 5–15s on first load while pdf2pic does its work; subsequent loads are instant from cache).
-  6. Visit `/profile` — confirm form loads and saves.
-  7. Click the `?` next to ASIN — confirm the drawer opens and renders the markdown.
+  4. Visit `/kdp` â€” confirm the existing kdp-ready books appear.
+  5. Click into one â€” confirm cover + 4Ã—4 preview grid render (preview renderer may take 5â€“15s on first load while pdf2pic does its work; subsequent loads are instant from cache).
+  6. Visit `/profile` â€” confirm form loads and saves.
+  7. Click the `?` next to ASIN â€” confirm the drawer opens and renders the markdown.
 
-- [ ] No commit needed (verification only).
+- [x] No commit needed (verification only).
 
 ---
 
 ## Definition of Done
 
-- [ ] All 21 tasks complete; every test green.
-- [ ] `web.ui/backend/kdp/` directory has parser, scanner, routes, previewRenderer, pinterestPlanner, and index modules.
-- [ ] `web.ui/backend/profile/` has routes + index.
-- [ ] `web.ui/backend/help/` has 7 markdown files + screenshots/.gitkeep + routes + index.
-- [ ] `web.ui/frontend-react/src/pages/` has KdpCatalog, KdpDetail, Profile, HelpIndex implementations (no longer empty stubs).
-- [ ] `web.ui/frontend-react/src/components/` has HelpDrawer, HelpIcon, MarkPublishedModal.
-- [ ] `web.ui/frontend-react/src/api/` has kdp, profile, help typed clients.
-- [ ] Server boots with `SKIP_KDP_SCANNER=1` for tests and without it in production.
-- [ ] Marking a book published inserts 6 pinterest_queue rows + 1 Day-30 reminder; Plan D / Plan E will pick them up.
-- [ ] User can edit profile, paste an ASIN, and read help articles without leaving the dashboard.
+- [x] All 21 tasks complete; every test green.
+- [x] `web.ui/backend/kdp/` directory has parser, scanner, routes, previewRenderer, pinterestPlanner, and index modules.
+- [x] `web.ui/backend/profile/` has routes + index.
+- [x] `web.ui/backend/help/` has 7 markdown files + screenshots/.gitkeep + routes + index.
+- [x] `web.ui/frontend-react/src/pages/` has KdpCatalog, KdpDetail, Profile, HelpIndex implementations (no longer empty stubs).
+- [x] `web.ui/frontend-react/src/components/` has HelpDrawer, HelpIcon, MarkPublishedModal.
+- [x] `web.ui/frontend-react/src/api/` has kdp, profile, help typed clients.
+- [x] Server boots with `SKIP_KDP_SCANNER=1` for tests and without it in production.
+- [x] Marking a book published inserts 6 pinterest_queue rows + 1 Day-30 reminder; Plan D / Plan E will pick them up.
+- [x] User can edit profile, paste an ASIN, and read help articles without leaving the dashboard.
