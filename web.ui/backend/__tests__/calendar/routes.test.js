@@ -46,6 +46,19 @@ function freshDb() {
       attempts INTEGER DEFAULT 0, last_error TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+    CREATE TABLE publishing_roadmap (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL CHECK(kind IN ('kdp','etsy')),
+      slug TEXT NOT NULL,
+      title TEXT NOT NULL,
+      target_release_date TEXT NOT NULL,
+      status TEXT NOT NULL,
+      source TEXT NOT NULL,
+      niche TEXT, rationale TEXT, file_lock_date TEXT,
+      kdp_book_id INTEGER, etsy_listing_id INTEGER, notes TEXT,
+      created_at TEXT, updated_at TEXT,
+      UNIQUE(kind, slug, target_release_date)
+    );
   `);
   db.prepare(
     `INSERT INTO kdp_books (slug, title, status, release_date, output_dir)

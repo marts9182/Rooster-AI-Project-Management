@@ -48,6 +48,19 @@ function freshDb() {
       attempts INTEGER DEFAULT 0, last_error TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
+    CREATE TABLE publishing_roadmap (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      kind TEXT NOT NULL CHECK(kind IN ('kdp','etsy')),
+      slug TEXT NOT NULL,
+      title TEXT NOT NULL,
+      target_release_date TEXT NOT NULL,
+      status TEXT NOT NULL,
+      source TEXT NOT NULL,
+      niche TEXT, rationale TEXT, file_lock_date TEXT,
+      kdp_book_id INTEGER, etsy_listing_id INTEGER, notes TEXT,
+      created_at TEXT, updated_at TEXT,
+      UNIQUE(kind, slug, target_release_date)
+    );
   `);
   return db;
 }
@@ -129,5 +142,72 @@ describe('aggregateCalendarEvents', () => {
     const events = aggregateCalendarEvents(db, '2026-05-01', '2026-06-01');
     const titles = events.map((e) => e.title);
     expect(titles).toEqual(['show']);
+  });
+});
+
+describe('aggregateCalendarEvents — publishing_roadmap', () => {
+  /** @type {import('better-sqlite3').Database} */
+  let db;
+  beforeEach(() => {
+    db = freshDb();
+  });
+
+  function seedRoadmap(row) {
+    db.prepare(
+      `INSERT INTO publishing_roadmap
+         (kind, slug, title, target_release_date, status, source, file_lock_date)
+       VALUES (@kind, @slug, @title, @target_release_date, @status, @source, @file_lock_date)`,
+    ).run({
+      file_lock_date: row.file_lock_date ?? null,
+      ...row,
+    });
+  }
+
+  it('emits a release event for each non-skipped row in window', () => {
+    seedRoadmap({
+      kind: 'kdp', slug: 'foo', title: 'Foo',
+      target_release_date: '2026-09-15', status: 'planned', source: 'reuse',
+      file_lock_date: '2026-08-31',
+    });
+    const events = aggregateCalendarEvents(db, '2026-09-01', '2026-10-01');
+    const release = events.find((e) => e.kind === 'roadmap.release');
+    expect(release).toBeTruthy();
+    expect(release.date).toBe('2026-09-15');
+    expect(release.title).toMatch(/Foo/);
+    expect(release.source_kind).toBe('publishing.roadmap');
+  });
+
+  it('emits a lock event when file_lock_date is inside window', () => {
+    seedRoadmap({
+      kind: 'kdp', slug: 'foo', title: 'Foo',
+      target_release_date: '2026-09-15', status: 'planned', source: 'reuse',
+      file_lock_date: '2026-08-31',
+    });
+    const events = aggregateCalendarEvents(db, '2026-08-01', '2026-09-01');
+    const lock = events.find((e) => e.kind === 'roadmap.lock');
+    expect(lock).toBeTruthy();
+    expect(lock.date).toBe('2026-08-31');
+    expect(lock.title).toMatch(/Lock file/i);
+  });
+
+  it('excludes skipped rows', () => {
+    seedRoadmap({
+      kind: 'kdp', slug: 'foo', title: 'Foo',
+      target_release_date: '2026-09-15', status: 'skipped', source: 'reuse',
+      file_lock_date: '2026-08-31',
+    });
+    const events = aggregateCalendarEvents(db, '2026-08-01', '2026-10-01');
+    expect(events.filter((e) => e.kind.startsWith('roadmap.'))).toHaveLength(0);
+  });
+
+  it('omits lock event when file_lock_date falls outside the [from,to) window', () => {
+    seedRoadmap({
+      kind: 'kdp', slug: 'foo', title: 'Foo',
+      target_release_date: '2026-09-15', status: 'planned', source: 'reuse',
+      file_lock_date: '2026-07-31',
+    });
+    const events = aggregateCalendarEvents(db, '2026-09-01', '2026-10-01');
+    expect(events.find((e) => e.kind === 'roadmap.release')).toBeTruthy();
+    expect(events.find((e) => e.kind === 'roadmap.lock')).toBeUndefined();
   });
 });

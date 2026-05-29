@@ -142,6 +142,44 @@ export function aggregateCalendarEvents(db, from, to) {
     });
   }
 
+  // ── Publishing roadmap — release + lock events ────────────────────────
+  const roadmapRows = /** @type {Array<{id:number,kind:string,slug:string,title:string,target_release_date:string,file_lock_date:string|null,status:string}>} */ (
+    db
+      .prepare(
+        `SELECT id, kind, slug, title, target_release_date, file_lock_date, status
+           FROM publishing_roadmap
+          WHERE status != 'skipped'
+            AND (
+                  (target_release_date >= ? AND target_release_date < ?)
+               OR (file_lock_date IS NOT NULL AND file_lock_date >= ? AND file_lock_date < ?)
+            )`,
+      )
+      .all(from, to, from, to)
+  );
+  for (const r of roadmapRows) {
+    const kindUpper = r.kind.toUpperCase();
+    if (r.target_release_date >= from && r.target_release_date < to) {
+      out.push({
+        date: r.target_release_date,
+        kind: 'roadmap.release',
+        title: `${kindUpper}: ${r.title}`,
+        source_kind: 'publishing.roadmap',
+        source_id: r.id,
+        url: '/calendar',
+      });
+    }
+    if (r.file_lock_date && r.file_lock_date >= from && r.file_lock_date < to) {
+      out.push({
+        date: r.file_lock_date,
+        kind: 'roadmap.lock',
+        title: `Lock file: ${r.title}`,
+        source_kind: 'publishing.roadmap',
+        source_id: r.id,
+        url: '/calendar',
+      });
+    }
+  }
+
   out.sort(
     (a, b) => a.date.localeCompare(b.date) || a.kind.localeCompare(b.kind),
   );
