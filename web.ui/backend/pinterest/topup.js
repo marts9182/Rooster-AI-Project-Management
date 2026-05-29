@@ -168,24 +168,68 @@ export function startTopupWorkerDefault({ db, emit, intervalMs = DEFAULT_INTERVA
   async function tick() {
     if (cancelled) return;
     try {
-      const { generatePin } = await import('./generator.js');
+      const { generatePinImage } = await import('./generator.js');
       const { assignSlots } = await import('./scheduler.js');
+      const path = await import('node:path');
+      const fs = await import('node:fs');
       const realDb = db ?? openDb();
       const schedulerCfg = {
         timeZone: process.env.PINTEREST_TZ ?? 'America/Los_Angeles',
         perDayMin: 3, perDayMax: 5, windowStartHour: 9, windowEndHour: 21,
       };
+      const TAGLINES = [
+        'Print and play instantly',
+        'Perfect for travel',
+        'A great gift idea',
+        'Find your calm with this puzzle book',
+        'Hours of focused fun',
+        'Designed for relaxing afternoons',
+        'New on Pocket Rooster Press',
+        'Available now on Amazon',
+      ];
       const generatorFn = async (s) => {
-        const out = await generatePin({
-          slug: s.slug, pinType: s.pin_type, index: s.variant,
-          sourcePngPath: '',
+        // Resolve the source PNG path (cover preview or interior page preview).
+        const book = realDb.prepare(
+          'SELECT cover_path, output_dir, subtitle FROM kdp_books WHERE id = ?',
+        ).get(s.bookId);
+        if (!book) throw new Error(`book ${s.bookId} not found`);
+        let sourcePngPath;
+        if (s.pin_type === 'cover_hero') {
+          sourcePngPath = book.cover_path;
+        } else {
+          // interior_preview — pick one of interior_1..5.png by variant.
+          const idx = (s.variant % 5) + 1;
+          sourcePngPath = book.output_dir
+            ? path.join(book.output_dir, `interior_${idx}.png`)
+            : null;
+        }
+        if (!sourcePngPath || !fs.existsSync(sourcePngPath)) {
+          throw new Error(
+            `source PNG missing for ${s.slug}/${s.pin_type} (variant ${s.variant}): ${sourcePngPath ?? '<null>'}`,
+          );
+        }
+        // Use a hash-derived numeric suffix so remix variants don't overwrite
+        // each other's output PNGs.
+        const hashSuffix = parseInt(
+          crypto.createHash('sha256')
+            .update(`${s.bookId}|${s.pin_type}|${s.variant}|${s.palette_seed}|${s.tagline_idx}`)
+            .digest('hex').slice(0, 8),
+          16,
+        );
+        const out = await generatePinImage({
+          slug: s.slug,
+          pinType: s.pin_type,
+          index: hashSuffix,
+          sourcePngPath,
           title: s.title,
+          subtitle: book.subtitle ?? undefined,
         });
+        const tagline = TAGLINES[s.tagline_idx % TAGLINES.length];
         return {
-          imagePath: out.imagePath ?? out,
+          imagePath: out,
           title: s.title,
-          description: `${s.title} — fresh on Pocket Rooster Press`,
-          linkUrl: s.asin ? `https://amazon.com/dp/${s.asin}` : 'https://amazon.com',
+          description: `${s.title} — ${tagline}`,
+          linkUrl: s.asin ? `https://www.amazon.com/dp/${s.asin}` : 'https://www.amazon.com',
         };
       };
       const schedulerFn = (count) => {
