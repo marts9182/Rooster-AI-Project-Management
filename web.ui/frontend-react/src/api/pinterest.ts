@@ -175,4 +175,51 @@ export async function refreshToken(): Promise<void> {
   if (!r.ok) await throwForStatus(r, 'refreshToken');
 }
 
+export interface CadenceBucket {
+  date: string;
+  posted: number;
+  failed: number;
+}
+
+export interface CadenceResponse {
+  days: number;
+  target_per_day: number;
+  buckets: CadenceBucket[];
+  summary: {
+    posted: number;
+    failed: number;
+    success_rate: number;
+    avg_per_day: number;
+  };
+}
+
+export interface EngagementRow {
+  history_id: number;
+  image_path: string | null;
+  book_slug: string | null;
+  posted_at: string;
+  saves: number | null;
+  clicks: number | null;
+  impressions: number | null;
+  pinterest_url: string | null;
+  engagement_available: boolean;
+}
+
+export interface EngagementResponse {
+  rows: EngagementRow[];
+  engagement_disabled: boolean;
+}
+
+export async function getCadence(days = 30): Promise<CadenceResponse> {
+  const r = await fetch(`/api/pinterest/cadence?days=${days}`);
+  if (!r.ok) await throwForStatus(r, 'getCadence');
+  return (await r.json()) as CadenceResponse;
+}
+
+export async function getEngagement(limit = 50): Promise<EngagementResponse> {
+  const r = await fetch(`/api/pinterest/engagement?limit=${limit}`);
+  if (!r.ok) await throwForStatus(r, 'getEngagement');
+  return (await r.json()) as EngagementResponse;
+}
+
 export { ApiError };
