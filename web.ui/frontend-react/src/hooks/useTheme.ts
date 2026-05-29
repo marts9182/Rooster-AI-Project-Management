@@ -25,6 +25,13 @@ function osPreference(): Theme {
 function applyTheme(theme: Theme): void {
   if (typeof document === 'undefined') return;
   document.documentElement.setAttribute('data-theme', theme);
+  // Notify token-reading components (e.g. pages/Calendar.tsx) that
+  // theme-derived CSS variables may have new computed values. Fires
+  // both on first paint and on every user toggle because the calling
+  // useEffect runs on mount and on theme state change.
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('themechange'));
+  }
 }
 
 /**

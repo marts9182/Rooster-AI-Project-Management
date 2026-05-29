@@ -72,6 +72,17 @@
   --tracking-tight: -0.01em;
   --tracking-base:  0;
   --tracking-wide:  0.04em;
+
+  /* ── Calendar event colors (added 2026-05-29, Task 4) ────────────────
+     Per-kind FullCalendar event backgrounds. Read at runtime via
+     getComputedStyle in pages/Calendar.tsx, which subscribes to a
+     `themechange` window event so light/dark swaps repaint instantly. */
+  --cal-kdp-release: #2d7a3a;
+  --cal-etsy-listed: #b76e2a;
+  --cal-reminder: #b14040;
+  --cal-pinterest: #b8004f;
+  --cal-roadmap-release: #5a8edb;
+  --cal-roadmap-lock: #8a5cf0;
 }
 
 [data-theme="dark"] {
@@ -105,6 +116,15 @@
   --row-failed-bg: #2a1a1a;
   --overlay-bg: rgba(0, 0, 0, 0.55);
   --modal-backdrop-bg: rgba(0, 0, 0, 0.7);
+
+  /* Dark-theme calendar event colors — brighter to stay legible on
+     the dark FullCalendar grid. */
+  --cal-kdp-release: #5fb56e;
+  --cal-etsy-listed: #d99060;
+  --cal-reminder: #e57676;
+  --cal-pinterest: #e8538a;
+  --cal-roadmap-release: #8ab4f0;
+  --cal-roadmap-lock: #b497ff;
 }
 
 * { box-sizing: border-box; }

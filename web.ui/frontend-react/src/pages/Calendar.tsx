@@ -33,14 +33,47 @@ import { dismissReminder, snoozeReminder } from '../api/reminders';
 import { useSseEvents } from '../hooks/useSseEvents';
 import RoadmapDetailModal from '../components/RoadmapDetailModal';
 
-const KIND_COLORS: Record<CalendarEventKind, string> = {
-  'kdp.release': '#4a90d9',
-  'etsy.listed': '#d96b4a',
-  'pinterest.post': '#c4488f',
-  reminder: '#e3b341',
-  'roadmap.release': '#7c3aed',
-  'roadmap.lock': '#a78bfa',
+/**
+ * Fallback hex values that mirror the `--cal-*` tokens in shell.css for the
+ * light theme. Used when getComputedStyle can't resolve the variable (jsdom
+ * tests, or a render before <html data-theme> is set).
+ */
+const KIND_COLOR_FALLBACK: Record<CalendarEventKind, string> = {
+  'kdp.release': '#2d7a3a',
+  'etsy.listed': '#b76e2a',
+  'pinterest.post': '#b8004f',
+  reminder: '#b14040',
+  'roadmap.release': '#5a8edb',
+  'roadmap.lock': '#8a5cf0',
 };
+
+const KIND_TOKEN: Record<CalendarEventKind, string> = {
+  'kdp.release': '--cal-kdp-release',
+  'etsy.listed': '--cal-etsy-listed',
+  'pinterest.post': '--cal-pinterest',
+  reminder: '--cal-reminder',
+  'roadmap.release': '--cal-roadmap-release',
+  'roadmap.lock': '--cal-roadmap-lock',
+};
+
+/**
+ * Read the live calendar palette from `:root`'s computed CSS custom properties
+ * so the colors flip with the active `data-theme`. Falls back to the
+ * light-theme defaults when running in jsdom (no real layout) or before the
+ * theme attribute has been applied.
+ */
+function readCalendarColors(): Record<CalendarEventKind, string> {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return { ...KIND_COLOR_FALLBACK };
+  }
+  const cs = getComputedStyle(document.documentElement);
+  const out = {} as Record<CalendarEventKind, string>;
+  (Object.keys(KIND_TOKEN) as CalendarEventKind[]).forEach((k) => {
+    const v = cs.getPropertyValue(KIND_TOKEN[k]).trim();
+    out[k] = v || KIND_COLOR_FALLBACK[k];
+  });
+  return out;
+}
 
 const KIND_LABELS: Record<CalendarEventKind, string> = {
   'kdp.release': 'KDP releases',
@@ -102,6 +135,17 @@ export default function Calendar() {
     defaultWindow(),
   );
   const [activeRoadmapId, setActiveRoadmapId] = useState<number | null>(null);
+  // Live calendar palette — re-read on `themechange` (dispatched by
+  // useTheme.applyTheme) so light/dark swaps repaint events + legend.
+  const [kindColors, setKindColors] = useState<Record<CalendarEventKind, string>>(
+    () => readCalendarColors(),
+  );
+
+  useEffect(() => {
+    const handler = () => setKindColors(readCalendarColors());
+    window.addEventListener('themechange', handler);
+    return () => window.removeEventListener('themechange', handler);
+  }, []);
 
   // Throttle SSE-triggered refetches to at most one per 2 seconds.
   const lastRefetchAt = useRef<number>(0);
@@ -161,12 +205,12 @@ export default function Calendar() {
         title: e.title,
         start: e.date,
         allDay: true,
-        backgroundColor: KIND_COLORS[e.kind],
-        borderColor: KIND_COLORS[e.kind],
+        backgroundColor: kindColors[e.kind] ?? '#888',
+        borderColor: kindColors[e.kind] ?? '#888',
         classNames: [`event-kind-${e.kind.replace('.', '-')}`],
         extendedProps: { calEvent: e },
       })),
-    [visible],
+    [visible, kindColors],
   );
 
   const toggleKind = useCallback((kind: CalendarEventKind) => {
@@ -241,9 +285,9 @@ export default function Calendar() {
                 style={{
                   padding: '4px 10px',
                   borderRadius: 12,
-                  border: `1px solid ${KIND_COLORS[k]}`,
-                  background: on ? KIND_COLORS[k] : 'transparent',
-                  color: on ? 'white' : KIND_COLORS[k],
+                  border: `1px solid ${kindColors[k]}`,
+                  background: on ? kindColors[k] : 'transparent',
+                  color: on ? 'white' : kindColors[k],
                   cursor: 'pointer',
                 }}
               >
@@ -318,7 +362,7 @@ export default function Calendar() {
                 className={`status-badge event-kind-${selected.kind.replace('.', '-')}`}
                 aria-label={`Kind: ${KIND_LABELS[selected.kind] ?? selected.kind}`}
                 style={{
-                  background: KIND_COLORS[selected.kind] ?? '#999',
+                  background: kindColors[selected.kind] ?? '#999',
                   color: 'white',
                   padding: '2px 8px',
                   borderRadius: 10,
