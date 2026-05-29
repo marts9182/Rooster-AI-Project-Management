@@ -148,7 +148,7 @@ export function aggregateCalendarEvents(db, from, to) {
       .prepare(
         `SELECT id, kind, slug, title, target_release_date, file_lock_date, status
            FROM publishing_roadmap
-          WHERE status != 'skipped'
+          WHERE status NOT IN ('skipped', 'published')
             AND (
                   (target_release_date >= ? AND target_release_date < ?)
                OR (file_lock_date IS NOT NULL AND file_lock_date >= ? AND file_lock_date < ?)

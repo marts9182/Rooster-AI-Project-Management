@@ -200,6 +200,16 @@ describe('aggregateCalendarEvents — publishing_roadmap', () => {
     expect(events.filter((e) => e.kind.startsWith('roadmap.'))).toHaveLength(0);
   });
 
+  it('excludes published rows (forward-only calendar)', () => {
+    seedRoadmap({
+      kind: 'kdp', slug: 'foo', title: 'Foo',
+      target_release_date: '2026-09-15', status: 'published', source: 'reuse',
+      file_lock_date: '2026-08-31',
+    });
+    const events = aggregateCalendarEvents(db, '2026-08-01', '2026-10-01');
+    expect(events.filter((e) => e.kind.startsWith('roadmap.'))).toHaveLength(0);
+  });
+
   it('omits lock event when file_lock_date falls outside the [from,to) window', () => {
     seedRoadmap({
       kind: 'kdp', slug: 'foo', title: 'Foo',
