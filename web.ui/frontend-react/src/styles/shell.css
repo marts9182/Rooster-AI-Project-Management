@@ -640,3 +640,24 @@ a:visited { color: var(--accent); }
 .mark-published-modal-date { display: block; margin-top: 4px; }
 .mark-published-modal-error { color: var(--danger); margin-top: 0; }
 .mark-published-modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* Pinterest calendar grid. */
+.pin-calendar { display: grid; gap: 4px; }
+.pin-calendar__row { display: grid; grid-template-columns: 60px repeat(7, 1fr); gap: 4px; align-items: stretch; }
+.pin-calendar__head { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.pin-calendar__day-head { padding: 4px; text-align: center; }
+.pin-calendar__slot-label { font-size: 0.75rem; color: var(--muted); padding: 4px; }
+.pin-calendar__cell { min-height: 36px; padding: 2px; border: 1px solid var(--border); border-radius: 4px; display: flex; flex-wrap: wrap; gap: 2px; }
+.pin-calendar__cell-empty { display: block; width: 100%; min-height: 32px; opacity: 0.05; }
+.pin-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; color: #fff;
+  padding: 2px 6px; border-radius: 999px; border: none; cursor: pointer;
+}
+.pin-chip--paused { background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.3) 4px, rgba(255,255,255,0.3) 8px); }
+.pin-chip--posting { animation: pin-chip-pulse 1.2s infinite ease-in-out; }
+.pin-chip--failed { background: transparent !important; color: #b91c1c; border: 1px solid #b91c1c; }
+@keyframes pin-chip-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

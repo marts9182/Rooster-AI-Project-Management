@@ -42,9 +42,11 @@ export interface PinterestQueueRow {
   link_url: string;
   status: QueueStatus;
   scheduled_for: string;
-  attempts: number;
-  last_error: string | null;
-  created_at: string;
+  attempts?: number;
+  last_error?: string | null;
+  created_at?: string;
+  /** Joined from kdp_books for calendar grouping; null when not joined. */
+  book_slug?: string | null;
 }
 
 export interface PinterestHistoryRow {
