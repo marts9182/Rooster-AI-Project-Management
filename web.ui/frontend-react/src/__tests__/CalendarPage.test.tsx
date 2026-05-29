@@ -160,6 +160,9 @@ beforeEach(() => {
     if (u.match(/\/api\/reminders\/\d+\/dismiss/) && init?.method === 'POST') {
       return Promise.resolve(jsonOk({ ok: true }));
     }
+    if (u.startsWith('/api/roadmap')) {
+      return Promise.resolve(jsonOk({ rows: [] }));
+    }
     return Promise.reject(new Error(`Unmocked fetch: ${u}`));
   });
   vi.stubGlobal('fetch', fetchMock);
@@ -311,6 +314,71 @@ describe('<Calendar />', () => {
         screen.queryByRole('dialog', { name: /event details/i }),
       ).not.toBeInTheDocument(),
     );
+  });
+
+  it('clicking a roadmap.release event opens the RoadmapDetailModal', async () => {
+    fetchMock.mockImplementation(async (url: string) => {
+      const u = String(url);
+      if (u.includes('/api/calendar')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            events: [
+              {
+                date: '2026-09-15',
+                kind: 'roadmap.release',
+                title: 'KDP: Foo',
+                source_kind: 'publishing.roadmap',
+                source_id: 7,
+                url: '/calendar',
+              },
+            ],
+          }),
+          text: async () => '{}',
+        } as unknown as Response;
+      }
+      if (u.startsWith('/api/roadmap')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            rows: [
+              {
+                id: 7,
+                kind: 'kdp',
+                slug: 'foo',
+                title: 'Foo',
+                target_release_date: '2026-09-15',
+                status: 'scheduled',
+                source: 'reuse',
+                niche: null,
+                rationale: null,
+                file_lock_date: '2026-08-31',
+                kdp_book_id: null,
+                etsy_listing_id: null,
+                notes: null,
+                created_at: '',
+                updated_at: '',
+              },
+            ],
+          }),
+          text: async () => '{}',
+        } as unknown as Response;
+      }
+      throw new Error(`unexpected URL: ${u}`);
+    });
+
+    render(
+      <MemoryRouter>
+        <Calendar />
+      </MemoryRouter>,
+    );
+    const event = await screen.findByText(/KDP: Foo/i);
+    await userEvent.click(event);
+    expect(
+      await screen.findByRole('dialog', { name: /roadmap/i }),
+    ).toBeInTheDocument();
   });
 
   it('refetches when an etsy:synced SSE event fires', async () => {

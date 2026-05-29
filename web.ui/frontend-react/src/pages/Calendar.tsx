@@ -31,12 +31,15 @@ import {
 } from '../api/calendar';
 import { dismissReminder, snoozeReminder } from '../api/reminders';
 import { useSseEvents } from '../hooks/useSseEvents';
+import RoadmapDetailModal from '../components/RoadmapDetailModal';
 
 const KIND_COLORS: Record<CalendarEventKind, string> = {
   'kdp.release': '#4a90d9',
   'etsy.listed': '#d96b4a',
   'pinterest.post': '#c4488f',
   reminder: '#e3b341',
+  'roadmap.release': '#7c3aed',
+  'roadmap.lock': '#a78bfa',
 };
 
 const KIND_LABELS: Record<CalendarEventKind, string> = {
@@ -44,6 +47,8 @@ const KIND_LABELS: Record<CalendarEventKind, string> = {
   'etsy.listed': 'Etsy listings',
   'pinterest.post': 'Pinterest posts',
   reminder: 'Reminders',
+  'roadmap.release': 'Planned release',
+  'roadmap.lock': 'File lock deadline',
 };
 
 const ALL_KINDS: CalendarEventKind[] = [
@@ -51,6 +56,8 @@ const ALL_KINDS: CalendarEventKind[] = [
   'etsy.listed',
   'pinterest.post',
   'reminder',
+  'roadmap.release',
+  'roadmap.lock',
 ];
 
 const SSE_REFETCH_KINDS = new Set([
@@ -94,6 +101,7 @@ export default function Calendar() {
   const [windowRange, setWindowRange] = useState<{ from: string; to: string }>(
     defaultWindow(),
   );
+  const [activeRoadmapId, setActiveRoadmapId] = useState<number | null>(null);
 
   // Throttle SSE-triggered refetches to at most one per 2 seconds.
   const lastRefetchAt = useRef<number>(0);
@@ -172,6 +180,11 @@ export default function Calendar() {
 
   const onEventClick = useCallback((arg: EventClickArg) => {
     const ev = arg.event.extendedProps.calEvent as CalendarEvent | undefined;
+    if (ev && ev.source_kind === 'publishing.roadmap') {
+      const id = Number(ev.source_id);
+      if (Number.isFinite(id)) setActiveRoadmapId(id);
+      return;
+    }
     if (ev) setSelected(ev);
   }, []);
 
@@ -367,6 +380,16 @@ export default function Calendar() {
             </div>
           </aside>
         </>
+      )}
+
+      {activeRoadmapId != null && (
+        <RoadmapDetailModal
+          id={activeRoadmapId}
+          onClose={() => setActiveRoadmapId(null)}
+          onChanged={() => {
+            void reload(windowRange);
+          }}
+        />
       )}
     </section>
   );
