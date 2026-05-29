@@ -367,3 +367,26 @@ describe('POST /api/pinterest/refresh', () => {
     expect(res.body.error).toMatch(/ECONNRESET/);
   });
 });
+
+describe('GET /api/pinterest/cadence', () => {
+  it('returns 30 buckets by default', async () => {
+    const resp = await request(app).get('/api/pinterest/cadence');
+    expect(resp.status).toBe(200);
+    expect(resp.body.buckets.length).toBe(30);
+    expect(resp.body.target_per_day).toBe(4);
+  });
+
+  it('honors the days query param', async () => {
+    const resp = await request(app).get('/api/pinterest/cadence?days=7');
+    expect(resp.body.buckets.length).toBe(7);
+  });
+});
+
+describe('GET /api/pinterest/engagement', () => {
+  it('returns the expected shape', async () => {
+    const resp = await request(app).get('/api/pinterest/engagement');
+    expect(resp.status).toBe(200);
+    expect(Array.isArray(resp.body.rows)).toBe(true);
+    expect(typeof resp.body.engagement_disabled).toBe('boolean');
+  });
+});

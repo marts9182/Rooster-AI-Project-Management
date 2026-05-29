@@ -220,11 +220,17 @@ export function markPosted(id, pinterestPinId) {
   const db = openDb();
   const now = new Date().toISOString();
   const txn = db.transaction(() => {
+    const row = db.prepare('SELECT image_path FROM pinterest_queue WHERE id=?').get(id);
     db.prepare(`UPDATE pinterest_queue SET status='posted' WHERE id=?`).run(id);
+    const pinterestUrl = pinterestPinId
+      ? `https://www.pinterest.com/pin/${pinterestPinId}/`
+      : null;
     db.prepare(`
-      INSERT INTO pinterest_history (queue_id, pinterest_pin_id, posted_at, success, error_message)
-      VALUES (?, ?, ?, 1, NULL)
-    `).run(id, pinterestPinId, now);
+      INSERT INTO pinterest_history
+        (queue_id, pinterest_pin_id, posted_at, success, error_message,
+         status, image_path, pinterest_url)
+      VALUES (?, ?, ?, 1, NULL, 'posted', ?, ?)
+    `).run(id, pinterestPinId, now, row?.image_path ?? null, pinterestUrl);
   });
   txn();
   recordEvent('pinterest:pin-posted', { queue_id: id, pinterest_pin_id: pinterestPinId });
@@ -240,15 +246,18 @@ export function markFailed(id, errorMessage) {
   const db = openDb();
   const now = new Date().toISOString();
   const txn = db.transaction(() => {
+    const row = db.prepare('SELECT image_path FROM pinterest_queue WHERE id=?').get(id);
     db.prepare(`
       UPDATE pinterest_queue
          SET status='failed', attempts = attempts + 1, last_error = ?
        WHERE id=?
     `).run(errorMessage, id);
     db.prepare(`
-      INSERT INTO pinterest_history (queue_id, pinterest_pin_id, posted_at, success, error_message)
-      VALUES (?, NULL, ?, 0, ?)
-    `).run(id, now, errorMessage);
+      INSERT INTO pinterest_history
+        (queue_id, pinterest_pin_id, posted_at, success, error_message,
+         status, image_path)
+      VALUES (?, NULL, ?, 0, ?, 'failed', ?)
+    `).run(id, now, errorMessage, row?.image_path ?? null);
   });
   txn();
   recordEvent('pinterest:pin-failed', { queue_id: id, error: errorMessage });

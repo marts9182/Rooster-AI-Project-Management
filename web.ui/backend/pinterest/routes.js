@@ -32,6 +32,7 @@ import {
   cancelQueueRow,
   updateQueueRow,
 } from './queue.js';
+import { cadenceBuckets, engagementRows } from './analytics.js';
 
 /**
  * Build the Pinterest router. The apiClient is required only for the
@@ -175,6 +176,19 @@ export function buildRouter(opts = {}) {
           : 500;
       res.status(code).json({ error: message });
     }
+  });
+
+  router.get('/cadence', (req, res) => {
+    const days = Math.min(Math.max(Number(req.query.days ?? 30) || 30, 1), 90);
+    const target = Number(process.env.PINTEREST_TARGET_PER_DAY ?? 4);
+    const db = openDb();
+    res.json(cadenceBuckets(db, { days, target }));
+  });
+
+  router.get('/engagement', (req, res) => {
+    const limit = Math.min(Math.max(Number(req.query.limit ?? 50) || 50, 1), 200);
+    const db = openDb();
+    res.json(engagementRows(db, { limit }));
   });
 
   return router;
