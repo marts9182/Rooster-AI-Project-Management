@@ -46,7 +46,7 @@ Three knocks, from below. Not on the ice — through it, or from under it, a sou
 
 She goes very still.
 
-She does not move. She does not breathe in a way she would call breathing. The fire ticks. The stones tick as they give up their heat. She counts the seconds without meaning to, the way you count between lightning and the thunder after it, and the counting goes on longer than she expects, long enough that she begins to think it was the only set, that it was over.
+She does not move. She does not breathe in a way she would call breathing. The fire ticks. The stones tick as they give up their heat. She counts the seconds without meaning to — she counts everything now, she has started to notice, the silences most of all — and it goes on longer than she expects, long enough that she begins to think it was the only set, that it was over.
 
 The cold comes up through the hatch.
 
