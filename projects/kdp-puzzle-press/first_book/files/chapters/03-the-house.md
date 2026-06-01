@@ -40,7 +40,11 @@ On the workbench: a half-finished piece she can't identify, clamped in a vise. C
 
 She puts the mallet down. She looks at the walls.
 
-He's covered them — not covered, that's the wrong word, decorated isn't right either. Marked them. Small carvings in the wood of the wall studs, in the exposed framing between the drywall panels. She has to get close to see them. Not letters, not exactly, though some of them remind her of something. Runes, she thinks, or what she imagines runes look like, though she doesn't actually know what runes look like. She takes out her phone and takes pictures of several of them.
+He's covered them — not covered, that's the wrong word, decorated isn't right either. Marked them. Small carvings in the wood of the wall studs, in the exposed framing between the drywall panels. She has to get close to see them. Not letters, not exactly, though some of them remind her of something. Runes, she thinks, or what she imagines runes look like, though she doesn't actually know what runes look like.
+
+She reaches out and traces one of them with her finger, following the cut of it, the way you'd read a word in a language you don't have. The wood is cold. Not cool, the way wood is in a basement in February — cold, the way the percolator was cold, the way a thing is cold when it has been holding the cold for a long time and means to go on holding it. She takes her hand back. The furnace is six feet away and running. She puts her finger against the stud beside it, the plain one, the uncarved one, and it's only wood, only the ordinary chill of the room. She tries the carving again. Cold. She tells herself the difference is in her, that a fingertip is a poor thermometer, that she's been down here twenty minutes in a basement and her hands have given up their heat unevenly the way hands do. It's a good explanation. She files it. It doesn't quite cover the part where she keeps her hand off the wall after that.
+
+She takes out her phone and takes pictures of several of them.
 
 She doesn't know why she takes the pictures. She just does.
 
@@ -62,6 +66,8 @@ She reads it again.
 
 She reads it a third time.
 
+*She came up around 2 but did not knock.* The basement is cold. It was cold when she came down and she hadn't thought anything of it, basements are cold, but she's aware of it now, a flat even cold with no edge to it, and her breath is going out of her in a thin visible thread that hangs there longer than breath should before it lets go. She's holding the notebook with both hands. She makes herself notice that — both hands, the way you hold a thing you've decided not to drop — and she sets one hand flat on the workbench instead, on the wood, which is the same temperature as everything else down here and tells her nothing. *She.* Not a name. Not the woman from the bar, not a neighbor, not anyone he'd have written down as anyone. Just *she*, the way you write a thing you don't have to explain to yourself because you already know what it is. *Stayed below.* Aino's heart is going faster than the moment calls for and she stands there and lets it, because there is nothing in this entry, nothing at all, an old man's ice measurements and a note that he was tired three days before he died of being seventy-seven in his kitchen, and her body has read it as something else and gotten there ahead of her, the way it got there ahead of her at the bar, under the sternum, the small cold weight settling in beside the one already there.
+
 She closes the notebook and puts it back exactly where it was. She goes upstairs. She sits at the kitchen table for a while without doing anything.
 
 Then she gets up and puts her coat on and goes outside, around the side of the house, down the slope through the pines toward the lake.
@@ -78,9 +84,13 @@ She stops at the tree line. She does not go to the sauna.
 
 The lake is frozen solid, or looks it — flat white stretching out to the far shore, the pines on the other side a dark line against the pale sky. A couple of fish houses are visible in the middle distance, other people's, small dark rectangles on the white. The ice is quiet. No cracking, no groaning, just the wind moving across the surface and lifting a fine spray of snow.
 
+The wind is at her back. It comes down the slope behind her, through the pines, and it should carry out across the lake and away, the way wind does over open ice, and it doesn't. It dies at the shoreline. She can feel it pushing at her shoulders and she can see, twenty feet out, where it stops — the snow lifting and turning and settling, lifting and settling, going nowhere, as though the lake is a room and the door is the tree line behind her and she is standing in the doorway with the cold pouring past her into it. The far shore is a mile off and perfectly still. Nothing moves out there. But the stillness isn't the stillness of an empty room. It's the stillness of a room with someone in it, the particular held quality of a space that has registered that the door is open, that something is standing in the doorway, and is waiting to see what it does. She has the clear and stupid sense that if she takes one step down onto the ice the whole white surface of it will know.
+
+She doesn't take the step. She tells herself she doesn't take it because the ice along the shore is rotten this time of year, undercut where the inlet runs, and she has better sense than to test it in city boots with no one knowing where she is. It's a good reason. It's even true. It is not why her feet have stopped where the snow ends.
+
 She stands there for a few minutes. The cold is working its way through her coat now, finding her shoulders, her ears.
 
-There is nothing wrong with the lake. It is a lake in February. It is exactly what a lake in February looks like.
+There is nothing wrong with the lake. It is a lake in February. It is exactly what a lake in February looks like. She says it to herself in those words, plainly, the way you read a label aloud to settle an argument, and the lake goes on attending to her, patient, the snow lifting and settling at the edge of it, and does not agree.
 
 She goes back to the house.
 
