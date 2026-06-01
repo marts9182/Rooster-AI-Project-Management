@@ -89,7 +89,7 @@ She thinks: I will call Mikko.
 
 The phone is on the wall by the back door. She crosses the kitchen to it and lifts the receiver and gets the dial tone, that flat steady note, and she puts her finger in the dial for the first number of his — and the knocking comes, three, up through the floor at the base of the door not three feet from where she is standing, and she takes her finger out of the dial.
 
-It is past midnight. It is past midnight on a Saturday and Mikko has the lake watch in the morning and a body that needs sleep, and there is nothing he can do about the floor that she cannot do, which is nothing. She is not going to be a woman who calls a man at midnight because the dark is loud. She hangs up the phone. She stands with her hand on the receiver for a moment longer than that decision required, and then she takes it away.
+It is past midnight. It is past midnight on a Saturday and Mikko has an early start in the morning and a body that needs sleep, and there is nothing he can do about the floor that she cannot do, which is nothing. She is not going to be a woman who calls a man at midnight because the dark is loud. She hangs up the phone. She stands with her hand on the receiver for a moment longer than that decision required, and then she takes it away.
 
 Three knocks. Seven seconds. Three knocks.
 
@@ -139,6 +139,6 @@ She pours the coffee. She wraps both hands around the cup and feels the heat com
 
 She is the last Hietala. Her great-grandfather started the watch and her grandfather kept it and her father kept it for thirty years and died with it broken in his chest, and there is no one left to hand it to, and Louise comes Wednesday, and between now and Wednesday there is a count coming up through the floor of the lake every night, patient and exact and a hundred years angry, and it is going to do everything it can to find the place in her where she gives.
 
-It is not going to find it. Not tonight, with the sun on the snow and the coffee in her hands. Whatever breaks before Wednesday, it is not going to be her.
+It will not find it tonight. The sun is coming up gold over the trees and the coffee is hot in her hands and her hands are steady. Whatever breaks before Wednesday, it is not going to be her.
 
 She drinks the coffee while it is hot. The day, when it gets going, is going to be warm.
