@@ -44,13 +44,17 @@ Not static — silence. A clean, total silence, like someone reached over and tu
 
 She doesn't touch the dial.
 
-She drives. The silence in the car is different from the silence before she'd turned the radio on. That had been just quiet. This is — she doesn't have a word for it. Like the quiet after someone asks a question.
+A dead spot, she thinks. They happen. You drop a station and pick up the silence between, and the display just hasn't caught up. Except the display has never caught up wrong before, not in nineteen years on this road, and the bars are full, and a dead spot is static, fuzz, the ghost of a station two counties over bleeding through — a dead spot is not nothing. The hills, then. The trees. Something between her and the tower, the dense pines swallowing it the way they swallow the light. But she'd lose the signal for that, lose the bars, and the bars are full.
 
-The man comes back mid-sentence: *—the kind of decision that'll cost you in March.* No static, no fade-in, just there again like he'd never been gone.
+She gives it the next reasonable thing. A fault at the station. A man at a board somewhere reaching for the wrong switch. That's allowed. That happens.
+
+She drives. The silence holds. It is not the silence before she'd turned the radio on; that had been just quiet, the ordinary quiet of a car and a road. This is the other kind. The kind that is waiting for something. Like the quiet after someone asks a question — the room holding its breath for the answer, everyone looking at you. She counts. She doesn't mean to and then she's doing it anyway, the seconds, the way you count the gap between lightning and the thunder to know how far off the storm is. Four. Five. Six.
+
+The man comes back mid-sentence: *—the kind of decision that'll cost you in March.* No static, no fade-in, just there again like he'd never been gone, like the gap had been hers and not his.
 
 She exhales slowly. She hadn't realized she'd stopped breathing.
 
-*WATERSMEET 11,* the next sign says. She doesn't need Watersmeet. She's forty minutes past the Watersmeet exit before it occurs to her that she should have eaten something. She eats an apple without tasting it.
+A sign comes up out of the snow, green and reflective, and her eyes go to it the way eyes do on an empty road, hungry for anything. *WATERSMEET 11.* She reads it twice. She has no business in Watersmeet — she's never had business in Watersmeet — but the name sits there a beat longer than it should, the way a name does when you've heard it somewhere and can't place where. Then the sign is behind her and the road is dark again. She's forty minutes past the exit before it occurs to her that she should have eaten something. She eats an apple without tasting it.
 
 ---
 
@@ -74,7 +78,9 @@ And then, from behind the house — down the slope, from the direction of the la
 
 Just the ice, she tells herself. The ice does that. She's heard it a thousand times.
 
-She gets her bag from the back seat and goes to the porch. The light above the door flickers when she reaches it — once, and then again, and then a third time — and then holds steady. Old wiring, she thinks. Old house.
+She gets her bag from the back seat and goes to the porch. The light above the door is on — the neighbor, or the lawyer, somebody left it on for her — and as she reaches the bottom step it flickers. Once. A pause, long enough that she thinks it's done. Then again. Another pause, longer, the dark coming back and sitting there. Then a third time, and this time she's stopped on the step watching it, her bag in her hand, the cold coming up through her boots. Then it holds steady, the way it must have been holding steady all along.
+
+Old wiring, she thinks. Old house.
 
 She lets herself in.
 
