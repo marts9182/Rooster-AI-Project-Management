@@ -62,7 +62,7 @@ The section lifts.
 
 Below it: the lockbox, a heavy metal box bolted to the framing of the platform, a combination lock on the hasp. She stares at it for a moment. He hadn't mentioned a combination.
 
-She tries his birthday. Nothing. She tries her birthday. Nothing. She tries her grandmother Aili's birthday, which she knows because it was two days before her own and they used to share a cake when she was small.
+She tries his birthday. Nothing. She tries her birthday. Nothing. She tries her mother's, the date carved into the headstone in the churchyard she has driven past but not walked into, and the lock holds. She sits back on her heels. Then she tries her grandmother Aili's birthday, which she knows because it was two days before her own and they used to share a cake when she was small.
 
 The lock opens.
 
@@ -96,7 +96,13 @@ She closes the hatch.
 
 She sits back on the lower bench with the old notebook in her lap and her heart going hard in her chest and the kiuas ticking down around her, and she thinks: *so that is what he was watching.*
 
-She stays in the sauna until the fire burns low. Then she banks the stove, closes the firebox vent, puts her coat back on, and walks back up the hill to the house with the notebook under her arm.
+She does not get up right away. The fire is past its height now and settling, the logs gone to a low orange seam in the firebox, and the heat in the stones is the long even kind that comes after the flames are done, the kind that will hold for another hour and then let go all at once. She sits in it. She lets the löyly thin out and does not ladle more. The carved marks come back out of the steam as the air clears, the band of them running level around the room, and she does not look at them either.
+
+What she thinks about is small. She does not try to think about the thing in the water, which is past her, which her mind keeps sliding off of the way a hand slides off ice. She thinks instead about the number of times she has been told, by people who meant it kindly, that her father was a private man. That he kept to himself. That whatever he did down at the lake was his own business and harmed no one. She had let herself believe it the way you believe a thing you have not tested, and the believing had cost her nothing, and now it has cost her everything it was holding back.
+
+She breathes the hot cedar and the mineral smell under it. Her body has changed in the last hour and she can locate the change without naming it: she will not, after this, be able to stand at the kitchen window at night and tell herself the prints are an animal's. The lie is gone the way a tooth is gone, a smooth socket where it was, the tongue going back to it. She is not afraid, exactly, sitting here. Fear would be easier. What she has instead is the flat certainty of someone who has read the bottom line of a page and cannot unread it, and the heat works on her the way it must have worked on him, ten thousand times, holding the body still while the rest of it caught up.
+
+When the seam in the firebox has gone from orange to a dull red she stands. Her legs are unsteady from the heat and she waits for them. Then she banks the stove, closes the firebox vent, puts her coat back on over a body that is still warm and will be cold by the top of the hill, and walks back up to the house with the notebook under her arm.
 
 She doesn't look back at the lake.
 
