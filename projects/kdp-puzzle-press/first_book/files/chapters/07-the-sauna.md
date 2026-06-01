@@ -62,7 +62,7 @@ The section lifts.
 
 Below it: the lockbox, a heavy metal box bolted to the framing of the platform, a combination lock on the hasp. She stares at it for a moment. He hadn't mentioned a combination.
 
-She tries his birthday. Nothing. She tries her birthday. Nothing. She tries her mother's, the date carved into the headstone in the churchyard she has driven past but not walked into, and the lock holds. She sits back on her heels. Then she tries her grandmother Aili's birthday, which she knows because it was two days before her own and they used to share a cake when she was small.
+She tries his birthday. Nothing. She tries her birthday. Nothing. She tries her grandfather Toivo's, the date she knows the way you know the birthdays of the drowned, and the lock holds. She sits back on her heels. Then she tries her grandmother Aili's birthday, which she knows because it was two days before her own and they used to share a cake when she was small.
 
 The lock opens.
 
