@@ -38,6 +38,14 @@ task_status.txt
 
 # Project-specific
 projects/
+# …but track the Anna Sen Mennä novel working files (negation must re-include each parent level)
+!/projects/
+/projects/*
+!/projects/kdp-puzzle-press/
+/projects/kdp-puzzle-press/*
+!/projects/kdp-puzzle-press/first_book/
+/projects/kdp-puzzle-press/first_book/*
+!/projects/kdp-puzzle-press/first_book/files/
 data/
 *.db
 *.sqlite
