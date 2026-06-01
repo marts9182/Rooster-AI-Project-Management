@@ -26,7 +26,13 @@ The drive to Iron Mountain takes forty-five minutes on roads that haven't been p
 
 The funeral home is on the main street in Iron Mountain, a brick building with a discreet sign and a parking lot that's been carefully shoveled. The man who meets her is named Gerald, fifties, the kind of careful gentle that people in his profession either come by naturally or learn so thoroughly it becomes the same thing. He has a folder with her father's name on it. He offers her coffee and she says no thank you and they sit across a desk from each other and go through the folder.
 
-Her father had, it turns out, pre-arranged most of this. Left a list of preferences — no viewing, Lutheran service, cremation after. The plot in the church cemetery had been in the family since his grandfather's time; that part at least required nothing from her. Gerald says all of this with a kind of respectful approval, as though her father had done everyone a favor by being so organized about his own death, which Aino supposes he had. She signs where Gerald indicates. She picks up a small envelope of information about what happens next, what she'll need to bring to the service, who will contact whom. Gerald is very thorough. She is grateful for his thoroughness because it means she does not have to think.
+He says her father's name the right way. That's the thing she notices first, sitting down. *Hietala* — the *ie* short and clipped, the way her father said it, the way the old men in the township say it, not *Hy-tay-la* the way the bank and the school and the State of Wisconsin have said it her whole life. People who learn the name learn it wrong. Gerald didn't learn it. He has it. She files that away without knowing where to put it and lets him keep talking.
+
+Her father had, it turns out, pre-arranged most of this. Left a list of preferences — no viewing, Lutheran service, cremation after. The plot in the church cemetery had been in the family since his grandfather's time; that part at least required nothing from her. Gerald says all of this with a kind of respectful approval, as though her father had done everyone a favor by being so organized about his own death, which Aino supposes he had.
+
+The folder, though. The folder is wrong, or not wrong, but old. The intake form on top is dated last week, crisp, the toner still sharp. But underneath it there's an older sheet, the paper gone soft and faintly yellow at the edge the way paper goes when it's sat in a drawer for years, and the typeface on it is the gray, slightly broken gray of a machine that needed a new ribbon a long time ago. She can't read it upside down and doesn't try. Pre-arranged, she reminds herself. He set this up years ago; of course there's old paper in here. People plan ahead up here. People who've watched their parents die in February plan very far ahead. That's all it is. She signs where Gerald indicates and doesn't look at the old sheet again, which costs her a small effort she doesn't examine.
+
+She picks up a small envelope of information about what happens next, what she'll need to bring to the service, who will contact whom. Gerald is very thorough. She is grateful for his thoroughness because it means she does not have to think.
 
 She is in the parking lot by eleven-fifteen, earlier than she'd expected. She sits in the car for a moment. Iron Mountain feels enormous after Kivijärvi — a grocery store, a hardware store, two gas stations visible from where she's parked, people walking on cleared sidewalks. A woman in a red coat walks past with a dog. Ordinary world going on.
 
@@ -110,14 +116,24 @@ He turns back to the hockey game.
 
 She finishes her burger. She has another beer. The couple in the booth pays and leaves. The bartender wipes down the bar and puts some glasses away and she can tell he's the kind of bartender who's comfortable with silence, which she appreciates. At some point Paavo Maki finishes his brandy and puts on his coat and goes out without saying anything else, and the door lets in a cold blast when it opens and swings shut.
 
-She sits with her second beer for a while after he's gone. The bar is empty now except for her and the bartender and the hockey game. She watches the players move around the ice without the sound, which makes it look like something she doesn't have a word for. Purposeful and silent and far away.
+She sits with her second beer for a while after he's gone. The bar is empty now except for her and the bartender and the hockey game. She watches the players move around the ice without the sound, which makes it look like something she doesn't have a word for. Purposeful and silent and far away. The puck goes somewhere she can't see and they all turn at once and skate after it. From up here, with the sound off, they don't look like men playing a game. They look like something moving on ice for a reason she isn't allowed to know.
 
-She thinks about what he said.
+*Stay off the lake.*
 
-She thinks about the footprints in the snow this morning, small and evenly spaced, ending at the back porch.
+She means to think about it the way she thinks about everything — turn it over, find the rational shape of it, set it down. He's old. Old men in towns like this carry a list of things that aren't safe and they hand the list to anyone who'll hold still. The ice is thin in February. People drown. He found her father; he's allowed to be careful about her. There. That's the explanation, sitting there reasonable on the bar in front of her, and it doesn't take.
 
-She pays her tab and tips well and goes out into the cold.
+It doesn't take because she can still feel where the second one landed. Not in her ear, where the first one had gone, the polite warning she'd half-smiled at. The second one — *stay off the lake*, his eyes finding hers, the brandy untouched in front of him — that one had gone in lower, under the sternum, and it's still there now, a small cold weight she can't talk herself out of, the way you can't talk yourself out of having swallowed something. Her body believed him before she'd decided whether to. Her body is still believing him.
 
-The drive back to the house takes four minutes. She doesn't go past the cross street that goes down to the lake. She goes the other way, the way she knows, the plowed gravel road through the pines. She tells herself this is because it's the faster way home.
+She thinks about the footprints in the snow this morning. Small and evenly spaced and patient-looking. Coming from the trees, crossing the open yard, ending at the back porch. Going to the porch. Not coming from it. She hadn't let herself finish that thought this morning and she doesn't finish it now, but it's in the room with her, the way the warning is in her ribs, and the two of them seem to know each other.
 
-She doesn't examine whether this is true.
+An animal, she thinks. The ice is thin. She pays her tab and tips well and goes out into the cold.
+
+The drive back to the house takes four minutes. There are two ways. The short way drops down the hill and crosses at the bottom, the cross street that runs along the shore, the one she'd grown up taking because it was simply how you went — past the boat launch, past the dark water you could see in summer between the houses. The long way climbs back through town and comes around on the plowed gravel road through the pines, the high road, the one that never sees the lake at all.
+
+At the bottom of the hill she comes to the cross street and her hands are already turning the wheel before she's chosen anything, the long way, up and around, away from the water. It adds maybe ninety seconds. The headlights swing across snowbanks and the black wall of pines and there's no lake out there to see in the dark anyway, no reason on earth not to take the short way, and she takes the long way, and she keeps her eyes on the gravel where it unrolls white in the high beams and does not once look toward the shore she can't see.
+
+It's the faster way home. She tells herself that, getting the words ready in case she needs them.
+
+She doesn't need them. There's no one in the car to say them to. There's only the small cold weight under her sternum, riding along, and the gravel, and the pines going by, and the turn for the house coming up where it always has.
+
+She doesn't examine whether the fast way is true. She knows it isn't. She drives the long way and lets that be the thing she doesn't examine instead.
