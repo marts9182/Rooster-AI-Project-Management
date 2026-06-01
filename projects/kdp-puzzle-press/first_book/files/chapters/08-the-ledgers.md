@@ -32,7 +32,11 @@ She keeps reading.
 
 The first Aino. Her great-grandmother. She looked at him for a long time and did not speak, and he wrote it down, and kept building.
 
-She closes the notebook for a moment. She looks out the kitchen window at the yard. The footprints. The slope down to the trees.
+She closes the notebook. She keeps one hand flat on the cover, the way you keep a hand on a thing you might have to deal with again, and she becomes aware that her hands are cold. The kitchen is not cold. The furnace is running; she can hear it. But her fingers have gone stiff around the leather and there is the coffee, the fresh cup she'd poured to read by, and when she lifts it to drink it is cold too, a skin already forming on it, and she does not remember letting it go that long. She does not know how long she has been sitting here. The light through the window has moved.
+
+In the quiet she can hear the house. The furnace, the tick of the baseboard heat, the refrigerator cycling — and under all of it, faintly, a sound she had not noticed until now, a settling somewhere below, a single small knock of wood against wood that could be the house adjusting to the cold or could be nothing or could be the floor over the basement. She holds still and waits to hear it again. It does not come again. She files it the way she files things and the filing does not work.
+
+These are not strangers in this book. The careful hand, the stones moved, the woman's cabin gone. The man who built a sauna over it and told his wife it was for the family. They are hers. She has his jaw, her father had his jaw, it is in the photograph in the hall. The thing the book is recording, page by terrible page in a man's even bookkeeping, is what her family did and went on doing, and she is holding it in two cold hands in her father's kitchen.
 
 She opens it again.
 
@@ -66,11 +70,19 @@ She reads on.
 
 *June 1. Hank turned fourteen last month. He is a good boy. He does not know yet. I have been thinking about whether to tell him. I have been thinking that perhaps if I tell him there is another way — if we could find another way — he would not have to carry this.*
 
-That is the last entry. The notebook ends there, in the middle of a page, June 1st 1962. Toivo drowned three weeks later.
+That is the last entry. The notebook ends there, in the middle of a page, June 1st 1962. The rest of the page is blank. The rest of Toivo's pages are blank.
+
+But Eino's notebook is not finished. She had stopped reading it at the spring of 1920, the entry that stopped her, and gone to the basement for Toivo's; she had read the two of them side by side after that and let Eino's lie open and forgotten under her elbow. She picks it up again now and turns to the back, to see how it ends, because Eino lived a long time — he died old, in his sleep, late that same year, an old man of eighty-two — and the careful faded hand goes on, thinner and shakier in the later pages but the same hand, the same weather and ice and the other kind of entry, all the way to the end.
+
+She finds it near the back. The date is in June. The ink is darker than the pages around it, pressed harder into the paper, the only place in the whole notebook where the old man's hand is not even.
+
+*June 22. They have brought my son up out of the water. He went out two days ago on the morning ice at the inlet, where it had not yet gone. He took no rod. He took the boat to the open water and then he left the boat and walked out onto the ice that was left and it would not hold a man and he knew it would not hold a man, he had walked that ice every spring for thirty years and knew to the inch what it would do. The sheriff has called it an accident. A man checks the ice in June and the ice gives way. I have signed the paper that says so. Aili does not believe it and I do not contradict her and I do not agree with her. He had said to me a week before that the watching was not enough and there must be another way and I told him there is no other way, there is only the watching, and he looked at me the way Aino looked at me in the autumn of 1919 and did not speak. I do not know what was in his mind on the ice. I do not think he knew. A man can walk out onto rotten ice meaning to test it and meaning the other thing both at once and not be able to say which, and then it does not matter what he meant. She was loud the night he died. She is quiet now. The boy is fourteen. He does not know yet. I am too old for this and there is no one else.*
+
+She reads it twice. She sets the notebook down very flat on the table.
 
 She sits at the kitchen table for a long time with both notebooks in front of her. Outside the window the light is changing — late afternoon, the sky going gold and orange through the pines, the snow on the yard turning pink.
 
-Her grandfather had been trying to find another way. He'd gone to a pastor who hadn't understood the question. And then he'd gone into the lake.
+Her grandfather had been trying to find another way. He'd gone to a pastor who hadn't understood the question. He'd gone to his own father and been told there was no other way. And then on a June morning he had taken the boat out and left it and walked out onto ice he knew to the inch, and whatever was in his mind out there, his father had not been able to name it and neither could she.
 
 She picks up her father's newest ledger, the one she'd read in the basement the first day. She finds the entry from the summer she was nineteen. She'd known it would be there. She reads it now knowing what she knows:
 
@@ -84,9 +96,14 @@ She. Her father had gone to the sauna the night Aino left. Had sat there alone. 
 
 Aino closes the notebooks. She stacks them carefully on the table. She gets up and goes to the window and stands there for a while watching the light go out of the sky.
 
-Then she picks up her phone and searches for the Lac Vieux Desert Band of Lake Superior Chippewa. She finds their tribal offices. She finds, after a few minutes, a name.
+<!-- SENSITIVITY-FLAG: band reference / search -->
+Then she picks up her phone.
 
-She writes it down on the back of her father's envelope.
+It is an absurd object to be holding in this kitchen. The notebooks on the table go back to 1919, leather and faded ink and a hand that learned English the hard way, and she is standing over them with a slab of glass that connects, when it feels like it, to everything. The bars in the corner of the screen come and go. She has to stand by the window to keep them.
+
+She doesn't know how to search for what she wants. There is no clean way to type it. She tries the name of the lake, the county, the word *Ojibwe*, the word *removed*, and reads her way down through real estate listings and a historical society page and a PDF of a county plat map until she has, slowly, the outline of it — the band, the dates, the ground that this lake sits on the edge of and used to sit deeper inside of. She finds the name of the band itself and writes it on the back of her father's envelope: Lac Vieux Desert Band of Lake Superior Chippewa. Then she finds the tribal offices, and a phone number, and a page of names and titles, and she reads the names until one of them is a person whose work might plausibly have anything to do with a wrong done on this lake in 1919, and she writes that name down too.
+
+It feels like nothing. It feels like the strangest thing she has done since she got here, stranger than the cold wood, stranger than the sauna — this, standing in her dead father's kitchen at dusk with a phone in her hand, looking up the people her great-grandfather wrote about as *she* and the names and *the stones*, as though the answer to a hundred years of it were a number she could call during business hours.
 
 She doesn't call tonight. It is too late in the day and she is not ready. But she has the name, and tomorrow she will be.
 
