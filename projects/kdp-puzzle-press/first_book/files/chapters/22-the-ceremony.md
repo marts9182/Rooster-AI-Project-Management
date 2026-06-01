@@ -1,5 +1,5 @@
 ---
-number: 18
+number: 22
 title: The Ceremony
 target_words: 3000
 ---

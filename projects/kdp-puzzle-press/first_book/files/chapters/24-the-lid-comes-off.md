@@ -1,5 +1,5 @@
 ---
-number: 20
+number: 24
 title: The Lid Comes Off
 target_words: 2500
 ---

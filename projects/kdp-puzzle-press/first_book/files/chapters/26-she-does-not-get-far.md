@@ -1,5 +1,5 @@
 ---
-number: 22
+number: 26
 title: She Does Not Get Far
 target_words: 1800
 ---
