@@ -76,6 +76,6 @@ She does not go in when Mikko drops her. She tells him she will be fine, which i
 
 When the truck is gone she does not go in. She walks down across the yard to the sauna, in the warm air, with the snow gone slick and gray under her boots, and she stands outside the door of it with her hand flat on the cedar wall the way she has done before. The wood is cold. The day is warm and the wood is cold, and under her feet, down through the slumping snow and the frozen ground and the soft going-honest ice, there is the thing she has no word for except that it knows she is standing there. It counts her. She is on the list and Dale Numminen never was, and it took Dale Numminen anyway, and she stands with her cold hand on the cold wood and does not take it away.
 
-"One more day," she says to the wall. She does not say it to comfort herself. She says it the way you say a number you mean to outlast. "Hold on until tomorrow."
+"One more day," she says to the wall. She says it the way you say a number you mean to outlast, not the way you say a thing for comfort. "Hold on until tomorrow."
 
 The wood does not warm under her hand. She did not expect it to.
