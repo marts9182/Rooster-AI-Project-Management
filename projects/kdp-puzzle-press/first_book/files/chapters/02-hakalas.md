@@ -30,7 +30,7 @@ He says her father's name the right way. That's the thing she notices first, sit
 
 Her father had, it turns out, pre-arranged most of this. Left a list of preferences — no viewing, Lutheran service, cremation after. The plot in the church cemetery had been in the family since his grandfather's time; that part at least required nothing from her. Gerald says all of this with a kind of respectful approval, as though her father had done everyone a favor by being so organized about his own death, which Aino supposes he had.
 
-The folder, though. The folder is wrong, or not wrong, but old. The intake form on top is dated last week, crisp, the toner still sharp. But underneath it there's an older sheet, the paper gone soft and faintly yellow at the edge the way paper goes when it's sat in a drawer for years, and the typeface on it is the gray, slightly broken gray of a machine that needed a new ribbon a long time ago. She can't read it upside down and doesn't try. Pre-arranged, she reminds herself. He set this up years ago; of course there's old paper in here. People plan ahead up here. People who've watched their parents die in February plan very far ahead. That's all it is. She signs where Gerald indicates and doesn't look at the old sheet again, which costs her a small effort she doesn't examine.
+The folder, though. The folder is wrong, or not wrong, but old. The intake form on top is dated last week, crisp, the toner still sharp. But underneath it there's an older sheet, the paper gone soft and faintly yellow at the edge the way paper goes when it's sat in a drawer for years, and the typeface on it is the gray, slightly broken gray of a machine that needed a new ribbon a long time ago. She can't read it upside down and doesn't try. Pre-arranged, she reminds herself. He set this up years ago; of course there's old paper in here. People plan ahead up here. People who've watched their parents die in February plan very far ahead. That's all it is. She signs where Gerald indicates and doesn't look at the old sheet again, and not looking at it costs her something small she'd rather not price.
 
 She picks up a small envelope of information about what happens next, what she'll need to bring to the service, who will contact whom. Gerald is very thorough. She is grateful for his thoroughness because it means she does not have to think.
 
@@ -124,7 +124,7 @@ She means to think about it the way she thinks about everything — turn it over
 
 It doesn't take because she can still feel where the second one landed. Not in her ear, where the first one had gone, the polite warning she'd half-smiled at. The second one — *stay off the lake*, his eyes finding hers, the brandy untouched in front of him — that one had gone in lower, under the sternum, and it's still there now, a small cold weight she can't talk herself out of, the way you can't talk yourself out of having swallowed something. Her body believed him before she'd decided whether to. Her body is still believing him.
 
-She thinks about the footprints in the snow this morning. Small and evenly spaced and patient-looking. Coming from the trees, crossing the open yard, ending at the back porch. Going to the porch. Not coming from it. She hadn't let herself finish that thought this morning and she doesn't finish it now, but it's in the room with her, the way the warning is in her ribs, and the two of them seem to know each other.
+She thinks about the footprints in the snow this morning. Small and evenly spaced and unhurried. Coming from the trees, crossing the open yard, ending at the back porch. Going to the porch. Not coming from it. She hadn't let herself finish that thought this morning and she doesn't finish it now, but it's in the room with her, the way the warning is in her ribs, and the two of them seem to know each other.
 
 An animal, she thinks. The ice is thin. She pays her tab and tips well and goes out into the cold.
 
@@ -136,4 +136,4 @@ It's the faster way home. She tells herself that, getting the words ready in cas
 
 She doesn't need them. There's no one in the car to say them to. There's only the small cold weight under her sternum, riding along, and the gravel, and the pines going by, and the turn for the house coming up where it always has.
 
-She doesn't examine whether the fast way is true. She knows it isn't. She drives the long way and lets that be the thing she doesn't examine instead.
+She doesn't ask herself whether the fast way is true. She knows it isn't. She drives the long way and lets that be the thing she doesn't examine instead.
