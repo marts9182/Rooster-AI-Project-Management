@@ -46,9 +46,15 @@ Three knocks, from below. Not on the ice — through it, or from under it, a sou
 
 She goes very still.
 
+She does not move. She does not breathe in a way she would call breathing. The fire ticks. The stones tick as they give up their heat. She counts the seconds without meaning to, the way you count between lightning and the thunder after it, and the counting goes on longer than she expects, long enough that she begins to think it was the only set, that it was over.
+
+The cold comes up through the hatch.
+
 *Three knocks. Said the names.* Her father's ledger. *Quiet by morning.*
 
 After a long silence there are three more.
+
+The same three. The same pause between them, measured out to the same length, as though something below were keeping the time exactly and would keep it exactly as long as it took. She does not say anything yet. She lets the sound finish and lets the room go quiet around where it had been, and she stays where she is, kneeling, until the quiet has held long enough that she trusts it.
 
 She becomes aware that she is holding her breath. She lets it out slowly. Her hands on her knees are trembling — not from cold, or not only from cold.
 
@@ -80,7 +86,9 @@ She listens to it.
 <!-- SENSITIVITY-FLAG: Louise Swifthawk's voicemail — first contact with the band member who will guide the cultural/ceremonial response -->
 A woman's voice, older, unhurried: *This is Louise Swifthawk. I understand you've been trying to reach someone about the lake property in Kivijärvi. I knew your father. I think it's time we talked. Call me back when you're ready.*
 
-Aino sets the phone down on the table. She wraps both hands around her mug of tea.
+She looks at the timestamp under the message. The call came in at 8:47. She does the arithmetic without deciding to. She was down at the sauna at 8:47 — on the lower bench, or kneeling at the edge of the open hatch, or walking back up the hill in the dark, the phone in her coat pocket where she never felt it, never heard it. It means nothing. People call in the evening. She looks at the number again, and then at the time again.
+
+Aino sets the phone down on the table, face down. She wraps both hands around her mug of tea.
 
 She will call back tomorrow. Tonight she sits in her father's kitchen with the photograph of herself at eight on the counter and the sound of three knocks still present somewhere in her body, below thought, below language, and she does not feel afraid.
 
