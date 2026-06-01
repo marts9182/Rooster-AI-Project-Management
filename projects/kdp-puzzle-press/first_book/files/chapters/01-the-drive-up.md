@@ -48,7 +48,7 @@ A dead spot, she thinks. They happen. You drop a station and pick up the silence
 
 She gives it the next reasonable thing. A fault at the station. A man at a board somewhere reaching for the wrong switch. That's allowed. That happens.
 
-She drives. The silence holds. It is not the silence before she'd turned the radio on; that had been just quiet, the ordinary quiet of a car and a road. This is the other kind. The kind that is waiting for something. Like the quiet after someone asks a question — the room holding its breath for the answer, everyone looking at you. She counts. She doesn't mean to and then she's doing it anyway, the seconds, the way you count the gap between lightning and the thunder to know how far off the storm is. Four. Five. Six.
+She drives. The silence holds. It is not the silence before she'd turned the radio on; that had been just quiet, the ordinary quiet of a car and a road. This is the other kind. The kind that is waiting for something. Like the quiet after someone asks a question — the room holding its breath for the answer. She counts. She doesn't mean to and then she's doing it anyway, the seconds, the way you count the gap between lightning and the thunder to know how far off the storm is. Four. Five. Six.
 
 The man comes back mid-sentence: *—the kind of decision that'll cost you in March.* No static, no fade-in, just there again like he'd never been gone, like the gap had been hers and not his.
 
