@@ -54,16 +54,45 @@ Aino thinks about Toivo's ledger entry. *The pastor gave me the answer I expecte
 
 "What do you know?" Aino asks. "What did my grandmother tell you?"
 
-Helmi is quiet for a moment. "Aili knew from the beginning. Eino told her — not what he'd done, not exactly, but enough. She understood the sauna. She understood what the watching was and what it wasn't." She pauses. "She was furious with him for the rest of his life and for the long years after. She kept it quiet because she had children and a life and because what else do you do. But she told me, when we were old enough to be telling each other the truth. She told me what she knew."
+Helmi is quiet for a moment. "Aili knew from the beginning. Eino told her — not what he'd done, not exactly, but enough. She understood the sauna. She understood what the watching was and what it wasn't."
+
+"How could she stay?"
+
+"Where would she go." Helmi says it without a question mark, the way you state a fact you've already turned over for fifty years. "She was twenty-four. She had two children by then and a third coming and no English and a husband who had done a thing she could not undo by leaving. She was furious with him for the rest of his life and for the long years after. She kept it quiet because she had children and a life and because what else do you do." A pause. "Aili was a smart woman. Smarter than the men she married into. Smart enough to know that knowing a thing and being able to fix it are not the same. She told me, when we were old enough to be telling each other the truth. She told me what she knew."
 
 "Which was?"
 
 <!-- SENSITIVITY-FLAG: Helmi recounts the killing and names Mindemoyen — the Ojibwe woman murdered by Eino and three other men; the name's origin in Eino's sleep-talk -->
 "That a woman was killed. That her husband and three other men did it. That they buried it — her, and what they'd done — under the sauna, and that it hadn't stayed buried." Helmi's voice is even, the voice of someone reciting a history they have long since moved past grief about and arrived at something colder. "She told me the woman's name. Mindemoyen. She had heard Eino say it in his sleep."
 
-Aino is quiet.
+Aino is quiet. Then: "But what *is* it. What's down there. You said you understood what the watching was. So tell me what it's watching."
 
-"What she didn't know," Helmi says, "and what I don't know, and what none of us know, is what to do about it. The women always knew more than the men but the men were the ones going into the sauna and we were not." A pause. "I told you to leave it. I meant it. I still mean it. But I also knew when I said it that you probably wouldn't."
+Helmi looks at her with something that is almost amusement and is not amusement.
+
+"You think because I am old and I am Finnish I have a word for it." She turns her cup a quarter-turn on the table. "We had words. That was the trouble. We came over with a whole language for it."
+
+"What words?"
+
+<!-- SENSITIVITY-FLAG: Helmi offers Finnish folk concepts (väki, vetehinen) explicitly as the settlers' inadequate lens — NOT as a description of the Ojibwe reality, which she does not claim to know or name -->
+Helmi is quiet long enough that Aino thinks she isn't going to answer. The coffee maker on the counter clicks off. Outside a car goes by and is gone.
+
+"In the old country," Helmi says, "everything had its *väki*. You know this word? No. Your father wouldn't have taught you." She says it without reproach. "It is hard to put in English. A force. A power that lives in a place, in a thing. The forest has its *väki*. Fire has its *väki* — you don't whistle near the stove, you don't speak ill of it, because it is awake and it has a temper. Water has the most of all. *Veden väki.*" She turns the word over carefully, an object she hasn't held in some time. "Where there was deep water, a lake like this one, the old people said there was a *vetehinen.* A water-being. It lived under the surface. It could be angry, it could pull a man down, it could be — paid off, almost. You gave the first fish back to it. You did not foul the water. You were polite to it, the way you are polite to a neighbor with a long memory and a short fuse."
+
+"And that's what's in the lake."
+
+"No." Helmi says it flatly, and then, more quietly, "That is the whole mistake. That is what I am trying to tell you." She sets the cup down. "They came here, Eino and the others, with these words in their mouths. *Väki. Vetehinen.* When the lake started — doing what it does — they reached for what they had. A man understands a thing he has a name for. So they told themselves: it is the water-spirit, it is angry, we will manage it the way our grandfathers managed the lakes at home. Watch it. Keep it fed. Keep it quiet." She shakes her head, once. "But a *vetehinen* is a Finnish thing. It belongs to Finnish water. The men brought the word across the ocean in a trunk like a coffee grinder and tried to set it down on a lake that already had — " she stops.
+
+Aino waits.
+
+"That already had whatever it had," Helmi finishes. "Which was not theirs. Which was not a *vetehinen* and never was. It was a woman, first of all, a real woman with a name, and what she became after they did what they did — that is not a thing I have a word for. The Finnish word was always too small. It was a borrowed coat that didn't fit and they kept trying to button it." She looks at the window. "*Vetehinen* is what they could say. It is not what was true."
+
+"Then what's true."
+
+"I don't know." Helmi says it without apology. "And the part I do know is not mine to hand out. There are people across the lake whose grandmothers knew what this water was before any Finn ever saw it, and they did not call it by my words, and they did not understand it the way four frightened men with a thing to hide understood it. If there is a true name for it, it is theirs, and you will not hear it from me, because I would only get it wrong the way Eino got it wrong, and getting it wrong is the entire history of this place." She picks up her coffee again. "That is why you are going to Watersmeet. That is the only sensible thing anyone in your family has thought of in a hundred years."
+
+Aino turns this over. "But Aili understood it. You said that. She knew what the watching was and wasn't, when Eino didn't."
+
+"She understood it could not be named and managed. That is most of what there was to know, and it was more than the men ever learned." A pause. "What none of us knew — Aili, me, your father — is what to *do* about it. The women always knew more than the men but the men were the ones going into the sauna and we were not." A pause. "I told you to leave it. I meant it. I still mean it. But I also knew when I said it that you probably wouldn't."
 
 "I called the tribal offices," Aino says. "I'm going to Watersmeet in two days."
 
@@ -93,6 +122,18 @@ Helmi thinks about this for a longer time than Aino expects.
 
 Aino thinks about Eino's notebook. *Kaunis.* Beautiful. The man who thought the lake was beautiful and then did what he did in it.
 
-She does not have anything to say to that. Helmi doesn't seem to expect anything.
+She does not have anything to say to that. Helmi doesn't seem to expect anything. The clock on the wall above the stove moves its minute hand with a small dry sound. Aino lets the question be over and finds that it isn't, quite — that it has left something in the room that wants a little more air.
+
+"Did you forgive her?" she asks. "For staying. For keeping it quiet."
+
+Helmi looks at her, and for the first time the stillness in her face is not the comfortable kind.
+
+"There was nothing to forgive," she says. "She did what a woman with three children does. She survived it and she did not let it eat her." She turns her cup again. "I used to think — when we were younger, before I understood anything — that she should have done more. Said something. To someone. I had ideas about what a person ought to do." A small breath that is not quite a laugh. "Then I got old enough to understand what would have happened to her, and to the children, and to nothing else. She was not the one who needed to be forgiven. She spent forty years carrying a thing she didn't put down there. That is its own kind of penance, carrying what isn't yours."
+
+She is quiet for a moment.
+
+"She made me promise I would tell whoever came after. That is all she could do, at the end. Hand it forward to someone with fewer reasons to be afraid." Helmi looks at her steadily. "So now I have told you. And you have fewer reasons than she did. Don't waste them."
+
+Aino nods. She finds she can't say anything. Helmi doesn't ask her to.
 
 They sit in the kitchen and drink their coffee and outside the birch tree stands in the cold without moving, white and bare and patient.
