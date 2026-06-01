@@ -48,7 +48,17 @@ She thanks him. She goes down the stairs and out into the February cold.
 
 ---
 
-She sits in the Subaru in the parking lot behind the hardware store for a long time before she opens the envelope.
+She does not open the envelope right away.
+
+She sits in the Subaru in the parking lot behind the hardware store with the engine running and the heat going and the envelope on the passenger seat where she set it when she got in. The lot is small, gravel and packed snow, a loading dock at the back of the store with a dumpster and a stack of wooden pallets going gray under a tarp. A man in a Carhartt coat carries a length of pipe out to a truck and goes back in. The light is the flat midday light of February up here, no shadows in it, the kind of light that makes everything look like a photograph of itself.
+
+She turns the heat down a notch. She checks the gas gauge, which is fine. She watches the man come out again with another length of pipe and load it and drive away. She tells herself she is letting the car warm up, which is not true; it is warm. She tells herself she will read it at home, which is what she told Ernest, and then she does not put the car in gear.
+
+Her hands are on the wheel. They are her mother's hands, people used to say, though she has no memory of her mother's hands to check it against. The knuckles are a little chapped from the cold. There is a paper cut on the side of one thumb from the probate forms that she had not noticed until now.
+
+The envelope is light. She knew that already, standing in the office. Light enough that there is almost nothing in it, which is somehow worse than if it had been thick, because a thick envelope is a man explaining himself and a thin one is a man who has decided exactly how much he is going to say.
+
+She picks it up. She holds it for a while longer. Then she works a finger under the flap and opens it.
 
 Inside: a key, small and old, the kind that fits a padlock rather than a door. A folded piece of paper, which is a hand-drawn map of Lake Kivijärvi and the surrounding property, her father's land marked with a simple rectangle for the house and a smaller shape at the shoreline for the sauna. An X on the lake, maybe thirty feet out from the sauna — she can't tell if it marks something on the surface or something below it.
 
@@ -76,10 +86,20 @@ She reads it twice. She folds it carefully and puts it back in the envelope with
 
 The thing in the water is not evil.
 
-She thinks about the hand she thought she saw in the lake at age seven, reaching up through the water toward the dock, and how her father had come down the hill at a run and pulled her back and told her it was just a reflection, just light on the water, and she had believed him for thirty years.
+She thinks about the lake at age seven.
+
+She was lying on her stomach on the end of the dock with her arm in the water to the elbow, the way you do at that age, trailing your fingers and watching the light come apart around them. The water was cold the way it is even in July up here, cold a few inches down. She remembers the boards warm against her belly and the cold of the water and the smell of the lake, which is its own smell, weed and stone and something underneath that. And she remembers the hand. Coming up through the green toward hers. Pale, and slower than a hand should move, and reaching, the fingers spread.
+
+She did not have time to be afraid of it. That came later. What came first was her father.
+
+She did not hear him on the hill. She heard him when he was already most of the way down it, the heavy fast crash of a grown man running on uneven ground, and then he had her — not gently, not the way he picked her up other times, but by the back of the swimsuit and one arm, hard enough that it left marks, hauling her up and back off the dock so fast her chin caught the board and her teeth came together on her tongue and she tasted blood. He held her against him with his heart going like something trying to get out. She could feel it through his shirt. He was looking at the water. Not at her, at the water, at the exact place her hand had been, and his face was a face she had never seen on him, before or after, the face of a man looking at a thing he already knew was there.
+
+*Just a reflection,* he said, after. *Just the light. There's nothing in the lake, Aino.* And his voice was steady when he said it, which is how she knew, even at seven, that it was not true, because his voice was steady and his hands were not.
+
+She believed him anyway. For thirty years she believed him.
 
 She starts the Subaru. She drives back to the house.
 
-She does not go to the sauna that afternoon. She makes coffee and sits at the kitchen table and looks at the photograph of herself at eight years old and thinks about her father running down the hill. How fast he moved. How frightened he looked.
+She does not go to the sauna that afternoon. She makes coffee and sits at the kitchen table and looks at the photograph of herself on the dock, eight years old and squinting and holding up the fish, the lake behind her and the sauna at the edge of the frame, and she thinks about how fast he came down that hill.
 
-How he'd known exactly where to look.
+He had not gone looking. He had known where to look.
