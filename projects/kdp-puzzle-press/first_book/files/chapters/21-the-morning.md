@@ -82,7 +82,7 @@ They go out the back, into the radius of pushed snow, and down the path.
 
 The lake is wrong in the early light.
 
-The cracks she'd seen the day before have spread overnight — the whole surface of the lake is webbed with them now, lines running in every direction from the point thirty feet out from the sauna, so that the ice looks less like ice than like something that has been holding its shape through effort and is close to stopping. The surface is a pale gray-white in the morning and it is moving, subtly, in a way ice does not move — a slow pulse, almost breathing, as though whatever is below it has been pressing up against it all night the way it pressed at the house.
+The cracks she'd seen the day before have spread overnight — the whole surface of the lake is webbed with them now, lines running in every direction from the point thirty feet out from the sauna, so that the ice looks less like ice than like something that has been keeping its shape under strain and is close to giving it up. The surface is a pale gray-white in the morning and it is moving, subtly, in a way ice does not move — a slow pulse, almost breathing, as though whatever is below it has been pressing up against it all night the way it pressed at the house.
 
 The fish houses are gone. She'd thought their owners had pulled them off for the season. Looking at the ice now she is less certain.
 
