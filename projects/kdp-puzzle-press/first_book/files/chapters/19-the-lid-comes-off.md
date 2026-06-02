@@ -40,7 +40,7 @@ The north end is twenty minutes by the road around the bay. Mikko does it in les
 
 The cold is in her chest the whole way. Not the room cold of the house at night. A live one, climbing.
 
-She thinks: *let his truck not be there.* She thinks it the way you think a thing you already know the answer to.
+She thinks: *let his truck not be there.* She thinks it, and she already knows the answer.
 
 His truck is there. Pulled off at the end of the spur where the Saaris put in, nosed up against the snowbank, the door hanging open and the dome light burning weak in the daylight.
 
@@ -100,7 +100,7 @@ Erik makes a sound she will not describe to anyone, ever.
 
 She does not look away. She had thought she would. At the inlet she turned and looked at the far trees and was glad of it after. She does not turn now. She makes herself hold it, the black place out at the spot where the white closed and reopened, because someone should, because Erik is held face-down in the slush in Mikko's arms with his eyes shut and his mouth open and no sound coming now, and Mikko has his face in Erik's coat, and somebody on this shore has to be the one who saw it, and it is going to be her.
 
-The water does not move. It stands in the cut, black and flat, the way it stood at the inlet, the lake's own depth come up where it has no business being, and it does not give him back. The saw does not float. Nothing floats. There is the cut, and the dark in it, and the white all around going gray in the late light, and the cold goes through the soles of her boots and up through her and out the top of her head, and she stands in the slush at the edge of the lake and she does not look away.
+The water does not move. It stands in the cut, black and flat, the lake's own depth come up where it has no business being, and it does not give him back. The saw does not float. Nothing floats. There is the cut, and the dark in it, and the white all around going gray in the late light, and the cold goes through the soles of her boots and up through her and out the top of her head, and she stands in the slush at the edge of the lake and she does not look away.
 
 ---
 
@@ -132,6 +132,6 @@ She thinks of the south shore, dark now, the sauna standing at the edge of the m
 
 She has to go back to that tonight.
 
-"One more night," she says. Not to Mikko, not to Erik. To the lake, or to the woman in it, or to no one. She says it the way she said it to the cedar wall yesterday, the way you say a number you mean to outlast, except that yesterday it was one more day and a thing held down, and now it is one more night and nothing holding it.
+"One more night," she says. Not to Mikko, not to Erik. To the lake, or to the woman in it, or to no one. She says it the way she said it to the cedar wall yesterday, the way you set down a number you intend to outlast, except that yesterday it was one more day and a thing held down, and now it is one more night and nothing holding it.
 
 The eave is not running anymore. The day's warmth has gone with the light, and the cold has come down hard and clean, and out on the black water the broken ice grinds against itself and moves.

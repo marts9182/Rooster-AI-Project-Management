@@ -48,7 +48,7 @@ He nods. "First light. We'll be there before the sun's up. I've been up before t
 
 "Tomorrow," Aino says. "We're going tomorrow."
 
-Marta and Juhani look at each other across the table, and Aino sees the look and does not understand it yet, and files it.
+Marta and Juhani look at each other across the table, and Aino sees the look and does not understand it yet, and lets it go by.
 
 "Mm," Juhani says, and that is all he says about the Saaris.
 

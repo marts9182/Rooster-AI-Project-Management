@@ -53,7 +53,7 @@ She cries for Mindemoyen. She cries for a woman she never met and never can meet
 
 She does not cry for herself. She thinks maybe that comes later. She thinks she has a great deal of crying for herself still to do and today is not that day.
 
-Mikko comes to stand beside her. He doesn't put his arm around her or say anything. He just stands there, the way he has been standing there through all of this, his presence its own form of speech.
+Mikko comes to stand beside her. He doesn't put his arm around her or say anything. He just stands there, the way he has been standing there through all of this.
 
 The roof goes. The walls come down in stages. The stone foundation holds, the fieldstone that Eino set in 1919 and that is not going anywhere — it will stand at the water's edge after the snow melts and into the spring and beyond, just stones, just a rectangle of old mortared rock that the weather will slowly work on. That is fine. That is what stones do.
 

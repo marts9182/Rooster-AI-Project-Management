@@ -14,7 +14,7 @@ Ernest Autio is in his late sixties, compact and careful-looking, with the kind 
 
 He gestures to the chair across from his desk and she sits. He opens a folder.
 
-The will is not complicated. The house and land to Aino, free and clear. The savings account — he names a figure, thirty-one thousand and change — to Aino. Personal effects to Aino. A small bequest to the Lutheran church, two hundred dollars, which makes her think of the pastor stacking chairs and feel something she doesn't examine.
+The will is not complicated. The house and land to Aino, free and clear. The savings account — he names a figure, thirty-one thousand and change — to Aino. Personal effects to Aino. A small bequest to the Lutheran church, two hundred dollars, which makes her think of the pastor stacking chairs and feel something she sets aside.
 
 Ernest reads all of this in the measured tone of a man who has read a great many wills and understands that the people sitting across from him are not really listening to the legal language, they are listening for their name and for the shape of what they're being left. She listens for both.
 

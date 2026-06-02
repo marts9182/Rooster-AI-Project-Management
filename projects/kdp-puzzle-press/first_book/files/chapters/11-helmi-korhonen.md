@@ -48,7 +48,7 @@ They sit across from each other at the kitchen table with coffee and a plate of 
 
 "He wrote, at the end. That he thought there might be another way. That he didn't know what it was."
 
-Helmi nods. "Toivo thought the same. He went looking for it in the wrong places." She sets her cup down. "The church," she says, with a flatness that is not quite contempt. "As though the church had anything useful to say about this."
+Helmi nods. "Toivo thought the same. He went looking for it in the wrong places." She sets her cup down. "The church," she says, with a flatness close to contempt. "As though the church had anything useful to say about this."
 
 Aino thinks about Toivo's ledger entry. *The pastor gave me the answer I expected. I did not find it useful.*
 

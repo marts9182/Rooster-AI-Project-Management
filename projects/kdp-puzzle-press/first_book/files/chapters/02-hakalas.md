@@ -134,6 +134,6 @@ At the bottom of the hill she comes to the cross street and her hands are alread
 
 It's the faster way home. She tells herself that, getting the words ready in case she needs them.
 
-She doesn't need them. There's no one in the car to say them to. There's only the small cold weight under her sternum, riding along, and the gravel, and the pines going by, and the turn for the house coming up where it always has.
+She doesn't need them. There's no one in the car to say them to. There's only the small cold weight riding along, and the gravel, and the pines going by, and the turn for the house coming up where it always has.
 
 She doesn't ask herself whether the fast way is true. She knows it isn't. She drives the long way and lets that be the thing she doesn't examine instead.
