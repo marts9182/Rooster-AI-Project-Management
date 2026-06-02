@@ -136,7 +136,10 @@ function renderBody(body) {
   const cleaned = body
     .split("\n")
     .filter((line) => !SENSITIVITY_FLAG_RE.test(line))
-    .join("\n");
+    .join("\n")
+    // Safety net: strip any inline SENSITIVITY-FLAG comment that is not on its
+    // own line (the line filter above only catches own-line comments).
+    .replace(/<!--\s*SENSITIVITY-FLAG:[\s\S]*?-->/g, "");
 
   const blocks = cleaned
     .split(/\n[ \t]*\n/)
