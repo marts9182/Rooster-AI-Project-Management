@@ -3,6 +3,7 @@ import { useChat } from '../../hooks/useChat';
 import ChatMessages from './ChatMessages';
 import ChatComposer from './ChatComposer';
 import ChatBlob from './ChatBlob';
+import './chat.css';
 
 interface Props {
   isOpen: boolean;
