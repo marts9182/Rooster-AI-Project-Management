@@ -104,6 +104,6 @@ She breathes the hot cedar and the mineral smell under it. Her body has changed 
 
 When the seam in the firebox has gone from orange to a dull red she stands. Her legs are unsteady from the heat and she waits for them. Then she banks the stove, closes the firebox vent, puts her coat back on over a body that is still warm and will be cold by the top of the hill, and walks back up to the house with the notebook under her arm.
 
-She doesn't look back at the lake.
+She almost doesn't look back at the lake.
 
-She almost doesn't.
+She does.

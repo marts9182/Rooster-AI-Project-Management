@@ -50,7 +50,7 @@ She stands in the dark kitchen for a long time. The house is completely still. W
 
 After a while she turns on the kitchen light. The yard looks ordinary under the artificial light, just snow and trees and the dark beyond. She fills a glass of water at the sink and drinks it standing up and tells herself to think clearly.
 
-The prints are small. No animal she can think of makes prints that shape and that size. She got her phone and she looked it up two nights ago — she'd spent an hour with her phone going through every animal in the U.P., comparing paw prints and hoof prints and claw marks, and nothing matched. She had put the phone away and not looked it up again.
+The prints are small. No animal she can think of makes prints that shape and that size. She'd gotten her phone and looked it up two nights ago — she'd spent an hour going through every animal in the U.P., comparing paw prints and hoof prints and claw marks, and nothing matched. She had put the phone away and not looked it up again.
 
 She goes back to bed. She does not sleep.
 

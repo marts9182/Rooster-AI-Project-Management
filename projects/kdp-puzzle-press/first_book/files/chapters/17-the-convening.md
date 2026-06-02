@@ -38,13 +38,13 @@ It is Marta who breaks it open. Aino would not have guessed it would be her — 
 
 The room goes still in a way the room has not been still all evening.
 
-"He never named the fourth," Marta says. "Said three and then stopped, and I always thought he didn't know it, and then I got older and understood he knew it and wouldn't say it because the fourth was nobody. The fourth line died out. Risto Mäkelä's boy, no children." She glances at Mikko, who carries that blood from the side that lived. "I'm sorry. I don't mean nobody."
+"He never named the fourth," Marta says. "Said three and then stopped, and I always thought he didn't know it, and then I got older and understood he knew it and wouldn't say it because the fourth was nobody. The fourth line died out. Risto Mäkelä's boy, no sons." She glances at Mikko, who carries that blood from the side that lived. "I'm sorry. I don't mean nobody."
 
 "No," Mikko says. "I know what you mean."
 
 "Four men," Juhani says. He has both spotted hands flat on the oilcloth now. "Eino Hietala. The Lehtinen — that's my grandfather. Saari." He does not look at Erik when he says it. "And the Mäkelä. In the fall. Nineteen and nineteen. They went out to a cabin." He stops. The melt is not ticking tonight; the night has gone cold again and the eaves have stopped running, and the quiet where that sound should be is its own thing in the room. "That's as far as my father ever got. They went out to a cabin and after that there was a watch on the lake and a sauna that wasn't a sauna, and the Hietalas kept it, and the rest of us kept our mouths shut and let them."
 
-"My father said the same," Erik says. Low. "Almost the word for word. They went out to a cabin." He keeps both hands flat on the table and does not touch the cup. "Fifty years I've had that sentence and never the end of it. A man learns not to want the end of a sentence like that."
+"My father said the same," Erik says. Low. "Almost word for word. They went out to a cabin." He keeps both hands flat on the table and does not touch the cup. "Fifty years I've had that sentence and never the end of it. A man learns not to want the end of a sentence like that."
 
 And there it is — the thing she did not expect, the strange heavy ease of it once the first plain words are out. Not relief, exactly; relief is too clean a word for what moves through the kitchen. It is more like the give in a frozen door when the second person leans on it: a hundred years of weight against the inside of it, four families each with a shoulder to it alone in the dark, and now all the shoulders at once and the thing finally moving. Nobody is comforted. Everybody is, somehow, lighter, and ashamed of the lightness, and saying it anyway because there is no one left to keep it from.
 

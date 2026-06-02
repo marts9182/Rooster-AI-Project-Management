@@ -104,7 +104,7 @@ She looks up. "Sorry?"
 
 "The ice." He doesn't look at her. "This time of year. It's not safe."
 
-She almost smiles. She's been coming up here since she was born, or came up here, and she knows what the ice is like in February. "Okay," she says.
+She almost smiles. She's been coming up here since she was born — or had, once — and she knows what the ice is like in February. "Okay," she says.
 
 "I mean it." Now he does look at her, and his eyes are sharper than she'd expected, sharper than an eighty-something man sitting alone with a brandy old fashioned at five in the afternoon has any right to be. "Stay off the lake."
 
@@ -122,7 +122,7 @@ She sits with her second beer for a while after he's gone. The bar is empty now 
 
 She means to think about it the way she thinks about everything — turn it over, find the rational shape of it, set it down. He's old. Old men in towns like this carry a list of things that aren't safe and they hand the list to anyone who'll hold still. The ice is thin in February. People drown. He found her father; he's allowed to be careful about her. There. That's the explanation, sitting there reasonable on the bar in front of her, and it doesn't take.
 
-It doesn't take because she can still feel where the second one landed. Not in her ear, where the first one had gone, the polite warning she'd half-smiled at. The second one — *stay off the lake*, his eyes finding hers, the brandy untouched in front of him — that one had gone in lower, under the sternum, and it's still there now, a small cold weight she can't talk herself out of, the way you can't talk yourself out of having swallowed something. Her body believed him before she'd decided whether to. Her body is still believing him.
+It doesn't take because she can still feel where the second one landed. Not in her ear, where the first one had gone, the polite warning she'd half-smiled at. The second one — *stay off the lake*, his eyes finding hers, the brandy forgotten in front of him — that one had gone in lower, under the sternum, and it's still there now, a small cold weight she can't talk herself out of, the way you can't talk yourself out of having swallowed something. Her body believed him before she'd decided whether to. Her body is still believing him.
 
 She thinks about the footprints in the snow this morning. Small and evenly spaced and unhurried. Coming from the trees, crossing the open yard, ending at the back porch. Going to the porch. Not coming from it. She hadn't let herself finish that thought this morning and she doesn't finish it now, but it's in the room with her, the way the warning is in her ribs, and the two of them seem to know each other.
 

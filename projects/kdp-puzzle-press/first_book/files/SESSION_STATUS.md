@@ -34,6 +34,20 @@ The resume list above is now **done**:
 
 **Still open (author decisions only):** confirm the AI-content declarations at upload; (optional) commission the sensitivity reader. All build artifacts are ready to upload.
 
+## Final read-through pass (2026-06-02) — done
+
+Full-book read-through via 6 parallel reader-agents (one per chapter block), each armed with the locked canon + extracting a facts ledger; continuity reconciled across the whole book afterward. **Result: continuity is clean** — every high-risk prior item verified consistent (Aino b.1987/age 38, father "fifty-eight" in Ch 1, the Ch 20 twelve-hours math, Eino's lockbox notebook, the 46-ledger count, the Sat→Wed countdown, Dale/Reino/Erik deaths, Mäkinen/Mäkelä rule, the two Finnish phrases, Mindemoyen spelling, no real institution names). No new sensitivity flags beyond `SENSITIVITY_READER_BRIEF.md`. Author-tics are well-thinned (filing 3, sternum/breastbone 2 across the whole book).
+
+**Six fixes applied** (then all deliverables rebuilt; interior still 222pp so the wrap is unaffected; EPUB re-validated epubcheck-clean):
+- Ch 17 — "no children" → **"no sons"** (matched the Ch 14 names-list; the daughter Rauha carries the blood, so "no sons" is the correct claim). HIGH.
+- Ch 2 — Paavo's brandy "untouched" → **"forgotten"** (he is shown drinking/finishing it). MED.
+- Ch 2 — "since she was born, or came up here" → **"since she was born — or had, once —"** (garbled self-correction).
+- Ch 6 — "She got her phone and she looked it up" → **"She'd gotten her phone and looked it up"** (tense).
+- Ch 7 — "She doesn't look back at the lake. / She almost doesn't." → **"She almost doesn't look back at the lake. / She does."** (was self-contradicting).
+- Ch 17 — "Almost the word for word" → **"Almost word for word"** (dropped article).
+
+A handful of declined LOW nits remain on record in the read-through report (e.g., Ch 2 "gray … gray"; Ch 10–13 "X that is not X" negations) — author chose not to change them.
+
 ## Source of truth & build
 - **Manuscript = `chapters/NN-slug.md`** (per-chapter markdown with `number:` / `title:` / `target_words:` frontmatter). The build orders by the `number:` field, not the filename.
 - **`build_book.mjs`** → regenerates `anna_sen_menna_kdp_ebook.html` (title page "Seven Martin"; strips `SENSITIVITY-FLAG` comments, inline and own-line). Run: `node build_book.mjs`.
