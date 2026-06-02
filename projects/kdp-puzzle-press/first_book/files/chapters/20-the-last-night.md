@@ -12,7 +12,7 @@ So Wednesday cannot come fast enough, and Wednesday is still a whole night away.
 
 Mikko is staying. He'd told her that yesterday, before any of this, before either man was dead — *I'll be back before dark and you are not going to be alone for this.* He came back before dark with his duffel and his own coat and a second thermometer in his pocket, and he has not left her side since the sun went down.
 
-It is the kind of cold that has nothing to do with weather. The thermometer on the porch reads four below, which for January is nothing. The cold she means is the other one, the one that comes up through the boards.
+It is the kind of cold that has nothing to do with weather. The thermometer on the porch reads twenty-six, an ordinary March night that has taken back the day's thaw the way these nights do. That is not the cold she means. The cold she means is the other one, the one that comes up through the boards.
 
 ---
 
@@ -106,7 +106,7 @@ Then the knocking resumes — the measured three-and-pause — as though the blo
 
 "I know."
 
-She stands in her kitchen at one in the morning, in her father's coat, in forty-six-degree air, with the knocking moving around her in the walls, and she thinks about Eino writing *kaunis* in a notebook and underlining the word twice. She thinks about Toivo's last ledger entry, the careful copperplate gone shaky at the end — *perhaps he will not have to carry this.* She thinks about her father, the year before he died, dialing a phone and hanging it up before anyone could answer. Over and over. She knows this from the phone records the lawyer sent, a column of one-minute calls to her Milwaukee number, all of them ending before the connection. He would dial her and then put the phone down. He would call her up to the edge of speaking and then not speak.
+She stands in her kitchen at one in the morning, in her father's coat, in forty-six-degree air, with the knocking moving around her in the walls, and she thinks about Eino writing *kaunis* in a notebook and underlining the word twice. She thinks about Toivo's last ledger entry, the careful copperplate gone shaky at the end — *perhaps he will not have to carry this.* She thinks about her father, the year before he died, calling her and not being able to do it. They are still there, those calls, scattered down the log on her own phone — his number a dozen times across those last months, most of them seconds long, a few that reached her voicemail and held nothing in them but the sound of his kitchen and a breath and the small click of him setting the receiver back down. He would call her up to the edge of speaking and then not speak.
 
 ---
 
@@ -124,7 +124,7 @@ Mikko looks at her.
 
 She does the math. She has done it before; she does it again now, here, in the cold, because the count is already running and the count will take any numbers it is given.
 
-She times every phone call. She has always timed them — looks at the clock when she picks up, looks again when she sets the receiver down — the way he did, the way her father did, a thing she got from him without ever being taught it. So she knows. Four calls a year, maybe. Holidays, his birthday, the one in spring when the ice went out and he'd call to tell her the date so she could write it down somewhere she would never look at again. Ten minutes a call, the long ones. Forty minutes a year. She is fifty-one years old and she left at thirty-two and that is nineteen years and nineteen times forty is seven hundred and sixty minutes and that is twelve hours and forty minutes.
+She times every phone call. She has always timed them — looks at the clock when she picks up, looks again when she sets the receiver down — the way he did, the way her father did, a thing she got from him without ever being taught it. So she knows. Four calls a year, maybe. Holidays, his birthday, the one in spring when the ice went out and he'd call to tell her the date so she could write it down somewhere she would never look at again. Ten minutes a call, the long ones. Forty minutes a year. She left at nineteen and she has been gone nineteen years, and nineteen times forty is seven hundred and sixty minutes, and seven hundred and sixty minutes is twelve hours and forty minutes.
 
 Twelve hours. In nineteen years she had given her father twelve hours of her voice, and he had given her twelve hours of his, and that is all there is now, that is the whole sum of it, twelve hours laid end to end would not get a person from here to Milwaukee, and somewhere in those twelve hours, in the long pauses between sentences that she had always been impatient with, he had been trying to tell her this and she had been waiting for him to get to the point so she could go.
 
@@ -194,7 +194,7 @@ Mikko has gone quiet beside her, his head tipped back against the cushion, his e
 
 She gets up, the quilt sliding off her shoulder, and the cold takes the warm place where it was instantly. She makes coffee. The simple acts of it — the grounds, the water, the percolator on the one free burner — are steadying in a way she is grateful for. She stands at the stove with her hands around the first cup and looks out the kitchen window, where, over the black line of the trees across the lake, the sky has begun, very faintly, to change. Not light yet. The idea of light. The gray that comes before the gray.
 
-The knocking goes on. Three and three and three. It has gone on for eight hours. She finds that she is counting it again, openly now, all pretense of not counting gone, counting it down toward the thing Louise promised — *first light* — counting the way you count the last contractions, the way you count a fever breaking, the way she counted as a girl in this house between the lightning and the thunder, the only counting she ever did that was for fun, and was not.
+The knocking goes on. Three and three and three. It has gone on for eight hours. She finds that she is counting it again, openly now, all pretense of not counting gone, counting it down toward the thing Louise promised — *first light* — counting the way you count the last contractions, the way you count a fever breaking, counting because the count is the only clock she has left and it is finally, after eight hours, running toward something.
 
 ---
 
