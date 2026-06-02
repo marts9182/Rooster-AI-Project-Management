@@ -1,81 +1,42 @@
-# Project Status — Folk Horror Novel
+# Project Status — *Anna Sen Mennä* (folk-horror novel)
 
-*Last session: May 2026. Use this to pick up where we left off in a new conversation.*
+*Updated 2026-06-01. Pen name: **Seven Martin**.*
 
----
+## Current state: SECOND-DRAFT REVISION COMPLETE
 
-## The Three Files You Need
+The book is now a complete, releasable-quality second draft: **~65,900 words, 26 chapters.** The first draft (~33k, scrambled Act Three) has been expanded to scene depth, the back half rebuilt as a strict day-by-day countdown, all broken outline-promises delivered, real on-page deaths restored, and the cultural institutions fictionalized to maximum restraint.
 
-1. **`novel_outline_working.md`** — The master document. Contains:
-   - Premise, comps, setting (Kivijärvi, Michigan, fictional U.P. iron-range town)
-   - Full Aino character document (Aino Marlene Hietala, 38, Finnish-American paralegal from Milwaukee)
-   - Central artifact: rantasauna (over-the-water Finnish shore sauna)
-   - The buried wrong: 1919 killing of an Anishinaabe woman named Mindemoyen
-   - Inheritance details, horror engine, structural skeleton (27 chapters, ~85k words)
-   - POV decision: close third, present tense
-   - Complete internal lore document (rules, mechanics, what resolves)
-   - Holes caught and fixed, holes to watch
+Awaiting: the author's full read of the second draft, and a sensitivity-reader pass (brief is ready — see below).
 
-2. **`chapter_01_draft.md`** — First draft of Chapter 1 (~3,200 words). Kept for reference.
+## Source of truth & build
+- **Manuscript = `chapters/NN-slug.md`** (per-chapter markdown with `number:` / `title:` / `target_words:` frontmatter). The build orders by the `number:` field, not the filename.
+- **`build_book.mjs`** → regenerates `anna_sen_menna_kdp_ebook.html` (title page "Seven Martin"; strips `SENSITIVITY-FLAG` comments, inline and own-line). Run: `node build_book.mjs`.
+- **`build_docx.mjs`** → regenerates `anna_sen_menna_kdp_print.docx` (dependency-free OOXML; zips via Windows PowerShell .NET — no pandoc/Word needed). Run: `node build_docx.mjs`. NOTE: this produces a **content-current manuscript DOCX**; final KDP print formatting (trim size, running heads, page numbers, font embedding) is still a manual Word pass.
+- Deliverables verified 2026-06-01: ebook HTML and print DOCX both = 26 chapters, author "Seven Martin", zero flag leakage, zero real institution names.
 
-3. **`chapter_01_revised.md`** — Revised draft after critique pass (~2,500 words). This is the current working version of Chapter 1.
+## What this revision did
+- Extracted the single-file HTML into per-chapter markdown + the two build scripts.
+- **Acts I–II (Ch 1–14):** expanded in place to scene depth (kept all model passages).
+- **Act Three rebuilt chronologically (Ch 15–21)** as a Sat→Wed countdown: Spring Coming (one scenic haunted night) · The Families (Lehtinen Sun + Erik Saari Mon; two factions seeded) · The Convening (Mon night; the name spoken aloud) · The Snowmobiler (Tue AM; Dale's death witnessed) · The Lid Comes Off (Tue PM; Reino Saari's on-page chainsaw death; ice cracks lake-wide) · The Last Night (hour-by-hour) · The Morning (dawn document-gathering).
+- **Climax/Resolution (Ch 22–26):** Ceremony (Finnish prayer *anna meidän anteeksi* + intensified peril) · Burning (carved-marks payoff) · Coals and Stone (the mother's call: *"I shouldn't have brought you back"*) · After · She Does Not Get Far ("I can hear it now").
+- **Mortal stakes restored:** Toivo's 1962 drowning (Ch 8), Dale (Ch 18), Reino (Ch 19), Aino's near-pull-under (Ch 22) — restraint held (no gore).
+- **Payoffs delivered:** Finnish folklore *väki/vetehinen* (Ch 11), the unconscious Finnish prayer (Ch 22), the mother's call (Ch 24), the carved containment-marks (Ch 23), the basement tools→watch tie (Ch 14), the twelve-hours-of-his-voice math (Ch 20), the lake's restored presence.
+- **Global passes:** continuity/tic/Finnish-thread audit (Task 29) and naming fictionalization (Task 30).
 
----
+## Continuity decisions locked this revision
+- **Names:** fourth 1919 family standardized to **Mäkinen** in narration + the names-list; **Mäkelä** kept only as the old-timers'/Louise's variant. Risto Jr. (d.1947, no sons) ends the male *name*; Rauha Mäkinen (daughter, married Aaltonen) carries the blood to Mikko.
+- **Timeline reconciled:** Hank b.1948, d. age 77 (≈ present 2025); **Aino b.1987, age 38, left at 19, gone 19 years**; Hank was 58 when she was 19. (Earlier draft's "father 48"/"Aino b.1971"/"age 51" were the inconsistent outliers, now fixed.) See `REVISION_NOTES_GLOBAL.md`.
+- **Eino's 1919 notebook** lives in the bolted sauna lockbox (not the basement shelf); Ch 8 fixed to match Ch 7/Ch 21.
+- **Institutions fictionalized:** town Watersmeet → **Tamarack**; band → **Tamarack Lake Band of Lake Superior Ojibwe** (real grouping "Lake Superior Ojibwe" retained).
 
-## Where We Left Off
+## Before release — open items
+1. **Sensitivity reader** (deferred, author to commission). Turnkey brief: **`SENSITIVITY_READER_BRIEF.md`** — collects all 29 flagged passages + standing questions A–I (highest priority: the name "Mindemoyen"; the ceremony depiction; Louise/elder agency; the *väki/vetehinen* framing; the climax prayer; the invented surname "Louise Swifthawk"; the carved figure; the supernatural-persistence framing; the untranslated closing line).
+2. **Author read** of the full second draft (act-boundary reviews done for Act Three; full-book read still wanted).
+3. **KDP print formatting** of the DOCX (the generated file is content-complete, not print-laid-out).
+4. **Cover, blurb, KDP metadata** — out of scope for this revision (separate task).
 
-We just completed a critique-and-revision pass on Chapter 1. The revised version is on the table and waiting for the user's read. Specifically waiting on feedback about:
-
-- **Voice consistency** — does the voice feel held throughout, or does it slip into a more "literary narrator" register in places?
-- **Pacing** — the chapter is tighter (2,500 vs 3,200 words). Did anything important get cut?
-- **The footprints ending** — *She goes back to bed. She does not sleep.* Does this land, or does it feel abrupt without the original dream coda?
-
----
-
-## Next Steps (in order)
-
-1. **Finalize Chapter 1.** Either accept the revised version or do another pass based on user feedback.
-
-2. **Draft Chapter 2 — "Hakala's."** Aino arrives too late for the funeral home, stops at the only bar that's open. Bartender is a high school classmate. Toivo Maki — the neighbor who found her father — is at the bar. He says: *Don't go out on the lake.* She thinks he means the ice. Establishes town texture, first explicit warning, sets up Toivo as recurring voice.
-
-3. **Continue drafting Act One** (Chapters 3–6) before returning to revise.
-
----
-
-## Open Items / TODO
-
-- **Sensitivity reader engagement.** Identify an Anishinaabe (Lac Vieux Desert Band area preferred) sensitivity reader before drafting Chapter 12 (the Watersmeet conversation). Salt & Sage Books or Writing Diversely. Budget $300–600. Start identifying readers early.
-
-- **Title.** Still untitled. Working titles to brainstorm later.
-
-- **Research items flagged in working doc:**
-  - 1919 timing against actual U.P. iron range history (Copper Strike was 1913–14; what was 1919 like specifically?)
-  - Rantasauna structural plausibility for 100 years of continuous use
-  - Drive timing from Milwaukee to western U.P. in February (verified ~7 hours, fits Ch 1)
-
-- **Continuity to confirm in draft:** Aili dies when Aino is 15; rupture (ledger discovery) happens when Aino is 19. Four years apart, separate events.
-
----
-
-## Key Decisions Locked In
-
-- **Genre/category:** Adult literary folk horror, ~85,000 words, standalone with series potential.
-- **Setting:** Kivijärvi, Michigan (fictional U.P. iron-range town). February 2026 with break-up in mid-March.
-- **Protagonist:** Aino Marlene Hietala, 38, Milwaukee paralegal.
-- **Central artifact:** Rantasauna built over the water at the family's lakeshore.
-- **Buried wrong:** 1919 killing of Mindemoyen by Eino Hietala and three other Finnish men.
-- **Horror engine:** Buried family guilt. The supernatural is what the historical wrong has become.
-- **POV/tense:** Close third, present tense.
-- **Series structure:** Standalone with series potential. Investigator-style series (Aino's perception is opened by the events of book one; she can now sense similar wrongness in other towns).
-- **Sequel hook:** Last line of Ch 27 — *I can hear it now.* She pulls off the highway at an exit she didn't plan to take.
-
----
-
-## How to Resume
-
-When starting a new conversation, share:
-- All three files in `/mnt/user-data/outputs/` (or wherever they're saved on your end)
-- This status document
-- What you want to work on next (revise Ch 1 further, draft Ch 2, research, etc.)
-
-Claude in the new conversation should read the working outline first, then the revised Ch 1, then this status doc, then proceed.
+## Key references
+- Spec: `docs/superpowers/specs/2026-06-01-anna-sen-menna-revision-design.md`
+- Plan: `docs/superpowers/plans/2026-06-01-anna-sen-menna-revision.md`
+- Running continuity notes: `projects/kdp-puzzle-press/first_book/files/REVISION_NOTES_GLOBAL.md`
+- Lore bible / outline: `novel_outline_working.md`
