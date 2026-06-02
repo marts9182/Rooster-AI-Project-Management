@@ -8,6 +8,21 @@ The book is now a complete, releasable-quality second draft: **~65,900 words, 26
 
 Awaiting: the author's full read of the second draft, and a sensitivity-reader pass (brief is ready — see below).
 
+## KDP production status (2026-06-01, evening) — paused here
+
+Going for fully KDP-ready (ebook + paperback). **Done & committed:**
+- **Cover** (concept: lone sauna over the frozen lake, chosen from 3 Nano Banana Pro candidates). Art generated via `web.ui/backend/scripts/generate_novel_cover.mjs` (Gemini `gemini-3-pro-image-preview`). Typography composited (Pillow) — title in Playfair, byline, subtitle.
+  - Ebook front: `cover/anna_sen_menna_cover_ebook.png` (1600×2560). Builder: `cover/compose_cover.py`.
+  - Paperback wrap: `cover/anna_sen_menna_cover_wrap.pdf` (+ `.png` preview), 300 DPI, front+spine+back, geometry for 222pp cream (spine 0.555″, full 11.807×8.75″). Builder: `cover/build_wrap.py`. Chosen art: `cover/anna-cover-a-hero-*.jpg`.
+- **Print interior:** `anna_sen_menna_kdp_print_interior.pdf` — 5.5×8.5, **222 pages**, Georgia body + Playfair display, all text fonts embedded (a parked base-14 Helvetica is referenced but renders zero text — harmless/standard). Builder: `build_print_interior.py`. Includes title page, copyright (with fiction + fictionalized-band disclaimer + AI-cover note), and About-the-Author. No dedication/epigraph (per author).
+- **Metadata kit:** `KDP_METADATA.md` — description (with KDP HTML), back-cover blurb, 7 keywords, 3 categories/BISAC, pricing (ebook $4.99 KU; paperback $13.99), author bio, **AI-disclosure guidance** (cover = AI-generated; text = author to declare honestly).
+- Spec: `docs/superpowers/specs/2026-06-01-anna-sen-menna-kdp-production-design.md`.
+
+**Resume next session (small):**
+1. Final QA + write `KDP_UPLOAD_CHECKLIST.md` (step-by-step upload order, AI disclosure, KU, ISBN, pricing, the recommended sensitivity-reader gate before going live).
+2. Minor polish: spine text order (currently author reads above title — flip so title is top); consider generating a proper EPUB for the ebook (currently the reflowable HTML/DOCX is the ebook source).
+3. Author decisions still open: confirm pricing; confirm the AI-content declarations; (optional) commission the sensitivity reader before publishing.
+
 ## Source of truth & build
 - **Manuscript = `chapters/NN-slug.md`** (per-chapter markdown with `number:` / `title:` / `target_words:` frontmatter). The build orders by the `number:` field, not the filename.
 - **`build_book.mjs`** → regenerates `anna_sen_menna_kdp_ebook.html` (title page "Seven Martin"; strips `SENSITIVITY-FLAG` comments, inline and own-line). Run: `node build_book.mjs`.
