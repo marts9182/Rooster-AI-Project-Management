@@ -18,7 +18,7 @@ She thinks about the entry in March of last year: *I am running out of time to l
 
 She thinks about the entry in May: *I should have told her the summer she found the ledger and I screamed at her and she left. That was the worst thing I ever did.*
 
-She thinks about Father's Day. Eleven minutes — he timed every call, and so does she; she got that from him without being taught it. She does not do the math again. She did it once, in the cold kitchen with the count coming up through the floor, and once is enough to carry.
+She thinks about Father's Day. Eleven minutes; he timed every call. She does not do the math again. She did it once, in the cold kitchen with the count coming up through the floor, and once is enough to carry.
 
 She builds the fire.
 
