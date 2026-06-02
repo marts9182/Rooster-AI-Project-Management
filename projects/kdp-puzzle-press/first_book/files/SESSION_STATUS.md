@@ -23,6 +23,17 @@ Going for fully KDP-ready (ebook + paperback). **Done & committed:**
 2. Minor polish: spine text order (currently author reads above title — flip so title is top); consider generating a proper EPUB for the ebook (currently the reflowable HTML/DOCX is the ebook source).
 3. Author decisions still open: confirm pricing; confirm the AI-content declarations; (optional) commission the sensitivity reader before publishing.
 
+## KDP production status (2026-06-02) — upload-ready
+
+The resume list above is now **done**:
+- **`KDP_UPLOAD_CHECKLIST.md` written** — full step-by-step upload order for ebook + paperback, AI-disclosure guidance, KU enrollment, free-KDP-ISBN, pricing, previewer/proof steps, and the post-publish launch tactic. Sensitivity reader is framed as **recommended, not a hard gate** (author's call).
+- **EPUB generated + validated.** New `build_epub.mjs` → `anna_sen_menna_kdp_ebook.epub` (EPUB 3: cover, title/copyright front matter mirroring the print interior, 26 chapters, About-the-Author, nav + NCX). **Passes epubcheck (0 errors / 0 warnings).** Zip done in Python so `mimetype` is truly STORED (method 0) — .NET's compression can't do that. This is now the preferred ebook upload; the HTML remains a fallback. (Requires the PyPI `epubcheck` wrapper to re-validate.)
+- **Spine flipped.** `cover/build_wrap.py` now rotates `-90` (clockwise): title sits **above** author and reads **top-to-bottom** (standard US/UK trade convention). Wrap PDF/PNG rebuilt.
+- **Pricing confirmed:** ebook **$4.99** (KU; optional $0.99 5-day Countdown launch week), paperback **$13.99**. Recorded in the checklist + metadata kit.
+- **Naming QA:** verified **Kivijärvi** (the protagonist's home town) and **Tamarack** (the separate town with the tribal offices, 40 mi away) are *intentionally two different places* — not the continuity error it first looked like. Back-cover/metadata "town of Kivijärvi" is correct.
+
+**Still open (author decisions only):** confirm the AI-content declarations at upload; (optional) commission the sensitivity reader. All build artifacts are ready to upload.
+
 ## Source of truth & build
 - **Manuscript = `chapters/NN-slug.md`** (per-chapter markdown with `number:` / `title:` / `target_words:` frontmatter). The build orders by the `number:` field, not the filename.
 - **`build_book.mjs`** → regenerates `anna_sen_menna_kdp_ebook.html` (title page "Seven Martin"; strips `SENSITIVITY-FLAG` comments, inline and own-line). Run: `node build_book.mjs`.

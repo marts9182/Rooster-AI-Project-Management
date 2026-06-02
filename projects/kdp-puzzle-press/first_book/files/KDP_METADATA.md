@@ -94,5 +94,5 @@ For this title:
 - **ISBN:** use the **free KDP ISBN** for the paperback (separate ISBN per format; ebooks don't need one).
 - **Publisher/Imprint:** optional. Leave blank or set an imprint name you control.
 - **Cover:** ebook = `cover/anna_sen_menna_cover_ebook.png` (1600×2560). Paperback = `cover/anna_sen_menna_cover_wrap.pdf` (full wrap; built for 222 pp, cream).
-- **Interior:** `anna_sen_menna_kdp_print_interior.pdf` (paperback). Ebook = upload `anna_sen_menna_kdp_ebook.html` (or convert to EPUB/.docx; KDP accepts the reflowable HTML/DOCX/EPUB).
+- **Interior:** `anna_sen_menna_kdp_print_interior.pdf` (paperback). Ebook = `anna_sen_menna_kdp_ebook.epub` (validated EPUB 3, passes epubcheck — preferred). The reflowable `anna_sen_menna_kdp_ebook.html` remains as a fallback source.
 - **Recommended before publishing:** the sensitivity-reader pass (`SENSITIVITY_READER_BRIEF.md`).

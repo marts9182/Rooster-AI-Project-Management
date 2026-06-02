@@ -199,11 +199,14 @@ def build_spine(spine_w, spine_h):
     title = "Anna Sen Mennä"
     cy = strip_h / 2
     # title left-of-center, author right-of-center along the strip length
+    # Title at the left of the strip, author at the right; a clockwise (-90)
+    # rotation then puts the title at the TOP of the spine and the author at the
+    # bottom, with text reading top-to-bottom (standard US/UK trade convention).
     tw = tf.getlength(title)
     sd.text((strip_w * 0.10, cy - tf.size * 0.62), title, font=tf, fill=BONE)
     aw = af.getlength(AUTHOR)
     sd.text((strip_w - strip_w * 0.10 - aw, cy - af.size * 0.55), AUTHOR, font=af, fill=BONE_DIM)
-    strip = strip.rotate(90, expand=True)
+    strip = strip.rotate(-90, expand=True)
     # paste centered onto spine
     img.paste(strip, ((spine_w - strip.width) // 2, (spine_h - strip.height) // 2))
     return img
