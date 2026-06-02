@@ -140,7 +140,7 @@ Then he is quiet for a very long time. Long enough that Aino thinks he is going 
 
 Erik looks at his hands. He is a big man, still solid despite his age, the kind who has dealt with hard things by dealing with them physically — the wood, the kept yard, the wife nursed through to the end, the life lived in deliberate order. She can see him trying to set this thing down in that order and finding that it will not lie flat.
 
-"My grandfather wouldn't stand there," he says slowly. "If he were alive. He'd do what Reino's going to do. Or he'd do nothing, which is what he did, all his life. Stand there or stand away — that's the choice in this family. There's never been a middle of it." He turns the cup a quarter-turn, the same small habit Juhani had, and she wonders if it is a thing all the old men here do or only the ones who are deciding something. "I haven't slept well in a week."
+"My grandfather wouldn't stand there," he says slowly. "If he were alive. He'd do what Reino's going to do. Or he'd do nothing, which is what he did, all his life. Stand there or stand away — that's the choice in this family. There's never been a middle of it." He presses his hands flat against the table and looks at them a moment, the spread fingers, as if making sure of something under them. "I haven't slept well in a week."
 
 "Neither have I," she says.
 
@@ -175,9 +175,5 @@ She thinks about her father. All the nights he drove this road in the dark, down
 "One more night," Mikko says.
 
 "One more night," she says, and does not say what she is thinking, which is that one more night assumes that everyone waits for Wednesday, and that she has just met a man who will not.
-
-She looks over at Mikko. He is watching the road.
-
-She looks back at the lake.
 
 One more night, if they are lucky. She is no longer sure they are going to be lucky.
