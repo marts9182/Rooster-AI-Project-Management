@@ -12,7 +12,20 @@
       "PowerShell(\"---contact sheet for all---\")",
       "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\build_real_grid_hero.py\" christmas-word-search-seniors 2>&1)",
       "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\preview_cover.py\" christmas-word-search-seniors 2>&1)",
-      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\preview_cover.py\" garden-companion 2>&1)"
+      "PowerShell(python \"C:\\\\Sandbox\\\\AIProjectManagement\\\\Rooster-AI-Project-Management\\\\projects\\\\kdp-puzzle-press\\\\scripts\\\\preview_cover.py\" garden-companion 2>&1)",
+      "Bash(npx vitest *)",
+      "Bash(git mv *)",
+      "Bash(node -e \"require\\('node:fs'\\).rmSync\\('web.ui/backend/.pinterest-profile', {recursive: true, force: true}\\); console.log\\('removed \\(or absent\\)'\\);\")",
+      "Bash(npm test *)",
+      "Bash(git commit -m ' *)",
+      "Bash(npm run *)",
+      "Bash(cd /c/Sandbox/AIProjectManagement/Rooster-AI-Project-Management/web.ui/backend && npm test 2>&1 | tail -3 && echo \"\" && echo \"=== Frontend ===\" && cd ../frontend-react && npm test 2>&1 | tail -3 && echo \"\" && echo \"=== Frontend build ===\" && npm run build 2>&1 | tail -3)",
+      "Read(//c/Sandbox/AIProjectManagement/**)",
+      "Bash(curl -sS -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:5000/)",
+      "Bash(curl -sS http://127.0.0.1:5000/api/status)",
+      "Bash(curl -sS http://127.0.0.1:5000/api/pinterest/token-status)",
+      "Bash(powershell -Command 'Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }')",
+      "Bash(awk -F= '{print $1}' .env.local)"
     ]
   }
 }

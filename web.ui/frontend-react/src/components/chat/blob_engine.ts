@@ -10,13 +10,13 @@ interface MoodParams {
 }
 
 const MOOD_TABLE: Record<BlobMood, MoodParams> = {
-  idle:        { baseAmp: 0.04, freq: 0.8, speed: 0.25 },
-  listening:   { baseAmp: 0.06, freq: 1.1, speed: 0.5 },
-  thinking:    { baseAmp: 0.10, freq: 2.2, speed: 1.0 },
-  responding:  { baseAmp: 0.08, freq: 1.6, speed: 1.5 },
-  'tool-using':{ baseAmp: 0.14, freq: 3.0, speed: 1.8 },
-  done:        { baseAmp: 0.05, freq: 0.9, speed: 0.3 },
-  error:       { baseAmp: 0.07, freq: 1.4, speed: 0.7 },
+  idle:        { baseAmp: 0.16, freq: 1.2, speed: 0.9 },
+  listening:   { baseAmp: 0.20, freq: 1.5, speed: 1.3 },
+  thinking:    { baseAmp: 0.28, freq: 2.4, speed: 2.0 },
+  responding:  { baseAmp: 0.24, freq: 1.8, speed: 2.4 },
+  'tool-using':{ baseAmp: 0.34, freq: 3.0, speed: 2.8 },
+  done:        { baseAmp: 0.14, freq: 1.1, speed: 0.8 },
+  error:       { baseAmp: 0.22, freq: 1.6, speed: 1.6 },
 };
 
 export type Noise = (x: number, y: number) => number;

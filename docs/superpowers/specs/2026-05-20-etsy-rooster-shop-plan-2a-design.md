@@ -172,7 +172,7 @@ Done once via the Etsy dev dashboard / Shop Manager web UI by the user:
 Pocket Rooster Press is a small imprint making printable products for people who
 like to slow down and make things by hand.
 
-[USER FILLS: 1–2 sentences about who you are and why you started the shop.]
+I started Pocket Rooster Press as a quiet corner of the internet for designs I'd want in my own house — bold, gentle, easy to color through on a slow evening. Each book and cut file is something I'd be happy to print and use myself.
 
 Every design is delivered as an instant download — no waiting, no shipping.
 Coloring books arrive as PDFs you print at home; SVG cut files work in Cricut,

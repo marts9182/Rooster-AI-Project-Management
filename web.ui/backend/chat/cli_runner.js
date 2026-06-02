@@ -92,6 +92,12 @@ export function runClaudeTurn({
   spawnFn = defaultSpawn,
 }) {
   // Build argv per spike findings.
+  // NOTE: On Windows, `shell: true` joins argv with spaces and re-parses the
+  // string via cmd.exe. If the prompt is passed as a positional arg, cmd.exe
+  // splits it at unquoted whitespace and only the first word reaches `claude`.
+  // We pipe the prompt over stdin instead — `claude --print` reads from stdin
+  // when no prompt argv is supplied. This sidesteps cross-platform shell
+  // quoting entirely.
   const args = [
     '--print',
     '--output-format', 'stream-json',
@@ -108,13 +114,16 @@ export function runClaudeTurn({
     args.push('--session-id', effectiveSessionId);
   }
 
-  args.push(prompt);
-
   const child = spawnFn('claude', args, {
     cwd,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: ['pipe', 'pipe', 'pipe'],
     shell: true,
   });
+
+  try {
+    child.stdin.write(prompt);
+    child.stdin.end();
+  } catch { /* if stdin is already gone, the close handler will report exit */ }
 
   // Buffers and accumulators.
   let stdoutBuf = '';

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useChatBlobContext } from './ChatBlobContext';
 import { computeBlobPath, makeNoise } from './blob_engine';
+import './chat.css';
 
 interface Props {
   size: 'sm' | 'md' | 'lg';
@@ -45,12 +46,27 @@ export default function ChatBlob({ size, onClick }: Props) {
       style={{ cursor: onClick ? 'pointer' : 'default' }}
     >
       <defs>
-        <linearGradient id={`chatblob-grad-${size}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={errorTint ? '#C0394B' : '#1F4F66'} />
-          <stop offset="100%" stopColor={errorTint ? '#E8A0A0' : '#CAA457'} />
-        </linearGradient>
-        <filter id={`chatblob-glow-${size}`}>
-          <feGaussianBlur stdDeviation={px / 60} />
+        <radialGradient id={`chatblob-grad-${size}`} cx="0.35" cy="0.35" r="0.85">
+          {errorTint ? (
+            <>
+              <stop offset="0%" stopColor="#FF7A8A" />
+              <stop offset="60%" stopColor="#E03A55" />
+              <stop offset="100%" stopColor="#7A1024" />
+            </>
+          ) : (
+            <>
+              <stop offset="0%" stopColor="#7CC4FF" />
+              <stop offset="55%" stopColor="#2E7CF6" />
+              <stop offset="100%" stopColor="#0B3A8C" />
+            </>
+          )}
+        </radialGradient>
+        <filter id={`chatblob-glow-${size}`} x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation={Math.max(1, px / 30)} result="glow" />
+          <feMerge>
+            <feMergeNode in="glow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
       </defs>
       <path

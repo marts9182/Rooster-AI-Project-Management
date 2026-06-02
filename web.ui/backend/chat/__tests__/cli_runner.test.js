@@ -11,6 +11,12 @@ function makeFakeProc() {
   const proc = new EventEmitter();
   proc.stdout = new EventEmitter();
   proc.stderr = new EventEmitter();
+  proc.stdin = {
+    chunks: [],
+    ended: false,
+    write(chunk) { this.chunks.push(String(chunk)); },
+    end() { this.ended = true; },
+  };
   proc.kill = vi.fn(function killImpl() {
     proc.killed = true;
     return true;
@@ -332,6 +338,48 @@ describe('chat/cli_runner.js — runClaudeTurn', () => {
     expect(result.exitCode).toBe(1);
     expect(onError).toHaveBeenCalledTimes(1);
     expect(onError.mock.calls[0][0].message).toMatch(/boom/);
+  });
+
+  it('prompt is piped over stdin (not passed as positional argv)', async () => {
+    // Regression: on Windows with shell:true, an unquoted prompt argv is split
+    // at whitespace by cmd.exe and only the first word reaches `claude`.
+    // We now pipe the prompt to child.stdin instead.
+    const proc = makeFakeProc();
+    const spawnFn = vi.fn(() => proc);
+    const prompt = 'Can you list all the books in my catalog';
+
+    const promise = runClaudeTurn({
+      conversationId: 7,
+      claudeSessionId: null,
+      prompt,
+      cwd: process.cwd(),
+      onChunk: vi.fn(),
+      onToolCall: vi.fn(),
+      onError: vi.fn(),
+      onComplete: vi.fn(),
+      timeoutMs: 60_000,
+      spawnFn,
+    });
+
+    await Promise.resolve();
+
+    // Prompt must not appear in argv.
+    const argsArray = spawnFn.mock.calls[0][1];
+    expect(argsArray).not.toContain(prompt);
+    // It must, however, have been written to stdin and stdin closed.
+    expect(proc.stdin.chunks.join('')).toBe(prompt);
+    expect(proc.stdin.ended).toBe(true);
+
+    emitJsonLine(proc, {
+      type: 'system',
+      subtype: 'init',
+      session_id: 'sid',
+      cwd: process.cwd(),
+      tools: [],
+    });
+    emitJsonLine(proc, resultEvent());
+    proc.emit('close', 0);
+    await promise;
   });
 
   it('timeout kills the subprocess', async () => {
