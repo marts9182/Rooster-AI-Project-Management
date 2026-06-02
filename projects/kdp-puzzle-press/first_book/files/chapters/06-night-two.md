@@ -72,7 +72,7 @@ The envelope is on the kitchen table. It has been on the kitchen table for the b
 
 She sits down across from it. She does not pick it up yet.
 
-She could leave. That is the thing she lets herself think, sitting there with the coffee going cold. She could fill the rest of the boxes and load the Subaru and lock the house and drive south, and the estate would stay open and Ernest Autio would wait, and her father's condition would go unmet, and some lawyer years from now would do whatever lawyers do with a house no one came back for. She could be in Watersmeet by noon and out of the U.P. by dark and home — the apartment, the radiator, the dog commercials — by the time the sound started again tonight for someone who was no longer here to hear it. No one would make her stay. The prints would go on being made in a yard no one was standing at the window of.
+She could leave. That is the thing she lets herself think, sitting there with the coffee going cold. She could fill the rest of the boxes and load the Subaru and lock the house and drive south, and the estate would stay open and Ernest Autio would wait, and her father's condition would go unmet, and some lawyer years from now would do whatever lawyers do with a house no one came back for. She could be in Tamarack by noon and out of the U.P. by dark and home — the apartment, the radiator, the dog commercials — by the time the sound started again tonight for someone who was no longer here to hear it. No one would make her stay. The prints would go on being made in a yard no one was standing at the window of.
 
 She thinks about how fast he came down that hill.
 

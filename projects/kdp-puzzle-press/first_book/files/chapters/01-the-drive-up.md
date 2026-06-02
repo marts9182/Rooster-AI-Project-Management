@@ -54,7 +54,7 @@ The man comes back mid-sentence: *—the kind of decision that'll cost you in Ma
 
 She exhales slowly. She hadn't realized she'd stopped breathing.
 
-A sign comes up out of the snow, green and reflective, and her eyes go to it the way eyes do on an empty road, hungry for anything. *WATERSMEET 11.* She reads it twice. She has no business in Watersmeet — she's never had business in Watersmeet — but the name sits there a beat longer than it should, the way a name does when you've heard it somewhere and can't place where. Then the sign is behind her and the road is dark again. She's forty minutes past the exit before it occurs to her that she should have eaten something. She eats an apple without tasting it.
+A sign comes up out of the snow, green and reflective, and her eyes go to it the way eyes do on an empty road, hungry for anything. *TAMARACK 11.* She reads it twice. She has no business in Tamarack — she's never had business in Tamarack — but the name sits there a beat longer than it should, the way a name does when you've heard it somewhere and can't place where. Then the sign is behind her and the road is dark again. She's forty minutes past the exit before it occurs to her that she should have eaten something. She eats an apple without tasting it.
 
 ---
 

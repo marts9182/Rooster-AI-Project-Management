@@ -4,7 +4,7 @@ title: Going Home
 target_words: 2200
 ---
 
-She rides back from Watersmeet in Mikko's passenger seat, watching the pines go by in the fading light. He drops her at the house and she stands in the cold driveway a moment watching his taillights disappear down the gravel road before going inside.
+She rides back from Tamarack in Mikko's passenger seat, watching the pines go by in the fading light. He drops her at the house and she stands in the cold driveway a moment watching his taillights disappear down the gravel road before going inside.
 
 The sky outside the kitchen window is the dull pewter of a day that never quite found the sun. She puts the kettle on and stands at the counter thinking about what Louise said.
 

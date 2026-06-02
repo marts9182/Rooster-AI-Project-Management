@@ -1,6 +1,6 @@
 ---
 number: 12
-title: The Drive to Watersmeet
+title: The Drive to Tamarack
 target_words: 3000
 ---
 
@@ -16,9 +16,9 @@ She calls Louise Swifthawk and tells her she'd like to bring someone, explains w
 
 ---
 
-They drive to Watersmeet on a Thursday morning, Mikko's truck because the roads are better with the higher clearance. The sky is low and white. The heater works on one setting, which is too hot, so they run it in bursts and then crack the windows, and the cab fills with the smell of exhaust and cold pine and the coffee in the two travel mugs in the console, going lukewarm.
+They drive to Tamarack on a Thursday morning, Mikko's truck because the roads are better with the higher clearance. The sky is low and white. The heater works on one setting, which is too hot, so they run it in bursts and then crack the windows, and the cab fills with the smell of exhaust and cold pine and the coffee in the two travel mugs in the console, going lukewarm.
 
-The landscape between Kivijärvi and Watersmeet is forty miles of the same country. Pines and birch and the occasional glimpse of a frozen lake through the trees, a gas station, a shuttered bait shop, a church with a plowed lot and no cars in it. The road runs straight for long stretches and then bends for no reason she can see, around some property line drawn a century ago by men who are all dead now. Mikko drives the way he does everything, without hurry, both hands on the wheel, easing off well before the curves.
+The landscape between Kivijärvi and Tamarack is forty miles of the same country. Pines and birch and the occasional glimpse of a frozen lake through the trees, a gas station, a shuttered bait shop, a church with a plowed lot and no cars in it. The road runs straight for long stretches and then bends for no reason she can see, around some property line drawn a century ago by men who are all dead now. Mikko drives the way he does everything, without hurry, both hands on the wheel, easing off well before the curves.
 
 They drive most of it without talking. Earlier in their acquaintance she had read his silences as the comfortable kind, a U.P. quality, or maybe just his — a man who does not feel the need to fill the air. This silence is not that. This one has a shape. There is a conversation they are not having and it sits between them on the bench seat like a third passenger, and she is aware of it the way you are aware of a sound that has stopped: the absence of it is louder than the thing would be.
 

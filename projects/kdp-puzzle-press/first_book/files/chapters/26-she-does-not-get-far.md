@@ -14,7 +14,7 @@ She drives through Ironwood. She drives through Hurley. The body, she finds, lea
 
 She crosses back into Wisconsin and the road straightens and the sky opens up and she has the clear, clean feeling of a highway in front of her for a long distance, and behind her, steady, the weight of everything she is driving away from, not letting go.
 
-She thinks about the six weeks. She lines them up in her mind the way she would line up the facts of a case at work, in order, each one leading to the next. The drive up. Hakala's. The house. The funeral. The will. The sauna. The ledgers. Watersmeet. The shore. The fire. She can see the shape of it now from the outside, which she couldn't while she was in it — the way each thing opened the next, the way she kept going one step further than she'd planned, the way the book she'd thought she was reading turned out to be a different book entirely.
+She thinks about the six weeks. She lines them up in her mind the way she would line up the facts of a case at work, in order, each one leading to the next. The drive up. Hakala's. The house. The funeral. The will. The sauna. The ledgers. Tamarack. The shore. The fire. She can see the shape of it now from the outside, which she couldn't while she was in it — the way each thing opened the next, the way she kept going one step further than she'd planned, the way the book she'd thought she was reading turned out to be a different book entirely.
 
 She thinks about Mikko. The way he dried dishes without being asked. The way he said *I'll come back* after she said it, quietly, as though he were testing the weight of it.
 

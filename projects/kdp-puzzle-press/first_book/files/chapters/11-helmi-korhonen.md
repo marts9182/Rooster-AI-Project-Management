@@ -12,7 +12,7 @@ Aino tells her, plainly, the way she would report something at work. The darknes
 
 Another pause, longer this time.
 
-"I'd like to meet with you in person," Louise says. "Not on the phone. Can you come to Watersmeet?"
+"I'd like to meet with you in person," Louise says. "Not on the phone. Can you come to Tamarack?"
 
 They agree on a day, two days from now. Louise gives her an address. She says: "Come alone," which Aino had intended to do anyway, and then: "Don't go back to the sauna until after we talk." A pause. "Please."
 
@@ -88,13 +88,13 @@ Aino waits.
 
 "Then what's true."
 
-"I don't know." Helmi says it without apology. "And the part I do know is not mine to hand out. There are people across the lake whose grandmothers knew what this water was before any Finn ever saw it, and they did not call it by my words, and they did not understand it the way four frightened men with a thing to hide understood it. If there is a true name for it, it is theirs, and you will not hear it from me, because I would only get it wrong the way Eino got it wrong, and getting it wrong is the entire history of this place." She picks up her coffee again. "That is why you are going to Watersmeet. That is the only sensible thing anyone in your family has thought of in a hundred years."
+"I don't know." Helmi says it without apology. "And the part I do know is not mine to hand out. There are people across the lake whose grandmothers knew what this water was before any Finn ever saw it, and they did not call it by my words, and they did not understand it the way four frightened men with a thing to hide understood it. If there is a true name for it, it is theirs, and you will not hear it from me, because I would only get it wrong the way Eino got it wrong, and getting it wrong is the entire history of this place." She picks up her coffee again. "That is why you are going to Tamarack. That is the only sensible thing anyone in your family has thought of in a hundred years."
 
 Aino turns this over. "But Aili understood it. You said that. She knew what the watching was and wasn't, when Eino didn't."
 
 "She understood it could not be named and managed. That is most of what there was to know, and it was more than the men ever learned." A pause. "What none of us knew — Aili, me, your father — is what to *do* about it. The women always knew more than the men but the men were the ones going into the sauna and we were not." A pause. "I told you to leave it. I meant it. I still mean it. But I also knew when I said it that you probably wouldn't."
 
-"I called the tribal offices," Aino says. "I'm going to Watersmeet in two days."
+"I called the tribal offices," Aino says. "I'm going to Tamarack in two days."
 
 Helmi looks at her for a long moment.
 

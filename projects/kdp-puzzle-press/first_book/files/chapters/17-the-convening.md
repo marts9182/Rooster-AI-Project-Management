@@ -55,7 +55,7 @@ And there it is — the thing she did not expect, the strange heavy ease of it o
 "They never told us her name," Marta says. It is half a question, the closest these people will come to asking.
 
 <!-- SENSITIVITY-FLAG: Aino speaks Mindemoyen's name aloud to the Finnish families — the name and the act of naming; no Ojibwe belief voiced -->
-Aino sets her cup down. She has carried the name since Louise gave it to her across a coffee table in Watersmeet — has held it in her mouth a hundred times alone in this house and never let it out, the way her father and his father held the whole of it, the way the door stayed shut.
+Aino sets her cup down. She has carried the name since Louise gave it to her across a coffee table in Tamarack — has held it in her mouth a hundred times alone in this house and never let it out, the way her father and his father held the whole of it, the way the door stayed shut.
 
 "Her name was Mindemoyen," she says.
 
