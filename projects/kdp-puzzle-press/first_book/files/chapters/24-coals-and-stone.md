@@ -68,7 +68,7 @@ She makes herself eat something standing up at the counter. Then she takes her p
 
 She has not done this in years — initiated it, dialed the number herself, sat and waited for Lila to pick up rather than letting Lila be the one who calls and the one who is owed the calling. It is not lost on her, the shape of it. She let her father's calls ring out for years and now she has spent a week learning what an unanswered call costs and tonight she is the one who picks up the phone. She does the thing she failed to do for him, for the parent who is still here to do it for.
 
-Lila answers on the fourth ring. In Phoenix it is two hours earlier and the evening is warm and ordinary; Aino can hear a television somewhere behind her, the dry hum of a house that has never once made a sound that meant something.
+Lila answers on the fourth ring. In Phoenix it is two hours earlier and the evening is warm and ordinary; Aino can hear a television somewhere behind her, the ordinary hum of a warm house a long way from this one.
 
 "Aino," her mother says, and there is surprise in it, and under the surprise something else, quick and braced. "Is everything all right?"
 
@@ -104,7 +104,7 @@ The thing she has waited her whole life to hear is a single sentence, and it is 
 
 "I will."
 
-They talk a few more minutes about nothing, about the drive south and the timing of it and whether she'll come through Chicago, and there is no reconciliation in it, no scene, nothing that would look like anything from the outside. But the sentence has been said. It is in the room with her now and it will be in the car with her when she drives, and it cannot be unsaid, and Aino understands that this is all she is going to get and that it is, against everything, enough. You do not always get the whole of a thing. Sometimes you get the one sentence.
+They talk a few more minutes about nothing, about the drive south and the timing of it and whether she'll come through Chicago, and there is no reconciliation in it, no scene, nothing that would look like anything from the outside. But the sentence has been said. It is in the room with her now and it will be in the car with her when she drives, and it cannot be unsaid, and Aino understands that this is all she is going to get and that it is, against everything, enough.
 
 "Goodnight, Mom," she says.
 
