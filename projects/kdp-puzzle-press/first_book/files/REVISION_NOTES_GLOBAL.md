@@ -12,6 +12,9 @@
   - Ch 8: Hank (father) **born 1948** ("the year her father was born", Toivo's ledger start).
   - Ch 12: Aino "born in **1971**, in Milwaukee."
   - Math fails: born 1971 + left at 19 → 1990; but father born 1948 was **42** in 1990, not 48. And 1948+77=**2025** death, so the gap since 1990 is **35 years**, not 19. Pick a consistent set (e.g. keep "left at nineteen / gone nineteen years" + adjust father's age-at-her-departure and/or birth year; or move her departure later). Then sweep Ch 1, 8, 12, 20 (the twelve-hours math), 23.
+- **New characters/backstory introduced in Act Three rebuild (verify consistency in Task 29):**
+  - **Reino Saari** — Erik Saari's younger brother (5–6 yrs younger), the "end-it-now" faction; introduced Ch 16, refuses at the convening Ch 17, dies on the ice Ch 19. Distinct from Erik (who stands on the shore Wed and survives).
+  - **Reino's drowned son** (Ch 16): "lost his boy to that lake... Through the ice, December, before any of us knew what the ice was doing or why." Invented to motivate Reino's grief-to-contempt. A prior lake death of a Saari descendant — should be reflected if/when the Ch 14 names-list (Saari column) is revisited, and is consistent with the lore (lake takes those who go on the water; family-connected). Confirm it doesn't collide with any other established death.
   - **Interim (Ch 20, applied):** the "twelve hours" math uses only the most-repeated canon — *"left at nineteen, gone nineteen years"* → 19×40 min = 760 min ≈ twelve hours forty minutes (matches Ch 23). No absolute current-age is pinned in Ch 20, pending the Task 29 decision. Earlier draft's "fifty-one / left at thirty-two" was removed.
 
 ## Tics / motifs to thin (Task 29)

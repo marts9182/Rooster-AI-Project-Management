@@ -104,7 +104,7 @@ The dog does not bark at it. Erik's shoulders set. A door slams, and boots come 
 
 "That's not it," Aino says.
 
-"It's close enough." He is not loud. That is the thing she notices, the thing that makes him worse than loud — there is no heat in it, or there is heat under it but he has it banked, controlled, the way Erik has the wood under control. "My grandfather drowned a woman in that lake. So they tell it. I never met him. I never met her. And I'm supposed to go stand on a shore at dawn and *acknowledge* it." The word comes out with the bark off. "You know what that does? Nothing. You want to know what stops a thing? You stop it. You don't ask it nice. You don't wait till Wednesday because somebody downstate has to be *asked*, and asking a thing like this is not asked quickly" — and she goes cold, because that is nearly Louise's own phrase, and she has no idea how it has gotten into this man's mouth, unless it is only that there is one way these things get said. "Three days. We sit on our hands for three more days because that's the polite schedule. You've had it in your floor every night. How many more nights you want."
+"It's close enough." He is not loud. That is the thing she notices, the thing that makes him worse than loud — there is no heat in it, or there is heat under it but he has it banked, controlled, the way Erik has the wood under control. "My grandfather drowned a woman in that lake. So they tell it. I never met him. I never met her. And I'm supposed to go stand on a shore at dawn and *acknowledge* it." The word comes out with the bark off. "You know what that does? Nothing. You want to know what stops a thing? You stop it. You don't ask it nice. You don't wait till Wednesday because somebody downstate has to be *asked* first, and asked on their own schedule. Three days. We sit on our hands for three more days because that's the polite thing. You've had it in your floor every night. How many more nights you want."
 
 "None," Aino says.
 
@@ -120,7 +120,7 @@ Erik does not answer right away. His hands are flat on the table. "I haven't dec
 
 "Reino," Erik says.
 
-"Don't." He is already moving toward the door. "You do your Wednesday. Stand there with the woman and the priest from Crystal Falls and whoever else. I'll handle the part that handles itself." At the door he stops and looks back at Aino, and for one moment there is something under the contempt that is not contempt at all, that is closer to what she saw in Juhani — thirty years of it, fifty, grief gone hard from having nowhere to go. "You think it wants to be acknowledged," he says. "It doesn't want to be acknowledged. It wants what it wants. The difference is going to cost you."
+"Don't." He is already moving toward the door. "You do your Wednesday. Stand there with the woman and the Lehtinens and whoever else. I'll handle the part that handles itself." At the door he stops and looks back at Aino, and for one moment there is something under the contempt that is not contempt at all, that is closer to what she saw in Juhani — thirty years of it, fifty, grief gone hard from having nowhere to go. "You think it wants to be acknowledged," he says. "It doesn't want to be acknowledged. It wants what it wants. The difference is going to cost you."
 
 The door bangs. The truck starts. The dog, outside, does not bark at it leaving either.
 
