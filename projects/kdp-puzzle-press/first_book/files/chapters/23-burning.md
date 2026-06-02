@@ -1,6 +1,6 @@
 ---
 number: 23
-title: What Her Father Wrote at the End
+title: Burning
 target_words: 2500
 ---
 
@@ -18,7 +18,7 @@ She thinks about the entry in March of last year: *I am running out of time to l
 
 She thinks about the entry in May: *I should have told her the summer she found the ledger and I screamed at her and she left. That was the worst thing I ever did.*
 
-She thinks about Father's Day. Eleven minutes. He timed every call. She wonders how many minutes there were across nineteen years of calls. She did the math once — if there were four calls a year and they averaged ten minutes, that was forty minutes a year, seven hundred and sixty minutes across nineteen years, twelve hours. Twelve hours of her father's voice in nineteen years.
+She thinks about Father's Day. Eleven minutes — he timed every call, and so does she; she got that from him without being taught it. She does not do the math again. She did it once, in the cold kitchen with the count coming up through the floor, and once is enough to carry.
 
 She builds the fire.
 
@@ -34,7 +34,7 @@ She has told herself she would build the fire and walk away, and now that she is
 
 The cedar burns fast. She knew it would — the wood is old and dry, forty years of kiuas heat drawn into the walls, and when the fire comes out of the firebox and finds the wall beside it the wall goes up like it has been waiting. She backs toward the door. The heat is immediate and serious, the real heat of a structure fire, nothing like the heat of the sauna in use, and she backs out through the door and stands outside and watches through the open door.
 
-The carvings go first. The band of marks running around the room, her great-grandfather's hand and her grandfather's hand and her father's hand in the wood, three generations of witnessing in a language she never learned to read — the fire finds them and they are gone in under a minute, and she watches them go and she does not look away.
+The carvings go first. The band of marks running around the room, her great-grandfather's hand and her grandfather's hand and her father's hand in the wood, three generations of witnessing in a language she never learned to read — the fire finds them and they are gone in under a minute, and she watches them go and she does not look away. She knows now what they were for. Not a record. A lid. The marks Eino first cut and Toivo re-cut and her father kept re-cutting, year over year, to hold the thing below where it lay — the watch and the marks and the sauna all one thing, one long act of keeping it down. She still cannot read a single one of them. She does not need to. She knows what they were doing, and she knows the men who did it, and that is all the fire is going to leave her with. The lid burns with what it was holding shut.
 
 The lauteet goes. The bench where she sat, the platform above it where she'd lain in the heat, the floor below it where the hatch was — the hatch over the water, the hatch her father had told her not to open, the one she opened anyway. All of it goes, and the fire finds the gap and the cold air from the lake below comes up through the opening and feeds it, and the sauna burns from the inside out and from the bottom up simultaneously and the smoke rising is dense and white against the gray sky.
 
