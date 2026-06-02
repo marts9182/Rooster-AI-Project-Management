@@ -53,7 +53,7 @@ She doesn't run. She breathes through it. It is the worst thing she has ever fel
 
 Beside her she can hear Mikko breathing deliberately, the way you breathe when you are keeping yourself from reacting to something. She doesn't look at him. She keeps her eyes on the ice.
 
-The ice is moving now in a way she can't explain and won't try to. The surface shifts and settles and the cracks open and close and the light on it does something the light isn't doing on anything else — a quality she has no word for, a depth in it, as though the ice is not two feet thick but two hundred, as though what she is looking at is not the surface but the bottom.
+The ice is moving now in a way she can't explain and won't try to. The surface shifts and settles and the cracks open and close and the light on it does something the light isn't doing on anything else — a depth in it, as though the ice is not two feet thick but two hundred, as though what she is looking at is not the surface but the bottom.
 
 <!-- SENSITIVITY-FLAG: The lake continues to respond to the spoken words of Louise's uncle as he leads the ceremony -->
 Louise's uncle speaks for a long time. His voice is low and steady and does not waver, and the lake responds to it, she can feel the response, the quality of the presence below the surface shifting incrementally from — she searches for the word — from *focused* to something more diffuse, as though the beam of something very concentrated is slowly widening.
