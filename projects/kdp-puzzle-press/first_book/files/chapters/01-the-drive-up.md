@@ -24,7 +24,7 @@ She thinks about the coffee maker.
 
 This is what her brain keeps doing. Not the big things, not the funeral or the house or what happens after, but the coffee maker — whether her father had still been using the old percolator or whether at some point he'd bought one of the machines with the pods. She doesn't know why this matters to her. It doesn't matter. But she'd been in his kitchen a hundred times as a girl and the percolator had always been there, the same dented aluminum one, and she wants to know if it was still there when he died and she can't ask anyone because it would be a strange thing to ask.
 
-She'd been nineteen the last time she was in that kitchen. Nineteen. Her father would have been forty-eight, which seems impossible now. He'd made her instant Folgers because she'd asked for instant Folgers, which she'd done because she was nineteen and contrary and she doesn't even like instant Folgers and she has thought about that cup of coffee with a regularity that is embarrassing, off and on, for nineteen years.
+She'd been nineteen the last time she was in that kitchen. Nineteen. Her father would have been fifty-eight, which seems impossible now. He'd made her instant Folgers because she'd asked for instant Folgers, which she'd done because she was nineteen and contrary and she doesn't even like instant Folgers and she has thought about that cup of coffee with a regularity that is embarrassing, off and on, for nineteen years.
 
 The truck in front of her slows. She slows. The snow is heavier now, the wipers earning their keep, and the road is going gray and soft at the shoulders. She backs off to forty-five and settles in.
 

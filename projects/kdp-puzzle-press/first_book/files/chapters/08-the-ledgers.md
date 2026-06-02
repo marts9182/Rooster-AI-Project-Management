@@ -42,7 +42,7 @@ She opens it again.
 
 The entries go on through the winter of 1919 and into 1920, the same pattern — weather, ice depth, and then occasionally the other kind of entry, the ones that don't sound like a man talking about ice. *She was restless last night. Three times she came up, three times I sat with it. The names again — she knows them all.* And later: *Risto's boy saw something at the inlet. We told him it was a beaver. He is seven. He believed us.*
 
-Risto's boy. The Mäkelä line, extinct by 1947 according to what they knew. A seven-year-old boy in 1920 who saw something at the inlet and was told it was a beaver.
+Risto's boy. The Mäkinen line, the male side of it gone by 1947 according to what they knew. A seven-year-old boy in 1920 who saw something at the inlet and was told it was a beaver.
 
 She reads through the winter and into the spring of 1920, and in April there is an entry that stops her:
 
@@ -109,7 +109,7 @@ She doesn't call tonight. It is too late in the day and she is not ready. But sh
 
 She makes dinner. She sits at the table with the notebooks and her father's ledgers spread around her like a flood. She eats without tasting much.
 
-After dinner she puts the notebooks and ledgers in order — Eino's first, then Toivo's four, then her father's forty-two — and carries them carefully down to the basement and puts them back on the shelf exactly as she found them.
+After dinner she carries the ledgers back down to the basement — Toivo's four, her father's forty-two — and sets them on the shelf in order, exactly as she found them. Eino's notebook she does not put with them. It never lived on that shelf; it lived in the locked box under the sauna bench, behind a combination that only the dead knew until last week, and that is where it belongs, and where — when she can make herself go back down to the cold and the dark of that room — she will return it. For tonight she leaves it on the kitchen table, squared to the edge, under the lamp.
 
 She goes back upstairs. She washes her hands at the kitchen sink.
 

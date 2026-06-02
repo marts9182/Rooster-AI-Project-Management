@@ -37,7 +37,7 @@ It is a list of names. Four columns — one for each of the four families. Under
 
 She is the last name on the Hietala list.
 
-Under the Mäkelä column, the last entry reads: *Risto Mäkelä Jr., b. 1912, d. 1947. No children.* The end of that line.
+Under the Mäkinen column, the last of the men reads: *Risto Mäkinen Jr., b. 1912, d. 1947. No sons.* The end of the name, if not the end of the blood.
 
 Under the Lehtinen column, three names below the original Lehtinen man: living descendants, she presumes, still in the area.
 
@@ -69,7 +69,7 @@ He comes over that afternoon, driving up the plowed gravel road in his truck, an
 
 He stands over the table and reads the list a long time, the way she had read it, top to bottom, column by column, and she lets him. She does not narrate it for him. She has learned, this week, that there is nothing to say while someone reads their own name into a thing like this and that the saying would only be for her.
 
-He finds his grandmother's name in the Mäkelä column. Rauha Mäkinen, b. 1921 — she'd been nine when they'd updated this, old enough to inherit the knowledge, young enough that it had shaped her whole life. Mikko's finger rests on her name for a moment. Then it moves up the column, to the original Mäkelä man at the top, one of the four, and back down again, the whole line of them, four generations of his own people set down in Eino's hand and then her father's, and then it stops at the bottom, where the Mäkelä column ends and hers does not.
+He finds his grandmother's name in the Mäkinen column. Rauha Mäkinen, b. 1921 — she'd been nine when they'd updated this, old enough to inherit the knowledge, young enough that it had shaped her whole life. A daughter of the family, married out to a man named Aaltonen, carried clear of the name and not clear of the blood. Mikko's finger rests on her name for a moment. Then it moves up the column, to the original Mäkinen man at the top, one of the four, and back down again, the whole line of them, four generations of his own people set down in Eino's hand and then her father's, and then it stops at the bottom, where the Mäkinen column ends and hers does not.
 
 "She never talked about it directly," he says. "She just — made sure I knew, in pieces. A thing here, a thing there. By the time I was old enough to put it together I already knew the whole shape of it."
 
