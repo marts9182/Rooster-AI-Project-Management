@@ -244,6 +244,42 @@ export class PinterestApiClient {
     }
     return { connected: true, expires_at: stored.expires_at };
   }
+
+  /**
+   * Live connection check: validates the token by actually calling the API.
+   * Unlike getTokenStatus (which only inspects the local file), this catches
+   * dead/wrong-environment tokens that still have a future expires_at.
+   *
+   * @returns {Promise<{connected: boolean, live_ok: boolean, expires_at: string|null,
+   *   identity: {username: string, business_name: string|null}|null, error: string|null}>}
+   */
+  async getLiveStatus() {
+    const base = await this.getTokenStatus();
+    if (!base.connected) {
+      return { ...base, live_ok: false, identity: null, error: 'no_valid_token' };
+    }
+    try {
+      const u = await this.getUserAccount();
+      return {
+        ...base,
+        live_ok: true,
+        identity: { username: u.username, business_name: u.business_name ?? null },
+        error: null,
+      };
+    } catch (err) {
+      // Surface "401" in the error message when the underlying failure is an
+      // authentication error — either a PinterestApiError with status 401, or
+      // the oauth layer's "refresh token expired" error (which is also a 401
+      // from Pinterest's token endpoint).
+      const status = err && typeof err === 'object' && 'status' in err ? err.status : null;
+      const raw = err?.message ?? String(err);
+      const isAuthError =
+        status === 401 ||
+        /refresh token expired|re-auth required/i.test(raw);
+      const message = isAuthError && !/401/.test(raw) ? `401 ${raw}` : raw;
+      return { ...base, live_ok: false, identity: null, error: message };
+    }
+  }
 }
 
 /**

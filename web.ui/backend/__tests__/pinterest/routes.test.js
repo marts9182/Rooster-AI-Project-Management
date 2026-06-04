@@ -278,12 +278,13 @@ describe('GET /api/pinterest/boards', () => {
 });
 
 describe('GET /api/pinterest/token-status', () => {
-  it('returns connected/expires_at envelope from apiClient.getTokenStatus', async () => {
+  it('returns connected/expires_at envelope from apiClient.getLiveStatus', async () => {
     const api = {
-      getTokenStatus: vi.fn(async () => ({
+      getLiveStatus: vi.fn(async () => ({
         connected: true,
         expires_at: '2026-06-26T18:32:00.000Z',
       })),
+      getTokenStatus: vi.fn(),
       listBoards: vi.fn(),
       getUserAccount: vi.fn(),
       createPin: vi.fn(),
@@ -298,9 +299,10 @@ describe('GET /api/pinterest/token-status', () => {
 
   it('returns 500 with the api error message on failure', async () => {
     const api = {
-      getTokenStatus: vi.fn(async () => {
+      getLiveStatus: vi.fn(async () => {
         throw new Error('disk read failed');
       }),
+      getTokenStatus: vi.fn(),
       listBoards: vi.fn(),
       getUserAccount: vi.fn(),
       createPin: vi.fn(),

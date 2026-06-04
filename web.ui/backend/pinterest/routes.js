@@ -9,7 +9,7 @@
  *   PUT  /api/pinterest/queue/:id          — patch title/description/scheduled_for
  *   GET  /api/pinterest/whoami             — apiClient.getUserAccount()
  *   GET  /api/pinterest/boards             — apiClient.listBoards()
- *   GET  /api/pinterest/token-status       — apiClient.getTokenStatus()
+ *   GET  /api/pinterest/token-status       — apiClient.getLiveStatus()
  *   POST /api/pinterest/refresh            — apiClient._forceRefresh() then getTokenStatus()
  *
  * SSE events emitted on state changes:
@@ -153,7 +153,7 @@ export function buildRouter(opts = {}) {
       return res.status(503).json({ error: 'api_client_unavailable' });
     }
     try {
-      const status = await apiClient.getTokenStatus();
+      const status = await apiClient.getLiveStatus();
       res.json(status);
     } catch (err) {
       const message = err?.message || String(err);
