@@ -194,6 +194,20 @@ export class PinterestApiClient {
     return resp.items ?? [];
   }
 
+  /**
+   * Create a board. Idempotency is the caller's job (see boards.ensureBoards).
+   * @param {string} name
+   * @param {{privacy?: 'PUBLIC'|'PROTECTED'|'SECRET', description?: string}} [opts]
+   * @returns {Promise<import('./api_client.js').PinterestBoard>}
+   */
+  async createBoard(name, opts = {}) {
+    return this._callApi('POST', '/v5/boards', {
+      name,
+      privacy: opts.privacy ?? 'PUBLIC',
+      ...(opts.description ? { description: opts.description } : {}),
+    });
+  }
+
   /** @returns {Promise<PinterestUser>} */
   async getUserAccount() {
     return this._callApi('GET', '/v5/user_account', null);

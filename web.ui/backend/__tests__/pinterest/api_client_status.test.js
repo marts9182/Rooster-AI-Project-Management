@@ -59,3 +59,21 @@ describe('getLiveStatus', () => {
     expect(called).toBe(false);
   });
 });
+
+describe('createBoard', () => {
+  it('POSTs /v5/boards with name + privacy and returns the board', async () => {
+    writeToken(new Date(Date.now() + 3600_000).toISOString());
+    let captured;
+    const fetchFn = async (url, init) => {
+      captured = { url, method: init.method, body: JSON.parse(init.body) };
+      return new Response(JSON.stringify({ id: '999', name: init.body && JSON.parse(init.body).name }),
+        { status: 201 });
+    };
+    const board = await client(fetchFn).createBoard('Large-Print Sudoku');
+    expect(captured.method).toBe('POST');
+    expect(captured.url).toMatch(/\/v5\/boards$/);
+    expect(captured.body.name).toBe('Large-Print Sudoku');
+    expect(captured.body.privacy).toBe('PUBLIC');
+    expect(board.id).toBe('999');
+  });
+});
