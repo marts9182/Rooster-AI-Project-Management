@@ -110,7 +110,7 @@ is `kdp_book_id` becomes a generic `(source, source_id)` pair.
 
 ### 2.2 Schema migration
 
-`migrations/0006_pinterest_multi_source.sql`:
+`migrations/0008_pinterest_multi_source.sql` (0006/0007 already exist):
 
 ```sql
 ALTER TABLE pinterest_queue   ADD COLUMN source TEXT NOT NULL DEFAULT 'kdp';
