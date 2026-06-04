@@ -35,12 +35,24 @@
  * Reminders in 'dismissed' or 'fired' status are excluded — the calendar
  * only surfaces pending action items.
  *
+ * Roadmap rows that are 'published' are kept only while they are still
+ * upcoming: a published row's release/lock event shows only if that event's
+ * own date is >= `today`. Once a published book's date has passed it drops
+ * off (forward-only declutter); a published-but-future row (e.g. a KDP
+ * scheduled release) stays visible because it still hasn't gone live.
+ *
  * @param {import('better-sqlite3').Database} db
  * @param {string} from
  * @param {string} to
+ * @param {string} [today]   ISO yyyy-mm-dd; defaults to the system date.
  * @returns {CalendarEvent[]}
  */
-export function aggregateCalendarEvents(db, from, to) {
+export function aggregateCalendarEvents(
+  db,
+  from,
+  to,
+  today = new Date().toISOString().slice(0, 10),
+) {
   /** @type {CalendarEvent[]} */
   const out = [];
 
@@ -148,7 +160,7 @@ export function aggregateCalendarEvents(db, from, to) {
       .prepare(
         `SELECT id, kind, slug, title, target_release_date, file_lock_date, status
            FROM publishing_roadmap
-          WHERE status NOT IN ('skipped', 'published')
+          WHERE status != 'skipped'
             AND (
                   (target_release_date >= ? AND target_release_date < ?)
                OR (file_lock_date IS NOT NULL AND file_lock_date >= ? AND file_lock_date < ?)
@@ -158,7 +170,15 @@ export function aggregateCalendarEvents(db, from, to) {
   );
   for (const r of roadmapRows) {
     const kindUpper = r.kind.toUpperCase();
-    if (r.target_release_date >= from && r.target_release_date < to) {
+    // A published row is forward-only: keep an event only while its own date
+    // is still upcoming. Non-published rows (planned, etc.) always show.
+    const keepIfPublished = (eventDate) =>
+      r.status !== 'published' || eventDate >= today;
+    if (
+      r.target_release_date >= from &&
+      r.target_release_date < to &&
+      keepIfPublished(r.target_release_date)
+    ) {
       out.push({
         date: r.target_release_date,
         kind: 'roadmap.release',
@@ -168,7 +188,12 @@ export function aggregateCalendarEvents(db, from, to) {
         url: '/calendar',
       });
     }
-    if (r.file_lock_date && r.file_lock_date >= from && r.file_lock_date < to) {
+    if (
+      r.file_lock_date &&
+      r.file_lock_date >= from &&
+      r.file_lock_date < to &&
+      keepIfPublished(r.file_lock_date)
+    ) {
       out.push({
         date: r.file_lock_date,
         kind: 'roadmap.lock',

@@ -200,14 +200,30 @@ describe('aggregateCalendarEvents — publishing_roadmap', () => {
     expect(events.filter((e) => e.kind.startsWith('roadmap.'))).toHaveLength(0);
   });
 
-  it('excludes published rows (forward-only calendar)', () => {
+  it('excludes published rows whose release date has already passed', () => {
     seedRoadmap({
       kind: 'kdp', slug: 'foo', title: 'Foo',
       target_release_date: '2026-09-15', status: 'published', source: 'reuse',
       file_lock_date: '2026-08-31',
     });
-    const events = aggregateCalendarEvents(db, '2026-08-01', '2026-10-01');
+    // today is after both dates → book has shipped, declutter it off the calendar
+    const events = aggregateCalendarEvents(db, '2026-08-01', '2026-10-01', '2026-10-01');
     expect(events.filter((e) => e.kind.startsWith('roadmap.'))).toHaveLength(0);
+  });
+
+  it('keeps the release event for a published row that has not released yet', () => {
+    seedRoadmap({
+      kind: 'kdp', slug: 'foo', title: 'Foo',
+      target_release_date: '2026-09-15', status: 'published', source: 'reuse',
+      file_lock_date: '2026-08-31',
+    });
+    // today is before the release date → still upcoming, must stay on the calendar
+    const events = aggregateCalendarEvents(db, '2026-08-01', '2026-10-01', '2026-09-01');
+    const release = events.find((e) => e.kind === 'roadmap.release');
+    expect(release).toBeTruthy();
+    expect(release.date).toBe('2026-09-15');
+    // its lock date (2026-08-31) is already in the past → that event stays hidden
+    expect(events.find((e) => e.kind === 'roadmap.lock')).toBeUndefined();
   });
 
   it('omits lock event when file_lock_date falls outside the [from,to) window', () => {
