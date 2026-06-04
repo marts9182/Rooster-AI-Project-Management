@@ -11,12 +11,15 @@
  *   GET  /api/pinterest/boards             — apiClient.listBoards()
  *   GET  /api/pinterest/token-status       — apiClient.getLiveStatus()
  *   POST /api/pinterest/refresh            — apiClient._forceRefresh() then getTokenStatus()
+ *   POST /api/pinterest/boards/sync        — ensureBoards() + persist niche→board_id map
+ *   POST /api/pinterest/post-now           — force-post one pending/paused row immediately
  *
  * SSE events emitted on state changes:
  *   - pinterest:paused
  *   - pinterest:resumed
  *   - pinterest:queue-row-cancelled
  *   - pinterest:queue-row-updated
+ *   - pinterest:boards-synced
  *
  * @module pinterest/routes
  */
@@ -32,8 +35,11 @@ import {
   resumeQueue,
   cancelQueueRow,
   updateQueueRow,
+  markPosted,
+  markFailed,
 } from './queue.js';
 import { cadenceBuckets, engagementRows } from './analytics.js';
+import { ensureBoards } from './boards.js';
 
 /**
  * Build the Pinterest router. The apiClient is required only for the
@@ -204,6 +210,51 @@ export function buildRouter(opts = {}) {
       topup_last_run: lastRun,
       topup_next_run: nextRun,
     });
+  });
+
+  // --- Ops routes -----------------------------------------------------------
+
+  router.post('/boards/sync', async (_req, res) => {
+    if (!apiClient) return res.status(503).json({ error: 'api_client_unavailable' });
+    try {
+      const mapPath = process.env.PINTEREST_BOARDS_MAP_PATH || undefined;
+      const map = await ensureBoards(apiClient, mapPath ? { mapPath } : {});
+      recordEvent('pinterest:boards-synced', { count: Object.keys(map).length });
+      res.json({ map });
+    } catch (err) {
+      res.status(500).json({ error: err?.message || String(err) });
+    }
+  });
+
+  // Ops-only: force-post one pending/paused row immediately, bypassing the
+  // scheduler. Used to verify the very first real post end-to-end.
+  router.post('/post-now', async (req, res) => {
+    if (!apiClient) return res.status(503).json({ error: 'api_client_unavailable' });
+    const id = Number(req.query.queue_id);
+    if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ error: 'bad_queue_id' });
+    const row = getQueueRow(id);
+    if (!row) return res.status(404).json({ error: 'not_found' });
+    if (!['pending', 'paused'].includes(row.status)) {
+      return res.status(409).json({ error: `row is '${row.status}', not postable` });
+    }
+    try {
+      const boardId = (row.board_id && String(row.board_id).trim())
+        ? String(row.board_id).trim()
+        : (process.env.PINTEREST_DEFAULT_BOARD_ID || '').trim();
+      if (!boardId) return res.status(400).json({ error: 'no_board' });
+      const result = await apiClient.createPin({
+        board_id: boardId,
+        title: row.title,
+        description: row.description,
+        link: row.link_url,
+        imagePath: row.image_path,
+      });
+      markPosted(id, result.id);
+      res.json({ ok: true, pinterest_pin_id: result.id });
+    } catch (err) {
+      markFailed(id, err?.message || String(err));
+      res.status(502).json({ error: err?.message || String(err) });
+    }
   });
 
   return router;
