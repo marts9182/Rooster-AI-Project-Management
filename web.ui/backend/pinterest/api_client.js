@@ -267,17 +267,7 @@ export class PinterestApiClient {
         error: null,
       };
     } catch (err) {
-      // Surface "401" in the error message when the underlying failure is an
-      // authentication error — either a PinterestApiError with status 401, or
-      // the oauth layer's "refresh token expired" error (which is also a 401
-      // from Pinterest's token endpoint).
-      const status = err && typeof err === 'object' && 'status' in err ? err.status : null;
-      const raw = err?.message ?? String(err);
-      const isAuthError =
-        status === 401 ||
-        /refresh token expired|re-auth required/i.test(raw);
-      const message = isAuthError && !/401/.test(raw) ? `401 ${raw}` : raw;
-      return { ...base, live_ok: false, identity: null, error: message };
+      return { ...base, live_ok: false, identity: null, error: err?.message ?? String(err) };
     }
   }
 }
