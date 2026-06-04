@@ -267,7 +267,18 @@ export class PinterestApiClient {
         error: null,
       };
     } catch (err) {
-      return { ...base, live_ok: false, identity: null, error: err?.message ?? String(err) };
+      // A 401 from the API makes _callApi force a token refresh and retry; when
+      // that refresh also fails, api_oauth.js throws a plain Error ("Pinterest
+      // refresh token expired — re-auth required") that names neither "401" nor
+      // "Authentication". Normalize that one case so callers can detect auth
+      // failures uniformly. (TODO: throw PinterestApiError(status:401) from
+      // api_oauth.js to make this unnecessary.)
+      const raw = err?.message ?? String(err);
+      const isAuthError =
+        (err?.status ?? null) === 401 ||
+        /refresh token expired|re-auth required/i.test(raw);
+      const error = isAuthError && !/401/.test(raw) ? `401 ${raw}` : raw;
+      return { ...base, live_ok: false, identity: null, error };
     }
   }
 }
