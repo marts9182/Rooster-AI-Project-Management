@@ -70,8 +70,10 @@ function resolveBoardId() {
  * @returns {Promise<RunOnceResult>}
  */
 export async function runOnce(input = {}) {
-  // 1) Board-id gate — if no board is resolvable, do NOT dequeue or fail
-  //    any row. The row stays pending until the user configures one.
+  // 1) Board-id gate — if no board is resolvable from env, do NOT dequeue or
+  //    fail any row. The row stays pending until the user configures one.
+  //    (Per-row board_id can override the env value after dequeue, but rows
+  //    without a board_id of their own still need the env default.)
   const boardId = resolveBoardId();
   if (!boardId) {
     setWorkerError(WORKER_NAME, 'no_default_board');
@@ -87,6 +89,11 @@ export async function runOnce(input = {}) {
     return { action: 'idle', posted: false, reason: 'no_due_row' };
   }
 
+  // 2b) Per-row board_id takes precedence; env default is the fallback.
+  const resolvedBoardId = (row.board_id && String(row.board_id).trim())
+    ? String(row.board_id).trim()
+    : boardId;
+
   // 3) Pre-flight: image must exist on disk.
   if (!fs.existsSync(row.image_path)) {
     const msg = `image_path missing: ${row.image_path}`;
@@ -98,7 +105,7 @@ export async function runOnce(input = {}) {
   // 4) Call the API.
   try {
     const result = await apiClient.createPin({
-      board_id: boardId,
+      board_id: resolvedBoardId,
       title: row.title,
       description: row.description,
       link: row.link_url,

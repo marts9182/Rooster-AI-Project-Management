@@ -280,6 +280,39 @@ describe('msUntilNextPending', () => {
   });
 });
 
+describe('runOnce — per-row board_id takes precedence over env default', () => {
+  it('uses row.board_id instead of PINTEREST_DEFAULT_BOARD_ID when the row has a non-empty board_id', async () => {
+    const img = path.join(tmpRoot, 'pin-row-board.png');
+    await fakeImage(img);
+    // Seed a row with board_id = 'board-XYZ', env default is 'env-default'.
+    process.env.PINTEREST_DEFAULT_BOARD_ID = 'env-default';
+    const db = openDb();
+    const past = new Date(Date.now() - 60_000).toISOString();
+    const info = db
+      .prepare(
+        `INSERT INTO pinterest_queue
+          (kdp_book_id, pin_type, image_path, title, description, link_url, status, scheduled_for, board_id)
+         VALUES (NULL, 'cover_hero', ?, 'T', 'D', 'http://amazon.com/dp/X', 'pending', ?, 'board-XYZ')`,
+      )
+      .run(img, past);
+    const rowId = Number(info.lastInsertRowid);
+
+    const api = fakeApiClient({
+      createPin: vi.fn(async () => ({ id: 'PIN_row_board' })),
+    });
+
+    const result = await runOnce({ apiClient: api });
+
+    expect(result.action).toBe('posted');
+    expect(result.posted).toBe(true);
+    expect(result.queueId).toBe(rowId);
+    // The row's board_id must win — NOT the env default 'env-default'.
+    expect(api.createPin).toHaveBeenCalledWith(
+      expect.objectContaining({ board_id: 'board-XYZ' }),
+    );
+  });
+});
+
 describe('startPosterWorker', () => {
   it('does NOT start the interval when PINTEREST_DEFAULT_BOARD_ID is missing (sets worker error instead)', async () => {
     delete process.env.PINTEREST_DEFAULT_BOARD_ID;
