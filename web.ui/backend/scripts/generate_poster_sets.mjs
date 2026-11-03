@@ -29,7 +29,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import { ImageGenerationService } from '../agents/ImageGenerationService.js';
+import { ImageGenerationService } from '../ImageGenerationService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
